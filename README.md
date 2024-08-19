@@ -25,7 +25,7 @@ PROCESS TO ADD AND RUN THIS PROJECT IN LOCAL
 
 2.npm i 
 
-3.add .env folder main location
+3.add .env file main location
 
 4.npm run dev-backend
 
