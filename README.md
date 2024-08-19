@@ -10,15 +10,23 @@ OBJECTIVE -
 
 
 BACKEND  - NODE
+
 FRONTEND - REACT
+
 DATABASE - POSTGRES
+
+
 
 --------------------------------------------
 PROCESS TO ADD AND RUN THIS PROJECT IN LOCAL
 ---------------------------------------------
 
 1.git clone
+
 2.npm i 
+
 3.add .env folder main location
+
 4.npm run dev-backend
+
 5.npm run dev-frontend
