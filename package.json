@@ -1,0 +1,35 @@
+{
+  "name": "waste-food-management-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-redis": "redis-server",
+    "dev-frontend": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && npm run dev",
+    "dev-backend": "nodemon backend/src/server.js",
+    "build": "npm-run-all -s build-frontend build-backend-prod",
+    "build-frontend": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && cd .. && npm install & npm install --prefix frontend & npm run build --prefix frontend",
+    "build-backend-prod": "npm install && webpack --config webpack.production.config.js --mode production",
+    "build-backend-dev": "npm install &&webpack --config webpack.development.config.js --mode development",
+    "start-backend-prod": "node ./dist/backend/main.js",
+    "start-frontend": "cd frontend && npm run preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "path": "^0.12.7",
+    "pg": "^8.12.0",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
