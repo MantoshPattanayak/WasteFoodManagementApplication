@@ -6,13 +6,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-#vite.config.js
+
 node_modules
 dist
 dist-ssr
 *.local
-.env
-accesslog
 
 # Editor directories and files
 .vscode/*
@@ -24,4 +22,3 @@ accesslog
 *.njsproj
 *.sln
 *.sw?
-.env
