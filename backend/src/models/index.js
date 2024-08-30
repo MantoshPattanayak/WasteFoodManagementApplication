@@ -27,9 +27,13 @@ db1.sequelize = sequelize;
 db1.DataTypes = DataTypes;
 db1.QueryTypes = QueryTypes;
 
+// import all table models
+db1.users = require("./users.model")(sequelize, DataTypes)
+db1.foodListings = require("./foodListings.model")(sequelize, DataTypes)
+db1.foodListingItems = require("./foodListingItems.model")(sequelize, DataTypes)
 
-// db1.hosteventbookings.sync({
-//   alter:false,
-// });
+db1.foodListings.sync({
+  alter:true,
+});
 
 module.exports = db1;

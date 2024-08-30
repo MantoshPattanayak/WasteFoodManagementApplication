@@ -7,12 +7,11 @@
     "start-redis": "redis-server",
     "dev-frontend": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && npm run dev",
     "dev-backend": "nodemon backend/src/server.js",
-    "build": "npm-run-all -s build-frontend build-backend-prod",
-    "build-frontend": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && cd .. && npm install & npm install --prefix frontend & npm run build --prefix frontend",
-    "build-backend-prod": "npm install && webpack --config webpack.production.config.js --mode production",
-    "build-backend-dev": "npm install &&webpack --config webpack.development.config.js --mode development",
-    "start-backend-prod": "node ./dist/backend/main.js",
-    "start-frontend": "cd frontend && npm run preview"
+    "build": "npm-run-all -s build-frontend-soulshare build-backend-soulshare",
+    "build-frontend-soulshare": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && cd .. && npm install & npm install --prefix frontend & npm run build --prefix frontend",
+    "build-backend-soulshare": "npm install && webpack --config webpack.production.config.js --mode production",
+    "start-backend-soulshare": "node ./dist/backend/main.js",
+    "start-frontend-soulshare": "cd frontend && npm run preview"
   },
   "keywords": [],
   "author": "",
