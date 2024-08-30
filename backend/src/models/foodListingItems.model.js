@@ -1,0 +1,54 @@
+module.exports = (sequelize, DataTypes) => {
+    const foodListings = sequelize.define("foodListingItems", {
+        foodListingItemId: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        foodName: {
+            type: DataTypes.STRING(150),
+        },
+        foodType: {
+            type: DataTypes.INTEGER,
+        },
+        quantity: {
+            type: DataTypes.INTEGER,
+        },
+        unit: {
+            type: DataTypes.STRING(30),
+        },
+        expirationDate: {
+            type: DataTypes.DATE,
+        },
+        description: {
+            type: DataTypes.STRING(200),
+        },
+        createdBy: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'users', // references the same table
+                key: 'userId',
+            },
+            allowNull: false,
+        },
+        updatedBy: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'users', // references the same table
+                key: 'userId',
+            },
+        },
+        createdOn: {
+            type: DataTypes.DATE,
+            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+        updatedOn: {
+            type: DataTypes.DATE,
+            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+    }, {
+        schema: "soulshare",
+        timestamps: false //disable Sequelize's automatic timestamps
+    })
+    return foodListings;
+}
