@@ -10,7 +10,9 @@ const statusCode = require("./utils/statusCode");
 
 
 //------------------------------------------path all files-----------------------------------------------------//
-const authRoutes = require("./routes/api/" + api_version + "/auth/user");
+const authRoutes = require("./routes/api/" + api_version + "/auth/user.routes");
+const foodsRoutes = require("./routes/api/" + api_version + "/foods/foods.routes");
+const notificationRoutes = require("./routes/api/" + api_version + "/notifications/notifications.routes");
 //-------------------------------------------------------------------------------------------------------------//
 
 
@@ -30,7 +32,7 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use((err,req,res,next)=>{
+app.use((err, req, res, next)=>{
   if(err){
     res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message:"something went wrong"
@@ -42,6 +44,8 @@ app.use((err,req,res,next)=>{
 
 //-------------------------------------------define router-----------------------------------------------------//
 app.use("/auth", authRoutes);
+app.use("/food", foodsRoutes);
+app.use("/notification", notificationRoutes);
 //-------------------------------------------------------------------------------------------------------------//
 
 
