@@ -1,20 +1,18 @@
 module.exports = (sequelize, DataTypes) => {
-    const foodListings = sequelize.define("foodListings", {
-        foodListingId: {
+    const rolePermissions = sequelize.define("rolePermissions", {
+        roleId: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        userId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
             references: {
-                model: "users", //foreign key ref to users.userId
-                key: "userId"
+                model: "roles",
+                key: "roleId"
             }
         },
-        receiverId: {   // if chartity org or individual selected
+        permissionId: {
             type: DataTypes.INTEGER,
+            references: {
+                model: "permissions",
+                key: "permissionId"
+            }
         },
         statusId: {
             type: DataTypes.INTEGER,
@@ -44,7 +42,12 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         schema: "soulshare",
-        timestamps: false //disable Sequelize's automatic timestamps
-    })
-    return foodListings;
+        timestamps: false,
+        uniqueKeys: {
+            role_permission_unique: {
+                fields: ['roleId', 'permissionId']
+            }
+        }
+    });
+    return rolePermissions;
 }

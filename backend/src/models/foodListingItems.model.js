@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const foodListings = sequelize.define("foodListingItems", {
+    const foodListingItems = sequelize.define("foodListingItems", {
         foodListingItemId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -8,8 +8,12 @@ module.exports = (sequelize, DataTypes) => {
         foodName: {
             type: DataTypes.STRING(150),
         },
-        foodType: {
+        foodCategory: {
             type: DataTypes.INTEGER,
+            references: {
+                model: "foodCategories",
+                key: "foodCategoryId"
+            }
         },
         quantity: {
             type: DataTypes.INTEGER,
@@ -22,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         description: {
             type: DataTypes.STRING(200),
+        },
+        statusId: {
+            type: DataTypes.INTEGER,
         },
         createdBy: {
             type: DataTypes.INTEGER,
@@ -50,5 +57,5 @@ module.exports = (sequelize, DataTypes) => {
         schema: "soulshare",
         timestamps: false //disable Sequelize's automatic timestamps
     })
-    return foodListings;
+    return foodListingItems;
 }

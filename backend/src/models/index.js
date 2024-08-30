@@ -31,9 +31,20 @@ db1.QueryTypes = QueryTypes;
 db1.users = require("./users.model")(sequelize, DataTypes)
 db1.foodListings = require("./foodListings.model")(sequelize, DataTypes)
 db1.foodListingItems = require("./foodListingItems.model")(sequelize, DataTypes)
+db1.foodCategories = require("./foodCategories.model")(sequelize, DataTypes)
+db1.fileTypes = require("./fileTypes.model")(sequelize, DataTypes)
+db1.entityTypes = require("./entityTypes.model")(sequelize, DataTypes)
+db1.files = require("./files.model")(sequelize, DataTypes)
+db1.fileAttachments = require("./fileAttachments.model")(sequelize, DataTypes)
+db1.ratings = require("./ratings.model")(sequelize, DataTypes)
+db1.notifications = require("./notifications.model")(sequelize, DataTypes)
+db1.roles = require("./roles.model")(sequelize, DataTypes)
+db1.permissions = require("./permissions.model")(sequelize, DataTypes)
+db1.rolePermissions = require("./rolePermissions.model")(sequelize, DataTypes)
 
-db1.foodListings.sync({
-  alter:true,
+
+db1.rolePermissions.sync({
+  alter: true,
 });
 
 module.exports = db1;
