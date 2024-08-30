@@ -1,20 +1,27 @@
 module.exports = (sequelize, DataTypes) => {
-    const foodListings = sequelize.define("foodListings", {
-        foodListingId: {
+    const ratings = sequelize.define("ratings", {
+        ratingId: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             autoIncrement: true,
+            primaryKey: true,
         },
-        userId: {
+        entityId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        entityType: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: "users", //foreign key ref to users.userId
-                key: "userId"
+                model: "entityTypes",
+                key: "entityTypeId"
             }
         },
-        receiverId: {   // if chartity org or individual selected
+        rating: {
             type: DataTypes.INTEGER,
+        },
+        comment: {
+            type: DataTypes.STRING(200),
         },
         statusId: {
             type: DataTypes.INTEGER,
@@ -44,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         schema: "soulshare",
-        timestamps: false //disable Sequelize's automatic timestamps
-    })
-    return foodListings;
+        timestamps: false
+    });
+    return ratings;
 }

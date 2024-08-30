@@ -1,23 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
-    const foodListings = sequelize.define("foodListings", {
-        foodListingId: {
+    const foodCategories = sequelize.define("foodCategories", {
+        foodCategoryId: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             autoIncrement: true,
+            primaryKey: true,
         },
-        userId: {
-            type: DataTypes.INTEGER,
+        foodCategoryName: {
+            type: DataTypes.STRING(50),
             allowNull: false,
-            references: {
-                model: "users", //foreign key ref to users.userId
-                key: "userId"
-            }
-        },
-        receiverId: {   // if chartity org or individual selected
-            type: DataTypes.INTEGER,
-        },
-        statusId: {
-            type: DataTypes.INTEGER,
         },
         createdBy: {
             type: DataTypes.INTEGER,
@@ -46,5 +36,5 @@ module.exports = (sequelize, DataTypes) => {
         schema: "soulshare",
         timestamps: false //disable Sequelize's automatic timestamps
     })
-    return foodListings;
+    return foodCategories;
 }

@@ -1,20 +1,22 @@
 module.exports = (sequelize, DataTypes) => {
-    const foodListings = sequelize.define("foodListings", {
-        foodListingId: {
+    const fileAttachments = sequelize.define("fileAttachments", {
+        fileAttachmentId: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             autoIncrement: true,
+            primaryKey: true,
         },
-        userId: {
+        fileName: {
+            type: DataTypes.STRING(50),
+        },
+        fileType: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             references: {
-                model: "users", //foreign key ref to users.userId
-                key: "userId"
+                model: "fileTypes",
+                key: "fileTypeId"
             }
         },
-        receiverId: {   // if chartity org or individual selected
-            type: DataTypes.INTEGER,
+        url: {
+            type: DataTypes.STRING(100),
         },
         statusId: {
             type: DataTypes.INTEGER,
@@ -46,5 +48,5 @@ module.exports = (sequelize, DataTypes) => {
         schema: "soulshare",
         timestamps: false //disable Sequelize's automatic timestamps
     })
-    return foodListings;
+    return fileAttachments;
 }
