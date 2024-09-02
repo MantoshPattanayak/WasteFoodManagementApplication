@@ -6,8 +6,11 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
         },
         foodCategoryName: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(80),
             allowNull: false,
+        },
+        foodSubCategoryName: {
+            type: DataTypes.STRING(80),
         },
         createdBy: {
             type: DataTypes.INTEGER,

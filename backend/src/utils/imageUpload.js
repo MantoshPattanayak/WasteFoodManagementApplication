@@ -1,8 +1,9 @@
-let fs = require('fs')
-const db = require('../models')
-const file = db.file;
-const fileAttachment = db.fileattachment
-const path = require('path')
+let fs = require('fs');
+const db = require('../models');
+const file = db.files;
+const fileAttachment = db.fileAttachments
+const path = require('path');
+
 let  imageUpload = async (imageData,entityType,subDir,filePurpose,insertionData,userId,errors, serialNumber,transaction)=>{
     // e.g.  sub dir = "facility Images"
     // insertionData is the object whose work is to give the data in the format {id:2, name:'US'}
