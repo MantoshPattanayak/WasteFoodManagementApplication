@@ -8,7 +8,7 @@ router.post("/addFoodDonationRequest", authenticateToken, foodsController.addFoo
 
 router.post("/viewFoodDonationList", authenticateToken, foodsController.viewFoodDonationList);
 
-router.get("/viewFoodDonationById/:id", authenticateToken, foods.viewFoodDonationById);
+router.get("/viewFoodDonationById/:id", authenticateToken, foodsController.viewFoodDonationById);
 
 router.put("/acceptFoodDonation", authenticateToken, foodsController.acceptFoodDonation);
 
