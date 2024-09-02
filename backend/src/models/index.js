@@ -43,8 +43,8 @@ db1.permissions = require("./permissions.model")(sequelize, DataTypes)
 db1.rolePermissions = require("./rolePermissions.model")(sequelize, DataTypes)
 
 
-db1.rolePermissions.sync({
-  alter: false,
+db1.foodListingItems.sync({
+  alter: true,
 });
 
 module.exports = db1;

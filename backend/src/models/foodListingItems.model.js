@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true,
         },
+        foodListingId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         foodName: {
             type: DataTypes.STRING(150),
         },
