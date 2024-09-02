@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
         entityType: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: "entityTypes",
-                key: "entityTypeId"
-            }
+            // references: {
+            //     model: "entityTypes",
+            //     key: "entityTypeId"
+            // }
         },
         message: {
             type: DataTypes.STRING(250),
@@ -29,18 +29,18 @@ module.exports = (sequelize, DataTypes) => {
         },
         createdBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
             allowNull: false,
         },
         updatedBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
         },
         createdOn: {
             type: DataTypes.DATE,

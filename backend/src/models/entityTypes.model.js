@@ -13,18 +13,18 @@ module.exports = (sequelize, DataTypes) => {
         },
         createdBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
             allowNull: false,
         },
         updatedBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
         },
         createdOn: {
             type: DataTypes.DATE,

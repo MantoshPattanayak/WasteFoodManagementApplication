@@ -2,35 +2,35 @@ module.exports = (sequelize, DataTypes) => {
     const rolePermissions = sequelize.define("rolePermissions", {
         roleId: {
             type: DataTypes.INTEGER,
-            references: {
-                model: "roles",
-                key: "roleId"
-            }
+            // references: {
+            //     model: "roles",
+            //     key: "roleId"
+            // }
         },
         permissionId: {
             type: DataTypes.INTEGER,
-            references: {
-                model: "permissions",
-                key: "permissionId"
-            }
+            // references: {
+            //     model: "permissions",
+            //     key: "permissionId"
+            // }
         },
         statusId: {
             type: DataTypes.INTEGER,
         },
         createdBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
             allowNull: false,
         },
         updatedBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
         },
         createdOn: {
             type: DataTypes.DATE,

@@ -5,26 +5,29 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true,
         },
+        fileTypeExtension: {
+            type: DataTypes.STRING(20),
+        },
         fileTypeName: {
-            type: DataTypes.STRING(30)
+            type: DataTypes.STRING(30),
         },
         statusId: {
             type: DataTypes.INTEGER,
         },
         createdBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
             allowNull: false,
         },
         updatedBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
         },
         createdOn: {
             type: DataTypes.DATE,

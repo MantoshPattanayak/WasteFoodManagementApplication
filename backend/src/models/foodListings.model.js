@@ -8,10 +8,10 @@ module.exports = (sequelize, DataTypes) => {
         userId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: "users", //foreign key ref to users.userId
-                key: "userId"
-            }
+            // references: {
+            //     model: "users", //foreign key ref to users.userId
+            //     key: "userId"
+            // }
         },
         receiverId: {   // if chartity org or individual selected
             type: DataTypes.INTEGER,
@@ -21,18 +21,18 @@ module.exports = (sequelize, DataTypes) => {
         },
         createdBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
             allowNull: false,
         },
         updatedBy: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'users', // references the same table
-                key: 'userId',
-            },
+            // references: {
+            //     model: 'users', // references the same table
+            //     key: 'userId',
+            // },
         },
         createdOn: {
             type: DataTypes.DATE,
