@@ -49,7 +49,28 @@ function validateTimeFormat(timeString) {
     return isValid;
 }
 
+/**
+ * function to current formate date as DDMMYYYYHHMMSSMS
+ * @returns formattedDate
+ */
+function formatDateToDDMMYYYYHHMMSSMS() {
+    const now = new Date();
+    // Extract individual date and time components
+    const day = String(now.getDate()).padStart(2, '0'); // Day (2 digits)
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Month (2 digits, 0-indexed)
+    const year = now.getFullYear(); // Year (4 digits)
+    const hours = String(now.getHours()).padStart(2, '0'); // Hours (2 digits)
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Minutes (2 digits)
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Seconds (2 digits)
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0'); // Milliseconds (3 digits)
+  
+    // Combine components into the desired format
+    const formattedDate = `${day}${month}${year}${hours}${minutes}${seconds}${milliseconds}`;
+    return formattedDate;
+  }
+
 module.exports ={
     validateAndConvertDate
     ,validateTimeFormat
+    ,formatDateToDDMMYYYYHHMMSSMS
 }
