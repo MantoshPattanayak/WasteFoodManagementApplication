@@ -41,9 +41,9 @@ db1.notifications = require("./notifications.model")(sequelize, DataTypes)
 db1.roles = require("./roles.model")(sequelize, DataTypes)
 db1.permissions = require("./permissions.model")(sequelize, DataTypes)
 db1.rolePermissions = require("./rolePermissions.model")(sequelize, DataTypes)
+db1.statusMaster = require("./statusMaster.model")(sequelize, DataTypes)
 
-
-db1.fileAttachments.sync({
+db1.statusMaster.sync({
   alter: false,
 });
 
