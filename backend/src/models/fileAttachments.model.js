@@ -5,6 +5,13 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             primaryKey: true,
         },
+        fileId: {
+            type: DataTypes.INTEGER,
+            // references: {
+            //     model: "files",
+            //     key: "fileId"
+            // }
+        },
         fileName: {
             type: DataTypes.STRING(50),
         },
