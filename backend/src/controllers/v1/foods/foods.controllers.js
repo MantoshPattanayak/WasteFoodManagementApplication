@@ -123,7 +123,7 @@ let viewFoodDonationList = async (req, res) => {
             select
                 u."userId", u."name", u."phoneNumber",
                 TO_CHAR(
-                    u."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
+                    fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
                 ) as createdOn,
                 u.latitude, u.longitude, count(fli."foodListingItemId") as totalItems 
@@ -229,10 +229,49 @@ let viewFoodDonationList = async (req, res) => {
 
 let viewFoodDonationById = async (req, res) => {
     try {
-
+        let foodListingId = req.params.id;
+        let foodDonationListQuery = `
+            select
+                fl."foodListingId", fli."foodListingItemId", fli."foodName", fli."foodCategory", fc."foodCategoryName", fli.quantity, fli.unit, u2."unitName",
+                CASE
+                    when fli."expirationDate" is null then null
+                    else TO_CHAR(fli."expirationDate"AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS')
+                    end as expirationDate, fli."statusId", sm.description, u."userId", u."name", u."phoneNumber",
+                TO_CHAR(
+                    fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
+                    'YYYY-MM-DD"T"HH24:MI:SS.MS'
+                ) as createdOn, u.latitude, u.longitude
+            from soulshare."foodListings" fl
+            inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
+            inner join soulshare."foodCategories" fc on fli."foodCategory" = fc."foodCategoryId"
+            inner join soulshare.units u2 on u2."unitId" = fli.unit
+            inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
+            inner join soulshare.users u on u."userId" = fl."userId"
+            where fl."foodListingId" = :foodListingId
+        `;
+        let fetchFoodListingDetails = await sequelize.query(foodDonationListQuery, {
+            replacements: {
+                foodListingId: foodListingId
+            },
+            type: Sequelize.QueryTypes.SELECT
+        });
+        
+        if (fetchFoodListingDetails.length > 0) {
+            return res.status(statusCode.SUCCESS.code).json({
+                message: "Food donation details",
+                fetchFoodListingDetails
+            })
+        }
+        else {
+            return res.status(statusCode.NOTFOUND.code).json({
+                message: "Food donation details not found",
+            });
+        }
     }
     catch (error) {
-
+        res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: error.message
+        })
     }
 }
 

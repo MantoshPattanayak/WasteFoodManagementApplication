@@ -42,9 +42,10 @@ db1.roles = require("./roles.model")(sequelize, DataTypes)
 db1.permissions = require("./permissions.model")(sequelize, DataTypes)
 db1.rolePermissions = require("./rolePermissions.model")(sequelize, DataTypes)
 db1.statusMaster = require("./statusMaster.model")(sequelize, DataTypes)
+db1.units = require("./units.model")(sequelize, DataTypes)
 
-db1.statusMaster.sync({
-  alter: false,
+db1.foodListingItems.sync({
+  alter: true,
 });
 
 module.exports = db1;
