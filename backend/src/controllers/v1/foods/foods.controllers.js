@@ -106,9 +106,18 @@ let viewFoodDonationList = async (req, res) => {
         let page = page_number || 1;
         let offset = (page - 1) * limit;
         let isDate = validateAndConvertDate(givenReq).isValid;
-        givenReq ?
-            isDate ?
-                validateAndConvertDate(givenReq).data : givenReq.toLowerCase() : null;
+        console.log("isDate", isDate);
+        if (givenReq) {
+            if (isDate) {
+                givenReq = validateAndConvertDate(givenReq).data;
+            }
+            else {
+                givenReq = givenReq.toLowerCase();
+            }
+        }
+        else {
+            givenReq = null;
+        }
         console.log({ page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq });
         let foodDonationListQuery = `
             select
@@ -170,12 +179,19 @@ let viewFoodDonationList = async (req, res) => {
         }
         if (distanceRange) {    // filter records whose distance falls within user provided range(kms)
             console.log("distanceRange filter");
-            foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
-                let distance = calculateDistance(userLatitude, userLongitude, food.latitude, food.longitude);
-                food.distance = distance;
-                if (distance <= distanceRange)
-                    return food;
-            });
+            if (!userLatitude || !userLongitude) {
+                return res.status(statusCode.BAD_REQUEST.code).json({
+                    message: "Please provide location access."
+                })
+            }
+            else {
+                foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
+                    let distance = calculateDistance(userLatitude, userLongitude, food.latitude, food.longitude);
+                    food.distance = distance;
+                    if (distance <= distanceRange)
+                        return food;
+                });
+            }
         }
         if (foodType) {     // filter records according to food type selected
             console.log("foodType filter");
@@ -184,14 +200,6 @@ let viewFoodDonationList = async (req, res) => {
             })
         }
 
-        /**
-         * u."userId", u."name", u."phoneNumber",
-                TO_CHAR(
-                    u."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
-                    'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as createdOn,
-                u.latitude, u.longitude, count(fli."foodListingItemId") as totalItems 
-         */
         if (givenReq) {
             foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
                 console.log("givenReq", givenReq, isDate);
@@ -200,7 +208,8 @@ let viewFoodDonationList = async (req, res) => {
                     return food.createdon?.toString().includes(givenReq);
                 }
                 else {
-                    return food.name?.toLowerCase().includes(givenReq);
+                    return food.name?.toLowerCase().includes(givenReq) ||
+                    food.createdon?.toString().includes(givenReq);
                 }
             })
         }
@@ -209,12 +218,12 @@ let viewFoodDonationList = async (req, res) => {
         res.status(statusCode.SUCCESS.code).json({
             message: "view food donation list",
             foodDonationData
-        })
+        });
     }
     catch (error) {
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
-        })
+        });
     }
 }
 
