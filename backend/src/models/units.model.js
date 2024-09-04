@@ -1,35 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
-    const foodListingItems = sequelize.define("foodListingItems", {
-        foodListingItemId: {
+    const units = sequelize.define("units", {
+        unitId: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             autoIncrement: true,
+            primaryKey: true,
         },
-        foodListingId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
+        unitName: {
+            type: DataTypes.STRING(20),
         },
-        foodName: {
-            type: DataTypes.STRING(150),
-        },
-        foodCategory: {
-            type: DataTypes.INTEGER,
-            // references: {
-            //     model: "foodCategories",
-            //     key: "foodCategoryId"
-            // }
-        },
-        quantity: {
-            type: DataTypes.INTEGER,
-        },
-        unit: {
-            type: DataTypes.INTEGER,
-        },
-        expirationDate: {
-            type: DataTypes.DATE,
-        },
-        description: {
-            type: DataTypes.STRING(200),
+        unitDescription: {
+            type: DataTypes.STRING(100),
         },
         statusId: {
             type: DataTypes.INTEGER,
@@ -60,6 +40,6 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         schema: "soulshare",
         timestamps: false //disable Sequelize's automatic timestamps
-    })
-    return foodListingItems;
+    });
+    return units;
 }
