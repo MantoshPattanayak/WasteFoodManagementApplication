@@ -209,7 +209,7 @@ let viewFoodDonationList = async (req, res) => {
                 }
                 else {
                     return food.name?.toLowerCase().includes(givenReq) ||
-                    food.createdon?.toString().includes(givenReq);
+                        food.createdon?.toString().includes(givenReq);
                 }
             })
         }
@@ -255,7 +255,7 @@ let viewFoodDonationById = async (req, res) => {
             },
             type: Sequelize.QueryTypes.SELECT
         });
-        
+
         if (fetchFoodListingDetails.length > 0) {
             return res.status(statusCode.SUCCESS.code).json({
                 message: "Food donation details",
@@ -284,6 +284,51 @@ let acceptFoodDonation = async (req, res) => {
     }
 }
 
+let closeFoodDonation = async (req, res) => {
+    let transaction = await sequelize.transaction();
+    try {
+        let today = new Date();
+        let userId = req.user?.userId || 1;
+        let { foodListingId } = req.body;
+        let statusMasterData = await db.statusMaster.findAll({
+            where: {
+                parentStatusCode: "FOOD_DONATION_STATUS"
+            }
+        });
+        console.log("statusMasterData", statusMasterData);
+        statusMasterData = statusMasterData.filter((data) => { return data.statusCode == "CLOSED" });
+
+        let [updateCount] = await foodListings.update({
+            statusId: statusMasterData[0].statusId,
+            updatedBy: userId,
+            updatedOn: today
+            }, {
+            where: {
+                foodListingId: foodListingId
+            },
+            transaction
+        });
+        console.log("updated", updateCount > 0);
+        if (updateCount > 0) {
+            transaction.commit();
+            return res.status(statusCode.SUCCESS.code).json({
+                message: "Food donation is closed."
+            });   
+        } else {
+            transaction.rollback();
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+                message: "Something went wrong."
+            }); 
+        }
+    }
+    catch (error) {
+        transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: error.message
+        });
+    }
+}
+
 let viewFoodPickupList = async (req, res) => {
     try {
 
@@ -307,6 +352,7 @@ module.exports = {
     viewFoodDonationList,
     viewFoodDonationById,
     acceptFoodDonation,
+    closeFoodDonation,
     viewFoodPickupList,
     viewFoodPickupById
 }

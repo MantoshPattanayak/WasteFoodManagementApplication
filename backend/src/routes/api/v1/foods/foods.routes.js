@@ -12,6 +12,8 @@ router.get("/viewFoodDonationById/:id", foodsController.viewFoodDonationById);
 
 router.put("/acceptFoodDonation", foodsController.acceptFoodDonation);
 
+router.put("/closeFoodDonation", foodsController.closeFoodDonation);
+
 router.post("/viewFoodPickupList", foodsController.viewFoodPickupList);
 
 router.get("/viewFoodPickupById/:id", foodsController.viewFoodPickupById);
