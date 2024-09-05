@@ -25,3 +25,4 @@ accesslog
 *.sln
 *.sw?
 .env
+frontend/env.js
