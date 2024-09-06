@@ -29,6 +29,21 @@ const api = {
         /**
          * in req.body - foodListingId
          */
+    },
+        url: "/auth/createOtp",
+        method: "post",
+    },
+    LOGIN_VERIFY_OTP: {
+        url: "/auth/verifyOtp",
+        method: "post",
+    },
+    LOGIN_WITH_OTP: {
+        url: "/auth/loginWithOTP",
+        method: "post",
+    },
+    LOGOUT: {
+        url: "/auth/logout",
+        method: "post"
     }
 }
 
