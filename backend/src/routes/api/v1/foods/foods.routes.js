@@ -6,6 +6,8 @@ let authenticateToken = require('../../../../middlewares/authToken.middlewares')
 
 router.post("/addFoodDonationRequest", foodsController.addFoodDonationRequest);
 
+router.get("/initialData", foodsController.initialData);
+
 router.post("/viewFoodDonationList", foodsController.viewFoodDonationList);
 
 router.get("/viewFoodDonationById/:id", foodsController.viewFoodDonationById);
