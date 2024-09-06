@@ -9,6 +9,14 @@ const api = {
          * 2. receiverId integer
          */
     },
+    INITIAL_FOOD_DROPDOWN_DATA: {
+        url: "/food/initialData",
+        method: "get",
+        /**
+         * for timeRange and distanceRange, send the option's value
+         * for foodType, send the option's id
+         */
+    },
     VIEW_FOOD_DONATION_LIST: {
         url: "/food/viewFoodDonationList",
         method: "post"

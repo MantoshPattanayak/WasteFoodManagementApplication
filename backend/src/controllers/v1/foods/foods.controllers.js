@@ -99,6 +99,34 @@ let addFoodDonationRequest = async (req, res) => {
     }
 }
 
+let initialData = async (req, res) => {
+    try {
+        let timeRange = [{Today: 'Today'}, {Yesterday: 'Yesterday'}];
+        let distanceRange = [
+            {0: 1},
+            {1: 2},
+            {2: 5},
+            {3: 10}
+        ]
+        let foodType = await db.foodCategories.findAll({
+            where: {
+                statusId: 1
+            },
+            type: QueryTypes.SELECT
+        });
+
+        return res.status(statusCode.SUCCESS.code).json({
+            message: 'food donation list filter dropdown data',
+            timeRange, distanceRange, foodType
+        })
+    }
+    catch (error) {
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: error.message
+        })
+    }
+}
+
 let viewFoodDonationList = async (req, res) => {
     try {
         let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq } = req.body;
@@ -349,6 +377,7 @@ let viewFoodPickupById = async (req, res) => {
 
 module.exports = {
     addFoodDonationRequest,
+    initialData,
     viewFoodDonationList,
     viewFoodDonationById,
     acceptFoodDonation,
