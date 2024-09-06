@@ -9,9 +9,15 @@ const authReducer = createSlice({
     initialState,
     reducers: {
         login(state = initialState, action) {
-            
+            const { type, payload } = action;
+            state.user = payload;
+            state.isLoggedin = true;
         },
-    }
+        logout(state = initialState, action) {
+            state.user = null;
+            state.isLoggedin = false;
+        }
+    },
 })
 
 export default authReducer.reducer;

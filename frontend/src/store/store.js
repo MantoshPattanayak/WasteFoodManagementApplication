@@ -6,8 +6,10 @@ import storage from "redux-persist/lib/storage";
 const persistConfig = {
     key: 'root',    //
     storage,
-    whitelist: ['authReducer'],  // Optional: Specify which reducers to persist
+    /*
+    whitelist: ['foodReducer'],  // Optional: Specify which reducers to persist
     blacklist: [],  //Optional: Specify which reducers not to persist
+    */
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

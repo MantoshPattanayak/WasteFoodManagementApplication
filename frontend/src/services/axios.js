@@ -2,7 +2,7 @@ import axios from "axios";
 import instance from "../../env";
 import tokenService from "./token.service";
 
-const { baseURL, headers, urlTimeout: timeout } = instance();
+const { headers, urlTimeout: timeout } = instance();
 let _retry_count = 0
 let _retry = null
 
@@ -22,13 +22,12 @@ function wait(delay) {
     return new Promise((resolve) => setTimeout(resolve, delay))
 }
 
-const instance = axios.create({
-    baseURL,
+const axiosInstance = axios.create({
     headers,
     timeout
 });
-
-instance.interceptors.request.use(
+// request interceptor to check if auth-header contains token or not.
+axiosInstance.interceptors.request.use(
     config => {
         if(!config.headers['Authorization']) {
             config.headers['Authorization'] = `Bearer ${tokenService.getLocalAccessToken()}`;
@@ -37,13 +36,13 @@ instance.interceptors.request.use(
     }, (error) => Promise.reject(error)
 );
 
-
-instance.interceptors.response.use((res) => res, async (err) => {
+// response interceptor to check if token is valid or expired
+axiosInstance.interceptors.response.use((res) => res, async (err) => {
     const origReqConfig = err.config;
         
         if(err.response.status >= 500 && _retry_count < 4) {
             _retry_count++;
-            return wait(timeDelay(_retry_count)).then(() => instance.request(origReqConfig))
+            return wait(timeDelay(_retry_count)).then(() => axiosInstance.request(origReqConfig))
         }
     
         if(err.response.status === 401 && origReqConfig.headers.hasOwnProperty('Authorization')) {
@@ -60,7 +59,7 @@ instance.interceptors.response.use((res) => res, async (err) => {
                 
                 return _retry.then((token) => {
                     origReqConfig.headers['Authorization'] = `Bearer ${token}`
-                    return instance.request(origReqConfig)
+                    return axiosInstance.request(origReqConfig)
                 })
             }
         }
@@ -92,4 +91,4 @@ async function refresh (rtoken) {
     }
 }
 
-export default instance;
+export default axiosInstance;
