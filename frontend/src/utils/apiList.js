@@ -30,6 +30,7 @@ const api = {
          * in req.body - foodListingId
          */
     },
+    LOGIN_CREATE_OTP: {
         url: "/auth/createOtp",
         method: "post",
     },
