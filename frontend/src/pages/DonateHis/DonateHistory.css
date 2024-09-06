@@ -1,0 +1,77 @@
+
+.text_his {
+    display: flex; 
+    align-items: center;
+    font-family: 'Arial', sans-serif; 
+    padding: 40px;
+    margin-left: 40px;
+}
+
+.text_his::before {
+    content: "";
+    display: inline-block; 
+    width: 7px; 
+    height: 54px; 
+    background-color: #000; 
+    margin-right: 10px; 
+}
+
+.text_his h1 {
+    margin: 0; 
+    font-size: 30px;
+}
+
+.parent-container {
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start; 
+    width: auto; 
+    padding: 10px;
+}
+
+.Child_conatiner_doner_his {
+    
+    max-width: 900px; 
+    padding: 10px; 
+    border: 1px solid grey; 
+    box-sizing: border-box; 
+    background-color: #DAD9F9;
+    width: 800px;
+}
+
+.list_his {
+    display: flex;
+    align-items: flex-start; 
+}
+
+.image_list_his img {
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 8px; 
+}
+
+.list_content {
+    margin-left: 20px; 
+    flex: 1;
+}
+
+.list_content h1 {
+    font-size: 16px;
+    line-height: 1.4; 
+    word-break: break-word; 
+    hyphens: auto; 
+    overflow-wrap: break-word; 
+}
+.image_list_his img {
+    height: 17vh;
+    
+}
+.Details_button{
+    display: flex;
+    float: right;
+    border: 3px solid rgb(34, 14, 164);
+    width: 30%;
+    text-align: center;
+    justify-content: center;
+    font-size: 18px;
+}
