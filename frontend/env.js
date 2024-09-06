@@ -1,5 +1,4 @@
 const instance = () => {
-
     return(
         {
             baseURL: "http://localhost:8000",
@@ -18,5 +17,4 @@ const instance = () => {
         }
     )
 }
-
-export default instance; 
+export default instance;
