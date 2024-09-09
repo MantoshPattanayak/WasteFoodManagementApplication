@@ -3,26 +3,78 @@ let statusCode = require("../../../utils/statusCode");
 const bcrypt = require("bcrypt");
 const fs = require('fs')
 let deviceLogin = db.device
-let otpCheck = db.otpDetails
+let otp
+let otpVerifications = db.otpVerifications
 let QueryTypes = db.QueryTypes
 const { sequelize, Sequelize } = require('../../../models')
 let jwt = require('jsonwebtoken');
-
 const { encrypt } = require('../../../middlewares/encryption.middlewares')
 const { decrypt } = require('../../../middlewares/decryption.middlewares')
 const { Op } = require("sequelize");
+let generateToken = require('../../../utils/generateToken');
+
+function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += numberValue.charAt(Math.floor(Math.random() * otpLength));
+  }
+  return result;
+}
 
 let createOtp = async (req, res) => {
   try {
+    let { encryptMobile: mobileNo } = req.body;
+    console.log("encrypted mobile number", mobileNo);
+    const generatedOTP = generateRandomOTP();
+    console.log("generated OTP", generatedOTP);
+    mobileNo = decrypt(mobileNo.toString()); //get the decrypted mobile number
+    console.log("decrypted mobile number", mobileNo);
+    let expiryTime = new Date();
+    expiryTime = expiryTime.setMinutes(expiryTime.getMinutes() + 1);
+    let otp = "123456";
 
+    if (mobileNo) { // if proper mobile number
+      let isOtpValid = await otpVerifications.findOne({
+        where: {
+          expiryTime: {
+            [Op.gte]: new Date(),
+            mobileNo
+          }
+        }
+      });
+      if (isOtpValid) { // if otp present, then expire the otp
+        let expireOtp = await otpVerifications.update({
+          expiryTime: new Date(Date.now() - 24 * 60 * 60 * 1000)
+        }, {
+          where: {
+            mobileNo: mobileNo
+          }
+        });
+
+        if (expireOtp.length > 0) {
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message:"Something went wrong"
+          })
+        }
+      }
+    }
+
+    return res.status(statusCode.SUCCESS.code).json({
+      message: "OTP sent successfully. OTP is valid for 1 minute.",
+      otp: generateRandomOTP,
+    });
   }
   catch (error) {
-
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: error.message
+    })
   }
 }
 
 let verifyOtp = async (req, res) => {
   try {
+    let { encryptMobile: mobileNo, isOTPVerified } = req.body;
+    console.log("req body params", { mobileNo, isOTPVerified });
 
   }
   catch (error) {
