@@ -43,8 +43,9 @@ db1.permissions = require("./permissions.model")(sequelize, DataTypes)
 db1.rolePermissions = require("./rolePermissions.model")(sequelize, DataTypes)
 db1.statusMaster = require("./statusMaster.model")(sequelize, DataTypes)
 db1.units = require("./units.model")(sequelize, DataTypes)
+db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
 
-db1.foodListingItems.sync({
+db1.otpVerifications.sync({
   alter: true,
 });
 
