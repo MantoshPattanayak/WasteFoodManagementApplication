@@ -12,7 +12,7 @@ let encrypt =  (val)=>{
     let encryptedValue = CryptoJS.AES.encrypt(val, parsedKey, { iv: parsedIv});   
     let ciphertext = encryptedValue.ciphertext;
     let encryptedString = ciphertext.toString();
-    console.log('ecnrytp', encryptedString)
+    // console.log('ecnrytp', encryptedString)
     return encryptedString;
 }
 

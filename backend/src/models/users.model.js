@@ -57,6 +57,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
         },
+        statusId: {
+            type: DataTypes.INTEGER,
+        }
     }, {
         schema: "soulshare",
         timestamps: false //disable Sequelize's automatic timestamps

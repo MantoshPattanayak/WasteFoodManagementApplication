@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import "./LogInSignUp.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import axiosInstance from "../../services/axios";
+import api from "../../utils/apiList";
+import { encryptData, decryptData } from "../../utils/encryption";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 function LogInSignUp() {
   const [userType, setUserType] = useState("Donor");
@@ -9,6 +16,7 @@ function LogInSignUp() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(60);
+  const navigate = useNavigate();
 
   // Handles the radio button change for user type
   const handleUserTypeChange = (event) => {
@@ -17,25 +25,76 @@ function LogInSignUp() {
 
   // Handles the phone number input change
   const handlePhoneNumberChange = (event) => {
-    setPhoneNumber(event.target.value);
+    let { value } = event.target;
+    value = value.replace(/\D/g, ''); //remove any characters other than digits
+    if(value.length == 1 && value == 0) { // dont allow first character as 0
+      value = "";
+    }
+    value = value.replace(/^([1-9]{1}\d{9}).*/, '$1');  //regex to check if the number is valid: 10 digits and starts with 1-9
+    setPhoneNumber(value);
   };
 
   // Handles OTP input change
   const handleOtpChange = (event) => {
-    setOtp(event.target.value);
+    let { value } = event.target;
+    value = value.replace(/\D{6}/g, ''); //remove any characters other than digits
+    if (value.length <= 6) {
+      setOtp(value);
+    }
   };
 
   // Simulates sending OTP
-  const handleGetOtp = () => {
-    if (phoneNumber) {
+  const handleGetOtp = async () => {
+    if (!phoneNumber) {
+      return;
+    }
+    try {
+      let res = await axiosInstance.post(api.LOGIN_CREATE_OTP.url, {
+        encryptMobile: encryptData(phoneNumber)
+      });
+      console.log("response of get otp api", res.data);
       setOtpSent(true);
       setTimer(60);
+      toast.success(res.data.message);
+    }
+    catch (error) {
+      console.error('otp generation failed!', error);
+      toast.error(error.response.data.message);
     }
   };
 
   // Handles OTP verification (you can add real verification logic here)
-  const handleVerifyOtp = () => {
-    alert(`Verifying OTP: ${otp}`);
+  const handleVerifyOtp = async () => {
+    // alert(`Verifying OTP: ${otp}`);
+    try {
+      let res = await axiosInstance.post(api.LOGIN_WITH_OTP.url, {
+        encryptMobile: encryptData(phoneNumber), encryptOtp: encryptData(otp)
+      });
+      console.log("response of verify otp api", res.data);
+      if(res.data.decideSignUpOrLogin) {
+        toast.success("Login successful!", {
+          autoClose: 1000,
+          onClose: () => {
+            setTimeout(() => {
+              navigate('/DonorLandingPage');
+            }, 500);
+          }
+        })
+      }
+      else {
+        toast.success("Please create your profile.", {
+          autoClose: 1000,
+          onClose: () => {
+            setTimeout(() => {
+              navigate('/Signup');
+            }, 500);
+          }
+        })
+      }
+    }
+    catch (error) {
+      console.error("OTP Verification failed!", error);
+    }
   };
 
   // Timer effect for OTP expiration countdown
@@ -137,6 +196,7 @@ function LogInSignUp() {
         </div>
       </div>
     </div>
+    <ToastContainer />
     </div>
   );
 }
