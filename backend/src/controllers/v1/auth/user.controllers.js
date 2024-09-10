@@ -78,6 +78,7 @@ let verifyOtp = async (req, res) => {
     let { encryptMobile: mobileNo, isOTPVerified } = req.body;
     console.log("req body params", { mobileNo, isOTPVerified });
 
+
   }
   catch (error) {
 
@@ -368,14 +369,52 @@ let loginWithOAuth = async (req, res) => {
   }
 }
 
-let viewUserProfile = async (req, res) => {
+
+const viewUserProfile = async (req, res) => {
+  console.log("view user profile details");
   try {
+    console.log(21, req.user.userId)
+    let userId = req.user?.userId || 1;
+ 
+    let publicRole = 4 
+    let statusId = 1;
+    let entityType = 'usermaster'
+    let filePurpose = 'User Image'
+  
+    
+    
+    let showpublic_user = await sequelize.query(`select u.* from amabhoomi.usermasters u where u.statusId = ? and u.roleId =? and u.userId = ?
+   `,{type:QueryTypes.SELECT,
+    replacements:[statusId,publicRole,userId]
+   })
 
-  }
-  catch (error) {
+   let findTheImageUrl = await sequelize.query(`select fl.url,fl.fileId from amabhoomi.usermasters u inner join fileattachments f on u.userId = f.entityId  
+   inner join files fl on fl.fileId = f.fileId where f.entityType = ? and f.filePurpose =? and u.statusId = ? and u.roleId =? and u.userId = ? and fl.statusId = ? and f.statusId = ?`,
+   {type:QueryTypes.SELECT,
+    replacements:[entityType,filePurpose,statusId,publicRole,userId,statusId,statusId]})
+    
+    if(findTheImageUrl.length>0){
+      showpublic_user[0].url = findTheImageUrl[0].url;
+      showpublic_user[0].fileId = findTheImageUrl[0].fileId;
+    }
 
+    console.log('show public user', showpublic_user)
+    
+    return res.status(statusCode.SUCCESS.code).json({
+      message: "Show Public User",
+      public_user: showpublic_user,
+      activityDetails:showActivities
+    });
+  } catch (err) {
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: err.message,
+    });
   }
-}
+};
+
+
 
 let logout = async (req, res) => {
   try {
@@ -403,6 +442,203 @@ let logout = async (req, res) => {
 }
 
 
+
+let signUp = async (req,res)=>{
+  let transaction;
+ try{
+  transaction = await sequelize.transaction();
+  console.log('1')
+  let roleId = 4; 
+  
+  console.log(req.body,'req.body')
+    let statusId = 1;
+    let {encryptEmail:email, encryptPassword:password,encryptFirstName:firstName,
+      encryptMiddleName:middleName,encryptLastName:lastName,
+      encryptPhoneNo:phoneNo,userImage,encryptLanguage:language,
+      encryptActivity:activities,isEmailVerified, location} = req.body;
+
+   
+    console.log(activities,"activities")
+
+    console.log('req.body',req.body)
+    let createdDt = new Date();
+    let updatedDt = new Date();
+    if(!firstName && !lastName && !phoneNo && !userImage && !activities && !language){
+      await transaction.rollback();
+      return res.status(statusCode.BAD_REQUEST.code).json({
+        message: `please provide all required data to set up the profile`
+      })
+    }
+    if(email){
+      if(isEmailVerified != 1){
+        await transaction.rollback();
+        return res.status(statusCode.BAD_REQUEST.code).json({
+          message: `Please verify the email first`
+        })
+      }
+      
+    }
+    // const decryptUserName = decrypt(userName);
+    // const decryptEmailId = decrypt(email);
+    // const decryptPhoneNumber = decrypt(phoneNo);
+ 
+    // password = decrypt(password)
+
+    let checkDuplicateMobile= await user.findOne({
+        where:
+        {
+         [Op.and]:[
+          {phoneNo:phoneNo},
+          {statusId:statusId}
+        ]
+          
+        },
+        transaction
+      })
+
+
+      console.log('password check',phoneNo)
+
+      if(checkDuplicateMobile){
+        await transaction.rollback();
+        return res.status(statusCode.CONFLICT.code).json({
+          message:"This mobile is already allocated to existing user"
+        })
+      }
+
+      console.log(checkDuplicateMobile,'check duplicate mobile')
+
+      
+      let lastLogin = new Date();
+  
+
+      // Hash the password
+      // const hashedPassword = await bcrypt.hash(password, 10);
+      // for uploading user image
+      
+
+
+
+      const newUser = await user.create({
+        firstName: firstName,
+        middleName: middleName,
+        lastName: lastName,
+        userName: email,
+        // password: hashedPassword,
+        phoneNo: phoneNo,
+        emailId: email,
+        roleId:roleId,
+        language:language,
+        location:location,
+        lastLogin:lastLogin, // Example of setting a default value
+        statusId: 1, // Example of setting a default value
+        createdDt: createdDt, // Set current timestamp for createdOn
+        updatedDt: updatedDt, // Set current timestamp for updatedOn
+     
+      },
+    {
+      transaction
+    });
+
+      if(!newUser){
+        await transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message:"Something went wrong"
+        })
+      }
+      if(isEmailVerified==1){
+        let [updateTheUser] = await user.update({
+          verifyEmail:isEmailVerified
+        },{
+          where:{
+            userId:newUser.userId
+          },
+          transaction
+        }
+      )
+      if(updateTheUser==0){
+        await transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message:`Something went wrong`
+        })
+      }
+      console.log(updateTheUser,'update the user email ')
+      }
+      if(activities){
+           // insert to prefered activity first
+        activities.forEach(async(activity)=>{
+          let insertToPreferedActivity  = await userActivityPreference.create({
+            userId:newUser.userId,
+            userActivityId: activity,
+            statusId:statusId,
+            createdBy:newUser.userId,
+            updatedBy:newUser.userId,
+            createdDt:createdDt,
+            updatedDt:updatedDt
+
+          },
+        {
+          transaction
+        })
+
+        if(!insertToPreferedActivity){
+          await transaction.rollback();
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message:`Something went wrong`
+          })
+        }
+        }) 
+      }
+   
+      
+      // after the user created successfully then the image can be added 
+      if(userImage){
+        let insertionData = {
+          id:newUser.userId,
+          name:decrypt(firstName)
+         }
+        // create the data
+        let entityType = 'usermaster'
+        let errors = [];
+        let subDir = "userDir"
+        let filePurpose = "User Image"
+        let uploadSingleImage = await imageUpload(userImage,entityType,subDir,filePurpose,insertionData,newUser.userId,errors,1,transaction)
+        console.log( uploadSingleImage,'165 line facility image')
+        if(errors.length>0){
+          await transaction.rollback();
+          if(errors.some(error => error.includes("something went wrong"))){
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({message:errors})
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
+        }
+       
+      }
+      if(newUser){
+        await transaction.commit();
+      // Return success response
+      return res.status(statusCode.SUCCESS.code).json({
+        message:"User created successfully", user: newUser 
+      })
+      }
+      else{
+         await transaction.rollback();
+        return res.status(statusCode.BAD_REQUEST.code).json({
+          message:`Data is not updated`
+        })
+      }
+
+    
+
+  } catch (err) {
+    // Handle errors
+
+    if(transaction) await transaction.rollback();
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message:err.message
+    })
+  }
+};
 
 
 
@@ -443,5 +679,7 @@ module.exports = {
   loginWithOAuth,
   viewUserProfile,
   logout,
+  signUp
+  
 }
 
