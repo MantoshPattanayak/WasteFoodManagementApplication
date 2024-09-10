@@ -3,7 +3,6 @@ let statusCode = require("../../../utils/statusCode");
 const bcrypt = require("bcrypt");
 const fs = require('fs')
 let deviceLogin = db.device
-let otp
 let otpVerifications = db.otpVerifications
 let QueryTypes = db.QueryTypes
 const { sequelize, Sequelize } = require('../../../models')
@@ -14,10 +13,12 @@ const { Op } = require("sequelize");
 let generateToken = require('../../../utils/generateToken');
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
+  console.log('incoming');
   let result = "";
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < otpLength; i++) {
     result += numberValue.charAt(Math.floor(Math.random() * otpLength));
   }
+  console.log('result', result);
   return result;
 }
 
@@ -32,18 +33,20 @@ let createOtp = async (req, res) => {
     let expiryTime = new Date();
     expiryTime = expiryTime.setMinutes(expiryTime.getMinutes() + 1);
     let otp = "123456";
+    let insertOtp;
 
     if (mobileNo) { // if proper mobile number
       let isOtpValid = await otpVerifications.findOne({
         where: {
           expiryTime: {
             [Op.gte]: new Date(),
-            
           },
-            mobileNo:mobileNo
+          mobileNo: mobileNo
         }
       });
-      if (isOtpValid) { // if otp present, then expire the otp
+      console.log(1, isOtpValid)
+      if (isOtpValid != null) { // if otp present, then expire the otp
+        console.log(2)
         let expireOtp = await otpVerifications.update({
           expiryTime: new Date(Date.now() - 24 * 60 * 60 * 1000)
         }, {
@@ -51,20 +54,33 @@ let createOtp = async (req, res) => {
             mobileNo: mobileNo
           }
         });
-
-        if (expireOtp.length > 0) {
-          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-            message:"Something went wrong"
-          })
-        }
+        console.log(3, expireOtp);
+        insertOtp = await otpVerifications.create({
+          mobileNo, code: encrypt(otp), expiryTime, verified: 0, createdBy: 1
+        });
+        console.log(4, insertOtp);
+      }
+      else {
+        console.log(5)
+        insertOtp = await otpVerifications.create({
+          mobileNo: encrypt(mobileNo), code: encrypt(otp), expiryTime, verified: 0, createdBy: 1
+        });
       }
     }
-
-    return res.status(statusCode.SUCCESS.code).json({
-      message: "OTP sent successfully. OTP is valid for 1 minute.",
-      otp: generateRandomOTP,
-    });
-
+    console.log("insertOTP", insertOtp);
+    if (insertOtp != null) {
+      console.log(6)
+      return res.status(statusCode.SUCCESS.code).json({
+        message: "OTP sent successfully. OTP is valid for 1 minute.",
+        otp: otp,
+      });
+    }
+    else {
+      console.log(7)
+      return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+        message: "Something went wrong!"
+      })
+    }
   }
   catch (error) {
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
@@ -85,32 +101,32 @@ let verifyOtp = async (req, res) => {
   }
 }
 
-let tokenAndSessionCreation = async(isUserExist,lastLoginTime,deviceInfo)=>{
+let tokenAndSessionCreation = async (isUserExist, lastLoginTime, deviceInfo) => {
   try {
-    let userName =  decrypt(isUserExist.userName)
+    let userName = decrypt(isUserExist.userName)
     let emailId
     let sessionId;
-    
-    if(isUserExist.emailId!=null){
-      emailId =  decrypt(isUserExist.emailId)
+
+    if (isUserExist.emailId != null) {
+      emailId = decrypt(isUserExist.emailId)
 
     }
-  
+
     let userId = isUserExist.userId
     let roleId = isUserExist.roleId
-    console.log(isUserExist.userId,userName,emailId)
+    console.log(isUserExist.userId, userName, emailId)
 
-    console.log(userId,userName,emailId,roleId,'roleId')
+    console.log(userId, userName, emailId, roleId, 'roleId')
 
-    let accessAndRefreshToken = await generateToken(userId,userName,emailId,roleId)
+    let accessAndRefreshToken = await generateToken(userId, userName, emailId, roleId)
 
     console.log(accessAndRefreshToken, "accessAndRefreshToken")
-    if(accessAndRefreshToken?.error){
+    if (accessAndRefreshToken?.error) {
       return {
-        error:accessAndRefreshToken.error
+        error: accessAndRefreshToken.error
       }
     }
-    let {accessToken,refreshToken} = accessAndRefreshToken;
+    let { accessToken, refreshToken } = accessAndRefreshToken;
 
     console.log(accessToken, refreshToken, 'accessToken and refresh token')
     const options = {
@@ -118,222 +134,226 @@ let tokenAndSessionCreation = async(isUserExist,lastLoginTime,deviceInfo)=>{
       secure: true
     };
 
-    let updateLastLoginTime =  await user.update({lastLogin:lastLoginTime},{
-      where :{
-        userId:isUserExist.userId
+    let updateLastLoginTime = await user.update({ lastLogin: lastLoginTime }, {
+      where: {
+        userId: isUserExist.userId
       }
     })
     // check for active session
 
-    let checkForActiveSession = await authSessions.findOne({where:{
-    [Op.and] :[{userId:isUserExist.userId},
-      {active:1}]
-    }})
+    let checkForActiveSession = await authSessions.findOne({
+      where: {
+        [Op.and]: [{ userId: isUserExist.userId },
+        { active: 1 }]
+      }
+    })
     // if active
-    if(checkForActiveSession){
+    if (checkForActiveSession) {
 
-      let updateTheSessionToInactive = await authSessions.update({active:2},{
-        where:{
-          sessionId:checkForActiveSession.sessionId}
+      let updateTheSessionToInactive = await authSessions.update({ active: 2 }, {
+        where: {
+          sessionId: checkForActiveSession.sessionId
+        }
       })
       console.log('update the session To inactive', updateTheSessionToInactive)
-        // after inactive
-        if(updateTheSessionToInactive.length>0){
-          // check if it is present in the device table or not
-          let checkDeviceForParticularSession = await deviceLogin.findOne({
-            where:{
-              sessionId:checkForActiveSession.sessionId
+      // after inactive
+      if (updateTheSessionToInactive.length > 0) {
+        // check if it is present in the device table or not
+        let checkDeviceForParticularSession = await deviceLogin.findOne({
+          where: {
+            sessionId: checkForActiveSession.sessionId
+          }
+        })
+        if (checkDeviceForParticularSession) {
+          if (checkDeviceForParticularSession.deviceName == deviceInfo.deviceName && checkDeviceForParticularSession.deviceType == deviceInfo.deviceType) {
+            // insert to session table first 
+            let insertToAuthSession = await authSessions.create({
+              lastActivity: new Date(),
+              active: 1,
+              deviceId: checkDeviceForParticularSession.deviceId,
+              userId: isUserExist.userId
+            })
+            // then update the session id in the device table
+            let updateTheDeviceTable = await deviceLogin.update({
+              sessionId: insertToAuthSession.sessionId
+            }, {
+              where: {
+                deviceId: checkDeviceForParticularSession.deviceId
+              }
+            })
+            sessionId = insertToAuthSession.sessionId
+          }
+          else {
+            // insert to device table 
+            let insertToDeviceTable = await deviceLogin.create({
+              deviceType: deviceInfo.deviceType,
+              deviceName: deviceInfo.deviceName,
+
+            })
+
+            // Insert to session table
+            let insertToAuthSession = await authSessions.create({
+              lastActivity: new Date(),
+              active: 1,
+              deviceId: insertToDeviceTable.deviceId,
+              userId: isUserExist.userId
+            })
+            // update the session id in the device table
+            let updateSessionIdInDeviceTable = await deviceLogin.update({
+              sessionId: insertToAuthSession.sessionId
+            }, {
+              where: {
+                deviceId: insertToDeviceTable.deviceId
+              }
+            })
+
+            sessionId = insertToAuthSession.sessionId
+          }
+          console.log('session id ', sessionId)
+        }
+        else {
+          console.log('session id2 ', sessionId)
+
+          // insert to device table 
+          let insertToDeviceTable = await deviceLogin.create({
+            deviceType: deviceInfo.deviceType,
+            deviceName: deviceInfo.deviceName,
+
+          })
+
+          // Insert to session table
+          let insertToAuthSession = await authSessions.create({
+            lastActivity: new Date(),
+            active: 1,
+            deviceId: insertToDeviceTable.deviceId,
+            userId: isUserExist.userId
+          })
+          // update the session id in the device table
+          let updateSessionIdInDeviceTable = await deviceLogin.update({
+            sessionId: insertToAuthSession.sessionId
+          }, {
+            where: {
+              deviceId: insertToDeviceTable.deviceId
             }
           })
-          if(checkDeviceForParticularSession){
-            if(checkDeviceForParticularSession.deviceName==deviceInfo.deviceName && checkDeviceForParticularSession.deviceType == deviceInfo.deviceType ){
-              // insert to session table first 
-              let insertToAuthSession = await authSessions.create({
-                lastActivity:new Date(),
-                active:1,
-                deviceId:checkDeviceForParticularSession.deviceId,
-                userId:isUserExist.userId
-              })
-              // then update the session id in the device table
-              let updateTheDeviceTable = await deviceLogin.update({
-                sessionId:insertToAuthSession.sessionId
-              },{
-                where:{
-                  deviceId:checkDeviceForParticularSession.deviceId
-                }
-              })
-              sessionId = insertToAuthSession.sessionId
-            }
-            else{
-              // insert to device table 
-              let insertToDeviceTable = await deviceLogin.create({
-                deviceType:deviceInfo.deviceType,
-                deviceName:deviceInfo.deviceName,
-              
-              })
-
-              // Insert to session table
-              let insertToAuthSession = await authSessions.create({
-                lastActivity:new Date(),
-                active:1,
-                deviceId:insertToDeviceTable.deviceId,
-                userId:isUserExist.userId
-              })
-              // update the session id in the device table
-              let updateSessionIdInDeviceTable = await deviceLogin.update({
-                sessionId:insertToAuthSession.sessionId
-              },{
-                where:{
-                  deviceId:insertToDeviceTable.deviceId
-                }
-              })
-
-              sessionId = insertToAuthSession.sessionId
-            }
-            console.log('session id ', sessionId)
-          }
-          else{
-            console.log('session id2 ', sessionId)
-
-              // insert to device table 
-              let insertToDeviceTable = await deviceLogin.create({
-                deviceType:deviceInfo.deviceType,
-                deviceName:deviceInfo.deviceName,
-              
-              })
-
-              // Insert to session table
-              let insertToAuthSession = await authSessions.create({
-                lastActivity:new Date(),
-                active:1,
-                deviceId:insertToDeviceTable.deviceId,
-                userId:isUserExist.userId
-              })
-              // update the session id in the device table
-              let updateSessionIdInDeviceTable = await deviceLogin.update({
-                sessionId:insertToAuthSession.sessionId
-              },{
-                where:{
-                  deviceId:insertToDeviceTable.deviceId
-                }
-              })
-              sessionId = insertToAuthSession.sessionId
-
-          }
-          console.log('session 3',sessionId)
-        }
-        else{
-          console.log('session 4',sessionId)
-
-          return {
-            error:'Something Went Wrong'
-          }
+          sessionId = insertToAuthSession.sessionId
 
         }
-      
-     
+        console.log('session 3', sessionId)
+      }
+      else {
+        console.log('session 4', sessionId)
+
+        return {
+          error: 'Something Went Wrong'
+        }
+
+      }
+
+
     }
-    else{
-        // insert to device table 
-        let insertToDeviceTable = await deviceLogin.create({
-          deviceType:deviceInfo.deviceType,
-          deviceName:deviceInfo.deviceName,
-        
-        })
+    else {
+      // insert to device table 
+      let insertToDeviceTable = await deviceLogin.create({
+        deviceType: deviceInfo.deviceType,
+        deviceName: deviceInfo.deviceName,
 
-        // Insert to session table
-        let insertToAuthSession = await authSessions.create({
-          lastActivity:new Date(),
-          active:1,
-          deviceId:insertToDeviceTable.deviceId,
-          userId:isUserExist.userId
-        })
-        // update the session id in the device table
-        let updateSessionIdInDeviceTable = await deviceLogin.update({
-          sessionId:insertToAuthSession.sessionId
-        },{
-          where:{
-            deviceId:insertToDeviceTable.deviceId
-          }
-        })
-        sessionId = insertToAuthSession.sessionId
+      })
+
+      // Insert to session table
+      let insertToAuthSession = await authSessions.create({
+        lastActivity: new Date(),
+        active: 1,
+        deviceId: insertToDeviceTable.deviceId,
+        userId: isUserExist.userId
+      })
+      // update the session id in the device table
+      let updateSessionIdInDeviceTable = await deviceLogin.update({
+        sessionId: insertToAuthSession.sessionId
+      }, {
+        where: {
+          deviceId: insertToDeviceTable.deviceId
+        }
+      })
+      sessionId = insertToAuthSession.sessionId
     }
     console.log('session id5', encrypt(sessionId), sessionId)
     return {
-      accessToken:accessToken,
-      refreshToken:refreshToken,
-      sessionId:encrypt(sessionId),
-      options:options
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      sessionId: encrypt(sessionId),
+      options: options
     }
 
   } catch (err) {
     return {
-      error:'Something Went Wrong'
+      error: 'Something Went Wrong'
     }
   }
 }
 
 let loginWithOTP = async (req, res) => {
   try {
-      console.log('loginwithotp',req.body)
-      let roleId = 4;
-      let statusId = 1;
-      let {encryptMobile:mobileNo,encryptOtp:otp}=req.body
+    // console.log('loginwithotp', req.body)
+    let statusId = 1;
+    let { encryptMobile: mobileNo, encryptOtp: otp } = req.body
 
-      let userAgent =  req.headers['user-agent'];
+    let userAgent = req.headers['user-agent'];
 
-      console.log('userAgent', userAgent)
-      let deviceInfo = parseUserAgent(userAgent)
-      let lastLoginTime = new Date();
+    // console.log('userAgent', userAgent)
+    let deviceInfo = parseUserAgent(userAgent)
+    let lastLoginTime = new Date();
+    // mobileNo = decrypt(mobileNo);
+    // otp = decrypt(otp);
 
-      if (mobileNo && otp) {
-        let isOtpValid = await otpVerifications.findOne({
-          where:{
-              expiryTime:{[Op.gte]:new Date()},
-              code:otp,
-              mobileNo:mobileNo
+    if (mobileNo && otp) {
+      let isOtpValid = await otpVerifications.findOne({
+        where: {
+          expiryTime: { [Op.gte]: new Date() },
+          code: otp,
+          mobileNo: mobileNo
+        }
+      })
+      console.log('207 line', isOtpValid)
+      if (isOtpValid) {
+        let updateTheVerifiedValue = await otpVerifications.update({ verified: 1 }
+          , {
+            where: {
+              id: isOtpValid.id || isOtpValid.dataValues.id
+            }
+          }
+        )
+        console.log(updateTheVerifiedValue, 'update the verified value')
+        let isUserExist = await db.users.findOne({
+          where: {
+            [Op.and]: [{ phoneNumber: decrypt(mobileNo) }, { statusId: statusId }]
           }
         })
-        console.log('207 line', isOtpValid)
-        if(isOtpValid){
-            let updateTheVerifiedValue = await otpVerifications.update({verified:1}
-              ,{
-                where:{
-                  id:isOtpValid.id
-                }
-              }
-            )
-            console.log(updateTheVerifiedValue,'update the verified value')
-             let isUserExist = await user.findOne({
-              where:{
-               [Op.and]:[{ phoneNo:mobileNo},{statusId:statusId},{roleId:roleId}]
-              }
-            })
-            console.log(isUserExist,'check user 223 line')
-          // If the user does not exist then we have to send a message to the frontend so that the sign up page will get render
-          if(!isUserExist){
-            return res.status(statusCode.SUCCESS.code).json({message:"please render the sign up page",decideSignUpOrLogin:0});  
-          }
-          
-          console.log('2')
-          let tokenGenerationAndSessionStatus = await tokenAndSessionCreation(isUserExist,lastLoginTime,deviceInfo);
+        console.log(isUserExist, 'check user 223 line')
+        // If the user does not exist then we have to send a message to the frontend so that the sign up page will get render
+        if (!isUserExist) {
+          return res.status(statusCode.SUCCESS.code).json({ message: "please render the sign up page", decideSignUpOrLogin: 0 });
+        }
 
-          console.log('all the data', tokenGenerationAndSessionStatus)
+        // console.log('2')
+        let tokenGenerationAndSessionStatus = await tokenAndSessionCreation(isUserExist, lastLoginTime, deviceInfo);
 
-          if(tokenGenerationAndSessionStatus?.error){
+        // console.log('all the data', tokenGenerationAndSessionStatus)
 
-            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-              message:tokenAndSessionCreation.error
-            })
+        if (tokenGenerationAndSessionStatus?.error) {
 
-          }
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: tokenAndSessionCreation.error
+          })
 
-          console.log('here upto it is coming')
-          let {accessToken, refreshToken, options,sessionId} = tokenGenerationAndSessionStatus
+        }
 
-        
+        // console.log('here upto it is coming')
+        let { accessToken, refreshToken, options, sessionId } = tokenGenerationAndSessionStatus
+
+
         // Set the access token in an HTTP-only cookie named 'accessToken'
-        res.cookie('accessToken', accessToken,options);
+        res.cookie('accessToken', accessToken, options);
 
         // Set the refresh token in a separate HTTP-only cookie named 'refreshToken'
         res.cookie('refreshToken', refreshToken, options)
@@ -341,16 +361,16 @@ let loginWithOTP = async (req, res) => {
         // bearer is actually set in the first to tell that  this token is used for the authentication purposes
 
         return res.status(statusCode.SUCCESS.code)
-        .header('Authorization', `Bearer ${accessToken}`)
-        .json({ message: "please render the login page", username: isUserExist.userName, fullname: isUserExist.fullName, email: isUserExist.emailId, role: isUserExist.roleId, accessToken: accessToken, refreshToken:refreshToken, decideSignUpOrLogin:1,sid:sessionId });
+          .header('Authorization', `Bearer ${accessToken}`)
+          .json({ message: "please render the login page", username: isUserExist.name, accessToken: accessToken, refreshToken: refreshToken, decideSignUpOrLogin: 1, sid: sessionId });
 
-        }
-        else{
-          return res.status(statusCode.BAD_REQUEST.code).json({
-            message:"Invalid Otp"
-          })
-        }
       }
+      else {
+        return res.status(statusCode.BAD_REQUEST.code).json({
+          message: "Invalid Otp"
+        })
+      }
+    }
 
   }
   catch (err) {
@@ -375,35 +395,38 @@ const viewUserProfile = async (req, res) => {
   try {
     console.log(21, req.user.userId)
     let userId = req.user?.userId || 1;
- 
-    let publicRole = 4 
+
+    let publicRole = 4
     let statusId = 1;
     let entityType = 'usermaster'
     let filePurpose = 'User Image'
-  
-    
-    
-    let showpublic_user = await sequelize.query(`select u.* from amabhoomi.usermasters u where u.statusId = ? and u.roleId =? and u.userId = ?
-   `,{type:QueryTypes.SELECT,
-    replacements:[statusId,publicRole,userId]
-   })
 
-   let findTheImageUrl = await sequelize.query(`select fl.url,fl.fileId from amabhoomi.usermasters u inner join fileattachments f on u.userId = f.entityId  
+
+
+    let showpublic_user = await sequelize.query(`select u.* from amabhoomi.usermasters u where u.statusId = ? and u.roleId =? and u.userId = ?
+   `, {
+      type: QueryTypes.SELECT,
+      replacements: [statusId, publicRole, userId]
+    })
+
+    let findTheImageUrl = await sequelize.query(`select fl.url,fl.fileId from amabhoomi.usermasters u inner join fileattachments f on u.userId = f.entityId  
    inner join files fl on fl.fileId = f.fileId where f.entityType = ? and f.filePurpose =? and u.statusId = ? and u.roleId =? and u.userId = ? and fl.statusId = ? and f.statusId = ?`,
-   {type:QueryTypes.SELECT,
-    replacements:[entityType,filePurpose,statusId,publicRole,userId,statusId,statusId]})
-    
-    if(findTheImageUrl.length>0){
+      {
+        type: QueryTypes.SELECT,
+        replacements: [entityType, filePurpose, statusId, publicRole, userId, statusId, statusId]
+      })
+
+    if (findTheImageUrl.length > 0) {
       showpublic_user[0].url = findTheImageUrl[0].url;
       showpublic_user[0].fileId = findTheImageUrl[0].fileId;
     }
 
     console.log('show public user', showpublic_user)
-    
+
     return res.status(statusCode.SUCCESS.code).json({
       message: "Show Public User",
       public_user: showpublic_user,
-      activityDetails:showActivities
+      activityDetails: showActivities
     });
   } catch (err) {
     logger.error(`An error occurred: ${err.message}`); // Log the error
@@ -443,199 +466,199 @@ let logout = async (req, res) => {
 
 
 
-let signUp = async (req,res)=>{
+let signUp = async (req, res) => {
   let transaction;
- try{
-  transaction = await sequelize.transaction();
-  console.log('1')
-  let roleId = 4; 
-  
-  console.log(req.body,'req.body')
+  try {
+    transaction = await sequelize.transaction();
+    console.log('1')
+    let roleId = 4;
+
+    console.log(req.body, 'req.body')
     let statusId = 1;
-    let {encryptEmail:email, encryptPassword:password,encryptFirstName:firstName,
-      encryptMiddleName:middleName,encryptLastName:lastName,
-      encryptPhoneNo:phoneNo,userImage,encryptLanguage:language,
-      encryptActivity:activities,isEmailVerified, location} = req.body;
+    let { encryptEmail: email, encryptPassword: password, encryptFirstName: firstName,
+      encryptMiddleName: middleName, encryptLastName: lastName,
+      encryptPhoneNo: phoneNo, userImage, encryptLanguage: language,
+      encryptActivity: activities, isEmailVerified, location } = req.body;
 
-   
-    console.log(activities,"activities")
 
-    console.log('req.body',req.body)
+    console.log(activities, "activities")
+
+    console.log('req.body', req.body)
     let createdDt = new Date();
     let updatedDt = new Date();
-    if(!firstName && !lastName && !phoneNo && !userImage && !activities && !language){
+    if (!firstName && !lastName && !phoneNo && !userImage && !activities && !language) {
       await transaction.rollback();
       return res.status(statusCode.BAD_REQUEST.code).json({
         message: `please provide all required data to set up the profile`
       })
     }
-    if(email){
-      if(isEmailVerified != 1){
+    if (email) {
+      if (isEmailVerified != 1) {
         await transaction.rollback();
         return res.status(statusCode.BAD_REQUEST.code).json({
           message: `Please verify the email first`
         })
       }
-      
+
     }
     // const decryptUserName = decrypt(userName);
     // const decryptEmailId = decrypt(email);
     // const decryptPhoneNumber = decrypt(phoneNo);
- 
+
     // password = decrypt(password)
 
-    let checkDuplicateMobile= await user.findOne({
-        where:
-        {
-         [Op.and]:[
-          {phoneNo:phoneNo},
-          {statusId:statusId}
+    let checkDuplicateMobile = await user.findOne({
+      where:
+      {
+        [Op.and]: [
+          { phoneNo: phoneNo },
+          { statusId: statusId }
         ]
-          
+
+      },
+      transaction
+    })
+
+
+    console.log('password check', phoneNo)
+
+    if (checkDuplicateMobile) {
+      await transaction.rollback();
+      return res.status(statusCode.CONFLICT.code).json({
+        message: "This mobile is already allocated to existing user"
+      })
+    }
+
+    console.log(checkDuplicateMobile, 'check duplicate mobile')
+
+
+    let lastLogin = new Date();
+
+
+    // Hash the password
+    // const hashedPassword = await bcrypt.hash(password, 10);
+    // for uploading user image
+
+
+
+
+    const newUser = await user.create({
+      firstName: firstName,
+      middleName: middleName,
+      lastName: lastName,
+      userName: email,
+      // password: hashedPassword,
+      phoneNo: phoneNo,
+      emailId: email,
+      roleId: roleId,
+      language: language,
+      location: location,
+      lastLogin: lastLogin, // Example of setting a default value
+      statusId: 1, // Example of setting a default value
+      createdDt: createdDt, // Set current timestamp for createdOn
+      updatedDt: updatedDt, // Set current timestamp for updatedOn
+
+    },
+      {
+        transaction
+      });
+
+    if (!newUser) {
+      await transaction.rollback();
+      return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+        message: "Something went wrong"
+      })
+    }
+    if (isEmailVerified == 1) {
+      let [updateTheUser] = await user.update({
+        verifyEmail: isEmailVerified
+      }, {
+        where: {
+          userId: newUser.userId
         },
         transaction
-      })
-
-
-      console.log('password check',phoneNo)
-
-      if(checkDuplicateMobile){
-        await transaction.rollback();
-        return res.status(statusCode.CONFLICT.code).json({
-          message:"This mobile is already allocated to existing user"
-        })
       }
-
-      console.log(checkDuplicateMobile,'check duplicate mobile')
-
-      
-      let lastLogin = new Date();
-  
-
-      // Hash the password
-      // const hashedPassword = await bcrypt.hash(password, 10);
-      // for uploading user image
-      
-
-
-
-      const newUser = await user.create({
-        firstName: firstName,
-        middleName: middleName,
-        lastName: lastName,
-        userName: email,
-        // password: hashedPassword,
-        phoneNo: phoneNo,
-        emailId: email,
-        roleId:roleId,
-        language:language,
-        location:location,
-        lastLogin:lastLogin, // Example of setting a default value
-        statusId: 1, // Example of setting a default value
-        createdDt: createdDt, // Set current timestamp for createdOn
-        updatedDt: updatedDt, // Set current timestamp for updatedOn
-     
-      },
-    {
-      transaction
-    });
-
-      if(!newUser){
-        await transaction.rollback();
-        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-          message:"Something went wrong"
-        })
-      }
-      if(isEmailVerified==1){
-        let [updateTheUser] = await user.update({
-          verifyEmail:isEmailVerified
-        },{
-          where:{
-            userId:newUser.userId
-          },
-          transaction
-        }
       )
-      if(updateTheUser==0){
+      if (updateTheUser == 0) {
         await transaction.rollback();
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-          message:`Something went wrong`
+          message: `Something went wrong`
         })
       }
-      console.log(updateTheUser,'update the user email ')
-      }
-      if(activities){
-           // insert to prefered activity first
-        activities.forEach(async(activity)=>{
-          let insertToPreferedActivity  = await userActivityPreference.create({
-            userId:newUser.userId,
-            userActivityId: activity,
-            statusId:statusId,
-            createdBy:newUser.userId,
-            updatedBy:newUser.userId,
-            createdDt:createdDt,
-            updatedDt:updatedDt
+      console.log(updateTheUser, 'update the user email ')
+    }
+    if (activities) {
+      // insert to prefered activity first
+      activities.forEach(async (activity) => {
+        let insertToPreferedActivity = await userActivityPreference.create({
+          userId: newUser.userId,
+          userActivityId: activity,
+          statusId: statusId,
+          createdBy: newUser.userId,
+          updatedBy: newUser.userId,
+          createdDt: createdDt,
+          updatedDt: updatedDt
 
-          },
-        {
-          transaction
-        })
+        },
+          {
+            transaction
+          })
 
-        if(!insertToPreferedActivity){
+        if (!insertToPreferedActivity) {
           await transaction.rollback();
           return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-            message:`Something went wrong`
+            message: `Something went wrong`
           })
         }
-        }) 
-      }
-   
-      
-      // after the user created successfully then the image can be added 
-      if(userImage){
-        let insertionData = {
-          id:newUser.userId,
-          name:decrypt(firstName)
-         }
-        // create the data
-        let entityType = 'usermaster'
-        let errors = [];
-        let subDir = "userDir"
-        let filePurpose = "User Image"
-        let uploadSingleImage = await imageUpload(userImage,entityType,subDir,filePurpose,insertionData,newUser.userId,errors,1,transaction)
-        console.log( uploadSingleImage,'165 line facility image')
-        if(errors.length>0){
-          await transaction.rollback();
-          if(errors.some(error => error.includes("something went wrong"))){
-            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({message:errors})
-          }
-          return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
-        }
-       
-      }
-      if(newUser){
-        await transaction.commit();
-      // Return success response
-      return res.status(statusCode.SUCCESS.code).json({
-        message:"User created successfully", user: newUser 
       })
+    }
+
+
+    // after the user created successfully then the image can be added 
+    if (userImage) {
+      let insertionData = {
+        id: newUser.userId,
+        name: decrypt(firstName)
       }
-      else{
-         await transaction.rollback();
-        return res.status(statusCode.BAD_REQUEST.code).json({
-          message:`Data is not updated`
-        })
+      // create the data
+      let entityType = 'usermaster'
+      let errors = [];
+      let subDir = "userDir"
+      let filePurpose = "User Image"
+      let uploadSingleImage = await imageUpload(userImage, entityType, subDir, filePurpose, insertionData, newUser.userId, errors, 1, transaction)
+      console.log(uploadSingleImage, '165 line facility image')
+      if (errors.length > 0) {
+        await transaction.rollback();
+        if (errors.some(error => error.includes("something went wrong"))) {
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+        }
+        return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
       }
 
-    
+    }
+    if (newUser) {
+      await transaction.commit();
+      // Return success response
+      return res.status(statusCode.SUCCESS.code).json({
+        message: "User created successfully", user: newUser
+      })
+    }
+    else {
+      await transaction.rollback();
+      return res.status(statusCode.BAD_REQUEST.code).json({
+        message: `Data is not updated`
+      })
+    }
+
+
 
   } catch (err) {
     // Handle errors
 
-    if(transaction) await transaction.rollback();
+    if (transaction) await transaction.rollback();
     logger.error(`An error occurred: ${err.message}`); // Log the error
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-      message:err.message
+      message: err.message
     })
   }
 };
@@ -648,26 +671,26 @@ function parseUserAgent(userAgent) {
 
   // Check if the User-Agent string contains patterns indicative of specific device types
   if (userAgent.includes('Windows')) {
-      deviceType = 'Desktop';
-      deviceName = 'Windows PC';
+    deviceType = 'Desktop';
+    deviceName = 'Windows PC';
   } else if (userAgent.includes('Macintosh')) {
-      deviceType = 'Desktop';
-      deviceName = 'Mac';
+    deviceType = 'Desktop';
+    deviceName = 'Mac';
   } else if (userAgent.includes('Linux')) {
-      deviceType = 'Desktop';
-      deviceName = 'Linux PC';
+    deviceType = 'Desktop';
+    deviceName = 'Linux PC';
   } else if (userAgent.includes('Android')) {
-      deviceType = 'Mobile';
-      deviceName = 'Android Device';
+    deviceType = 'Mobile';
+    deviceName = 'Android Device';
   } else if (userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('iPod')) {
-      deviceType = 'Mobile';
-      deviceName = 'iOS Device';
+    deviceType = 'Mobile';
+    deviceName = 'iOS Device';
   }
-    else if(userAgent.includes('Postman')){
-      deviceType = 'PC'
-      deviceName = 'Postman'
-      
-    }
+  else if (userAgent.includes('Postman')) {
+    deviceType = 'PC'
+    deviceName = 'Postman'
+
+  }
 
   return { deviceType, deviceName };
 }
@@ -680,6 +703,6 @@ module.exports = {
   viewUserProfile,
   logout,
   signUp
-  
+
 }
 

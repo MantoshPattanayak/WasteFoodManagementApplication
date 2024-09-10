@@ -1,6 +1,8 @@
+import instance from "../../env";
+const baseURL = instance().baseURL;
 const api = {
     ADD_FOOD_DONATION: {
-        url: "/food/addFoodDonationRequest",
+        url: baseURL + "/food/addFoodDonationRequest",
         method: "post"
         /**
          * in req.body
@@ -10,7 +12,7 @@ const api = {
          */
     },
     INITIAL_FOOD_DROPDOWN_DATA: {
-        url: "/food/initialData",
+        url: baseURL + "/food/initialData",
         method: "get",
         /**
          * for timeRange and distanceRange, send the option's value
@@ -18,40 +20,42 @@ const api = {
          */
     },
     VIEW_FOOD_DONATION_LIST: {
-        url: "/food/viewFoodDonationList",
+        url: baseURL + "/food/viewFoodDonationList",
         method: "post"
         /**
          * in req.body - page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq
          */
     },
     VIEW_FOOD_DONATION_BY_ID: {
-        url: "/food/viewFoodDonationById",
+        url: baseURL + "/food/viewFoodDonationById",
         method: "get",
         /**
          * in req.params - foodListingId
          */
     },
     CLOSE_FOOD_DONATION: {
-        url: "/food/closeFoodDonation",
+        url: baseURL + "/food/closeFoodDonation",
         method: "put",
         /**
          * in req.body - foodListingId
          */
     },
     LOGIN_CREATE_OTP: {
-        url: "/auth/createOtp",
+        url: baseURL + "/auth/createOtp",
         method: "post",
-    },
-    LOGIN_VERIFY_OTP: {
-        url: "/auth/verifyOtp",
-        method: "post",
+        /**
+         * req body - encryptMobile
+         */
     },
     LOGIN_WITH_OTP: {
-        url: "/auth/loginWithOTP",
+        url: baseURL + "/auth/loginWithOTP",
         method: "post",
+        /**
+         * req body - encryptMobile, encryptOtp
+         */
     },
     LOGOUT: {
-        url: "/auth/logout",
+        url: baseURL + "/auth/logout",
         method: "post"
     }
 }

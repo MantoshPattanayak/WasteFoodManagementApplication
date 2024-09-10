@@ -46,7 +46,7 @@ db1.units = require("./units.model")(sequelize, DataTypes)
 db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
 
 db1.otpVerifications.sync({
-  alter: true,
+  alter: false,
 });
 
 module.exports = db1;

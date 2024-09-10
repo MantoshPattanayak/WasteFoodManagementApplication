@@ -9,7 +9,7 @@ let _retry = null
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
-  
+
 function timeDelay(k) {
     const base_interval = 0.5
     const base_multiplier = 1.5
@@ -17,7 +17,7 @@ function timeDelay(k) {
     const max = k === 5 ? 500 : retry_interval
     return retry_interval + randomInt(0, max)
 }
-  
+
 function wait(delay) {
     return new Promise((resolve) => setTimeout(resolve, delay))
 }
@@ -29,7 +29,7 @@ const axiosInstance = axios.create({
 // request interceptor to check if auth-header contains token or not.
 axiosInstance.interceptors.request.use(
     config => {
-        if(!config.headers['Authorization']) {
+        if (!config.headers['Authorization']) {
             config.headers['Authorization'] = `Bearer ${tokenService.getLocalAccessToken()}`;
         }
         return config;
@@ -39,34 +39,34 @@ axiosInstance.interceptors.request.use(
 // response interceptor to check if token is valid or expired
 axiosInstance.interceptors.response.use((res) => res, async (err) => {
     const origReqConfig = err.config;
-        
-        if(err.response.status >= 500 && _retry_count < 4) {
+    // console.log("error", err);
+    if (err.code != "ERR_NETWORK" && err.response?.status >= 500 && _retry_count < 4) {
+        _retry_count++;
+        return wait(timeDelay(_retry_count)).then(() => axiosInstance.request(origReqConfig))
+    }
+
+    if (err.response.status === 401 && origReqConfig.headers.hasOwnProperty('Authorization')) {
+        const rtoken = tokenService.getLocalRefreshToken();
+        if (rtoken && _retry_count < 4) {
+
             _retry_count++;
-            return wait(timeDelay(_retry_count)).then(() => axiosInstance.request(origReqConfig))
+
+            delete origReqConfig.headers['Authorization']
+
+            _retry = await refresh(rtoken)
+                .finally(() => _retry = null)
+                .catch(error => Promise.reject(error))
+
+            return _retry.then((token) => {
+                origReqConfig.headers['Authorization'] = `Bearer ${token}`
+                return axiosInstance.request(origReqConfig)
+            })
         }
-    
-        if(err.response.status === 401 && origReqConfig.headers.hasOwnProperty('Authorization')) {
-            const rtoken = tokenService.getLocalRefreshToken();
-            if(rtoken && _retry_count < 4) {
-                
-                _retry_count++;
-    
-                delete origReqConfig.headers['Authorization']
-    
-                _retry = await refresh(rtoken)
-                    .finally(() => _retry = null)
-                    .catch(error => Promise.reject(error))
-                
-                return _retry.then((token) => {
-                    origReqConfig.headers['Authorization'] = `Bearer ${token}`
-                    return axiosInstance.request(origReqConfig)
-                })
-            }
-        }
-        return Promise.reject(err);
+    }
+    return Promise.reject(err);
 });
 /** function to fetch refresh token on expiry */
-async function refresh (rtoken) {
+async function refresh(rtoken) {
     let _rtoken = ''
     let _token = ''
 
@@ -84,7 +84,7 @@ async function refresh (rtoken) {
         _token = response.data.token
 
         tokenService.updateLocalAccessToken(_token);
-    } catch(error) {
+    } catch (error) {
         console.log(error)
     } finally {
         return _token

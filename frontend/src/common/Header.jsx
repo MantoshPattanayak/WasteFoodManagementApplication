@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Header.css'; // Import the CSS file for styling
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -18,7 +19,14 @@ const Header = () => {
             <li className="header__nav-item"><a href="#about">About</a></li>
             <li className="header__nav-item"><a href="#services">Services</a></li>
             <li className="header__nav-item"><a href="#contact">Contact</a></li>
-             <li className="header__nav-item"><button className='Login_button'>Login</button></li>
+             <li className="header__nav-item">
+              <Link className='Login_button' onClick={toggleSidebar} to={'/Login'}>
+                Login
+              </Link>
+              {/* <button className='Login_button'>
+                Login
+              </button> */}
+            </li>
           </ul>
         </nav>
         <div className="header__hamburger" onClick={toggleSidebar}>
@@ -34,7 +42,14 @@ const Header = () => {
           <li className="sidebar__item"><a href="#about" onClick={toggleSidebar}>About</a></li>
           <li className="sidebar__item"><a href="#services" onClick={toggleSidebar}>Services</a></li>
           <li className="sidebar__item"><a href="#contact" onClick={toggleSidebar}>Contact</a></li>
-          <li className="header__nav-item"><button className='Login_button' onClick={toggleSidebar}>Login</button></li>
+          <li className="header__nav-item">
+            <Link className='Login_button' onClick={toggleSidebar} to={'/Login'}>
+              Login
+            </Link>
+            {/* <button className='Login_button' onClick={toggleSidebar}>
+              Login
+            </button> */}
+          </li>
         </ul>
       </div>
     </header>
