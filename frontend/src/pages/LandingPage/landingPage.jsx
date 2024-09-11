@@ -9,6 +9,7 @@ import community_image from "../../assets/community.png"
 import Header from "../../common/Header"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import Footer from "../../common/footer"
 
 const LandingPage = () => {
     
@@ -69,6 +70,7 @@ const LandingPage = () => {
         </div>
     </div>
 </div>
+<Footer/>
 
         </div>
     )
