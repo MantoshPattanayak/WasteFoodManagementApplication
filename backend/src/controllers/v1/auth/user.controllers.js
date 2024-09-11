@@ -3,6 +3,7 @@ let statusCode = require("../../../utils/statusCode");
 const bcrypt = require("bcrypt");
 const fs = require('fs')
 let deviceLogin = db.device
+let users = db.users
 let otpVerifications = db.otpVerifications
 let QueryTypes = db.QueryTypes
 const { sequelize, Sequelize } = require('../../../models')
@@ -475,89 +476,50 @@ let signUp = async (req, res) => {
 
     console.log(req.body, 'req.body')
     let statusId = 1;
-    let { encryptEmail: email, encryptPassword: password, encryptFirstName: firstName,
-      encryptMiddleName: middleName, encryptLastName: lastName,
-      encryptPhoneNo: phoneNo, userImage, encryptLanguage: language,
-      encryptActivity: activities, isEmailVerified, location } = req.body;
+    let { name, email, phoneNumber, longitude, latitude, userType, userImage } = req.body;
 
-
-    console.log(activities, "activities")
-
-    console.log('req.body', req.body)
-    let createdDt = new Date();
-    let updatedDt = new Date();
-    if (!firstName && !lastName && !phoneNo && !userImage && !activities && !language) {
+    console.log('req.body', { name, phoneNumber, longitude, latitude, userType })
+    let createdOn = new Date();
+    // let updatedOn = new Date();
+    if (!name && !phoneNumber && !longitude && !latitude && !userType) {
       await transaction.rollback();
       return res.status(statusCode.BAD_REQUEST.code).json({
         message: `please provide all required data to set up the profile`
       })
     }
-    if (email) {
-      if (isEmailVerified != 1) {
-        await transaction.rollback();
-        return res.status(statusCode.BAD_REQUEST.code).json({
-          message: `Please verify the email first`
-        })
-      }
 
-    }
-    // const decryptUserName = decrypt(userName);
-    // const decryptEmailId = decrypt(email);
-    // const decryptPhoneNumber = decrypt(phoneNo);
-
-    // password = decrypt(password)
-
-    let checkDuplicateMobile = await user.findOne({
+    let checkDuplicateMobile = await users.findOne({
       where:
       {
         [Op.and]: [
-          { phoneNo: phoneNo },
+          { phoneNumber: phoneNumber },
           { statusId: statusId }
         ]
-
       },
       transaction
     })
-
-
-    console.log('password check', phoneNo)
+    console.log('checkDuplicateMobile', checkDuplicateMobile);
 
     if (checkDuplicateMobile) {
       await transaction.rollback();
       return res.status(statusCode.CONFLICT.code).json({
-        message: "This mobile is already allocated to existing user"
+        message: "This phone number is already allocated to existing user."
       })
     }
 
-    console.log(checkDuplicateMobile, 'check duplicate mobile')
-
-
     let lastLogin = new Date();
 
-
-    // Hash the password
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    // for uploading user image
-
-
-
-
-    const newUser = await user.create({
-      firstName: firstName,
-      middleName: middleName,
-      lastName: lastName,
-      userName: email,
-      // password: hashedPassword,
-      phoneNo: phoneNo,
-      emailId: email,
-      roleId: roleId,
-      language: language,
-      location: location,
+    const newUser = await users.create({
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+      userType: userType || null,
+      longitude: longitude,
+      latitude: latitude,
       lastLogin: lastLogin, // Example of setting a default value
       statusId: 1, // Example of setting a default value
-      createdDt: createdDt, // Set current timestamp for createdOn
-      updatedDt: updatedDt, // Set current timestamp for updatedOn
-
+      createdOn: createdOn, // Set current timestamp for createdOn
+      updatedOn: null, // Set current timestamp for updatedOn
     },
       {
         transaction
@@ -569,64 +531,20 @@ let signUp = async (req, res) => {
         message: "Something went wrong"
       })
     }
-    if (isEmailVerified == 1) {
-      let [updateTheUser] = await user.update({
-        verifyEmail: isEmailVerified
-      }, {
-        where: {
-          userId: newUser.userId
-        },
-        transaction
-      }
-      )
-      if (updateTheUser == 0) {
-        await transaction.rollback();
-        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-          message: `Something went wrong`
-        })
-      }
-      console.log(updateTheUser, 'update the user email ')
-    }
-    if (activities) {
-      // insert to prefered activity first
-      activities.forEach(async (activity) => {
-        let insertToPreferedActivity = await userActivityPreference.create({
-          userId: newUser.userId,
-          userActivityId: activity,
-          statusId: statusId,
-          createdBy: newUser.userId,
-          updatedBy: newUser.userId,
-          createdDt: createdDt,
-          updatedDt: updatedDt
-
-        },
-          {
-            transaction
-          })
-
-        if (!insertToPreferedActivity) {
-          await transaction.rollback();
-          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-            message: `Something went wrong`
-          })
-        }
-      })
-    }
-
 
     // after the user created successfully then the image can be added 
     if (userImage) {
       let insertionData = {
         id: newUser.userId,
-        name: decrypt(firstName)
+        name: name
       }
       // create the data
-      let entityType = 'usermaster'
+      let entityType = 'users'
       let errors = [];
       let subDir = "userDir"
       let filePurpose = "User Image"
       let uploadSingleImage = await imageUpload(userImage, entityType, subDir, filePurpose, insertionData, newUser.userId, errors, 1, transaction)
-      console.log(uploadSingleImage, '165 line facility image')
+      console.log(uploadSingleImage, 'error image')
       if (errors.length > 0) {
         await transaction.rollback();
         if (errors.some(error => error.includes("something went wrong"))) {
@@ -634,7 +552,6 @@ let signUp = async (req, res) => {
         }
         return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
       }
-
     }
     if (newUser) {
       await transaction.commit();
@@ -649,14 +566,9 @@ let signUp = async (req, res) => {
         message: `Data is not updated`
       })
     }
-
-
-
   } catch (err) {
     // Handle errors
-
     if (transaction) await transaction.rollback();
-    logger.error(`An error occurred: ${err.message}`); // Log the error
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: err.message
     })
@@ -703,6 +615,5 @@ module.exports = {
   viewUserProfile,
   logout,
   signUp
-
 }
 

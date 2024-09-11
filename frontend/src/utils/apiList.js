@@ -57,6 +57,10 @@ const api = {
     LOGOUT: {
         url: baseURL + "/auth/logout",
         method: "post"
+    },
+    SIGNUP: {
+        url: baseURL + "/auth/signup",
+        method: "post",
     }
 }
 

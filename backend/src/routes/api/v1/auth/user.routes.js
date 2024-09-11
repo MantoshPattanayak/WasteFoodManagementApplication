@@ -16,4 +16,6 @@ router.get('/viewUserProfile', authenticateToken, authController.viewUserProfile
 
 router.post('/logout', authenticateToken, authController.logout);
 
+router.post('/signup', authenticateToken, authController.signUp);
+
 module.exports = router
