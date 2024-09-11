@@ -26,7 +26,7 @@ const LandingPage = () => {
                         healthier
                         community.</p>
                     <span className="Button_on_image">
-                        <button className="button-19" role="button">Donate Now</button>
+                        <button className="button-19" role="button"> Donate Now</button>
                         <button className="button-9" role="button">Join as a volunteer</button>
                     </span>
                 </span>

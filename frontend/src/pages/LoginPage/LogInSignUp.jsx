@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 function LogInSignUp() {
   const [userType, setUserType] = useState("Donor");
   const [phoneNumber, setPhoneNumber] = useState("");

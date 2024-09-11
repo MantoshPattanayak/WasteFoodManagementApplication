@@ -19,8 +19,8 @@ const Header = () => {
         </div>
         <nav className={`header__nav ${isSidebarOpen ? 'open' : ''}`}>
           <ul className="header__nav-list">
-            <li className="header__nav-item"><a href="#home">Home</a></li>
-            <li className="header__nav-item"><a href="#about">About</a></li>
+            <li className="header__nav-item"> <Link to={'/'}>Home</Link> </li>
+            <li className="header__nav-item"> <Link to={"/About"}>About</Link></li>
             <li className="header__nav-item"><a href="#services">Services</a></li>
             <li className="header__nav-item"><a href="#contact">Contact</a></li>
              <li className="header__nav-item">

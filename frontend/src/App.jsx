@@ -11,7 +11,7 @@ const AvailableFood = React.lazy(() => import('./pages/AvailableFood/AvailableFo
 const LogInSignUp = React.lazy(() => import('./pages/LoginPage/LogInSignUp'))
 const DonorDetails = (React.lazy(() => import('./pages/DonorPage/DonorDetails')))
 const ReceivedHistoryPage = withAuth(React.lazy(() => import('./pages/ReceivedHistory/ReceivedHistoryPage')))
-
+import About from './pages/AboutPage/AboutPage';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -30,6 +30,7 @@ function App() {
                   <Route path="/Login" element={<LogInSignUp />} />
                   <Route path="/ReceivedHistoryPage" element={<ReceivedHistoryPage />} />
                   <Route path="/DonorDetails" element={<DonorDetails />} />
+                  <Route path="/About" element={<About />} />
                 </Routes>
               </Suspense>
             </div>
