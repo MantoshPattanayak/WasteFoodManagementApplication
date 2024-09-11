@@ -1,4 +1,4 @@
-import "./AvilableFood.css"
+import "./AvailableFood.css"
 import Header from "../../common/Header";
 import image_his_list from "../../assets/food_donation_home.jpeg"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,7 +6,7 @@ import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faUtensils } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-const AvilableFood=()=>{
+const AvailableFood=()=>{
     return(
         <div className='Mian_conatiner_doner_his'>
         <Header />
@@ -84,4 +84,4 @@ const AvilableFood=()=>{
     </div>
     )
 }
-export default AvilableFood;
+export default AvailableFood;

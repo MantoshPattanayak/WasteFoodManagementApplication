@@ -3,6 +3,7 @@ let statusCode = require("../../../utils/statusCode");
 const bcrypt = require("bcrypt");
 const fs = require('fs')
 let deviceLogin = db.device
+let authSessions = db.authSessions
 let users = db.users
 let otpVerifications = db.otpVerifications
 let QueryTypes = db.QueryTypes
@@ -104,22 +105,16 @@ let verifyOtp = async (req, res) => {
 
 let tokenAndSessionCreation = async (isUserExist, lastLoginTime, deviceInfo) => {
   try {
-    let userName = decrypt(isUserExist.userName)
-    let emailId
+    let userName = isUserExist.name;
     let sessionId;
-
-    if (isUserExist.emailId != null) {
-      emailId = decrypt(isUserExist.emailId)
-
-    }
 
     let userId = isUserExist.userId
     let roleId = isUserExist.roleId
-    console.log(isUserExist.userId, userName, emailId)
+    console.log(isUserExist.userId, userName)
 
     console.log(userId, userName, emailId, roleId, 'roleId')
 
-    let accessAndRefreshToken = await generateToken(userId, userName, emailId, roleId)
+    let accessAndRefreshToken = await generateToken(userId, userName);
 
     console.log(accessAndRefreshToken, "accessAndRefreshToken")
     if (accessAndRefreshToken?.error) {
@@ -135,7 +130,7 @@ let tokenAndSessionCreation = async (isUserExist, lastLoginTime, deviceInfo) => 
       secure: true
     };
 
-    let updateLastLoginTime = await user.update({ lastLogin: lastLoginTime }, {
+    let updateLastLoginTime = await users.update({ lastLogin: lastLoginTime }, {
       where: {
         userId: isUserExist.userId
       }
@@ -333,7 +328,11 @@ let loginWithOTP = async (req, res) => {
         console.log(isUserExist, 'check user 223 line')
         // If the user does not exist then we have to send a message to the frontend so that the sign up page will get render
         if (!isUserExist) {
-          return res.status(statusCode.SUCCESS.code).json({ message: "please render the sign up page", decideSignUpOrLogin: 0 });
+          return res.status(statusCode.SUCCESS.code).json({
+            message: "please render the sign up page",
+            decideSignUpOrLogin: 0,
+            user: {}
+          });
         }
 
         // console.log('2')
@@ -363,8 +362,16 @@ let loginWithOTP = async (req, res) => {
 
         return res.status(statusCode.SUCCESS.code)
           .header('Authorization', `Bearer ${accessToken}`)
-          .json({ message: "please render the login page", username: isUserExist.name, accessToken: accessToken, refreshToken: refreshToken, decideSignUpOrLogin: 1, sid: sessionId });
-
+          .json({
+            message: "please render the login page",
+            user: {
+              username: isUserExist.name,
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+              decideSignUpOrLogin: 1,
+              sid: sessionId
+            }
+          });
       }
       else {
         return res.status(statusCode.BAD_REQUEST.code).json({
@@ -372,7 +379,6 @@ let loginWithOTP = async (req, res) => {
         })
       }
     }
-
   }
   catch (err) {
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
@@ -563,7 +569,7 @@ let signUp = async (req, res) => {
     else {
       await transaction.rollback();
       return res.status(statusCode.BAD_REQUEST.code).json({
-        message: `Data is not updated`
+        message: `User signup failed.`
       })
     }
   } catch (err) {
@@ -614,7 +620,7 @@ let initialData = async (req, res) => {
         statusId: 1
       }
     });
-    
+
     return res.status(statusCode.SUCCESS.code).json({
       message: "roles category data",
       roles: fetchRoles

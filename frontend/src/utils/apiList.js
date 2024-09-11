@@ -61,10 +61,17 @@ const api = {
     SIGNUP: {
         url: baseURL + "/auth/signup",
         method: "post",
+        /**
+         * name, email, phoneNumber, longitude, latitude, userType, userImage
+         */
     },
     USER_INITIALDATA: {
         url: baseURL + '/auth/initialData',
         method: "get",
+    },
+    REFRESH_TOKEN: {
+        url: baseURL + '/auth/refresh-token',
+        method: "post",
     }
 }
 
