@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const api_version = process.env.API_VERSION
 const authController = require('../../../../controllers/'+api_version+'/auth/user.controllers');
+const refreshTokenController = require('../../../../controllers/'+api_version+'/auth/refreshToken.controllers');
 let authenticateToken = require('../../../../middlewares/authToken.middlewares')
 
 router.post('/createOtp', authController.createOtp);
@@ -19,5 +20,7 @@ router.post('/logout', authenticateToken, authController.logout);
 router.post('/signup', authenticateToken, authController.signUp);
 
 router.get('/initialData', authController.initialData);
+
+router.post('/refresh-token', refreshTokenController.refresh);
 
 module.exports = router

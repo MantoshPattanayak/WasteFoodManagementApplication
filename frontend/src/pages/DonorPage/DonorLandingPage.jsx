@@ -3,6 +3,7 @@ import Header from "../../common/Header";
 import "./DonorLandingPage.css";
 import Ads_image from "../../assets/ad.jpg"
 import dis_image from "../../assets/dis.png"
+import { Link } from "react-router-dom";
 const DonorLandingPage = () => {
     return (
         <div className="main_conatiner_DonorPage">
@@ -23,9 +24,9 @@ const DonorLandingPage = () => {
             </div>
             <div className="exp_donot">
                 <div className="Button_donor">
-                    <button  class="button-5" role="button">Donate</button>
-                    <button  class="button-5" role="button">Donation history</button>
-                    <button  class="button-5" role="button">Explore food requests</button>
+                    <Link to={"/DonorDetails"}><button className="button-5" role="button">Donate</button></Link>
+                    <Link to={"/DonateHistory"}><button className="button-5" role="button">Donation history</button></Link>
+                    <Link to={"/AvailableFood"}><button className="button-5" role="button">Explore food requests</button></Link>
                 </div>
                 <div className="donor_details">
                     <img className="dis_image"  src={dis_image}></img>

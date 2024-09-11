@@ -44,8 +44,10 @@ db1.rolePermissions = require("./rolePermissions.model")(sequelize, DataTypes)
 db1.statusMaster = require("./statusMaster.model")(sequelize, DataTypes)
 db1.units = require("./units.model")(sequelize, DataTypes)
 db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
+db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
+db1.device = require('./device.model')(sequelize, DataTypes)
 
-db1.otpVerifications.sync({
+db1.users.sync({
   alter: false,
 });
 

@@ -1,12 +1,12 @@
 let jwt = require('jsonwebtoken');
 
 //Generate an access token and a refresh token for this database user
-async function jwtTokens(userId, userName, emailId, roleId) {
+async function jwtTokens(userId, userName) {
   try {
     console.log(userId, userName, emailId, 'token data')
 
-    const user = { userId, userName, emailId, roleId };
-    console.log(userId, userName, emailId, roleId);
+    const user = { userId, userName };
+    console.log(userId, userName);
 
     let accessToken;
     let refreshToken;

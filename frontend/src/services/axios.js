@@ -1,6 +1,7 @@
 import axios from "axios";
 import instance from "../../env";
 import tokenService from "./token.service";
+import api from "../utils/apiList";
 
 const { headers, urlTimeout: timeout } = instance();
 let _retry_count = 0
@@ -66,13 +67,13 @@ axiosInstance.interceptors.response.use((res) => res, async (err) => {
     return Promise.reject(err);
 });
 /** function to fetch refresh token on expiry */
-async function refresh(rtoken) {
+export async function refresh(rtoken) {
     let _rtoken = ''
     let _token = ''
 
     try {
         let response = await axios({
-            baseURL: baseURL + '/refresh-token',
+            baseURL: api.REFRESH_TOKEN.url,
             timeout,
             method: 'post',
             data: {
@@ -84,8 +85,10 @@ async function refresh(rtoken) {
         _token = response.data.token
 
         tokenService.updateLocalAccessToken(_token);
+        return true;
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return false;
     } finally {
         return _token
     }
