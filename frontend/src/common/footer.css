@@ -1,0 +1,88 @@
+footer {
+    background-color: #0A122A;
+    color: white;
+    font-size: 14px;
+    height: 65vh;
+}
+.text_overcom{
+    display: flex;
+    justify-content: center;
+   
+   text-align: center;
+
+}
+.text_overcom h1{
+    font-size: 40px;
+    margin-top: 80px;
+}
+.footer_button_vol_do{
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+    gap: 50px;
+}
+.volunteer_button{
+    padding: 10px;
+    width: 8%;
+    background-color: #0A122A;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #fff;
+}
+.donate_button{
+    padding: 10px;
+    width: 8%;
+    background-color: #fff;
+    color: #0A122A;
+    font-size: 16px;
+    border-radius: 10px;
+  
+}
+.content_footer{
+    display: flex;
+    justify-content: space-evenly;
+    padding: 30px;
+
+}
+
+.footer-section h4 {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 15px;
+}
+
+.footer-section ul li a {
+    color: #e5e5e5;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+
+/* copy_right */
+.copy_right{
+    display: flex;
+    justify-content: center;
+}
+.copy_right h1{
+    font-size: 16px;
+    margin-top: 30px;
+}
