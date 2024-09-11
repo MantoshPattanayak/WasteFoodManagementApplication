@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Header.css'; // Import the CSS file for styling
 import { Link } from 'react-router-dom';
+import Logo from '../assets/food-donation-icon 1.svg'
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -12,7 +13,10 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header__container">
-        <div className="header__logo">Logo</div>
+        <div className="header__logo">
+          <img src={Logo}/>
+          <p>SOUL SHARE</p>
+        </div>
         <nav className={`header__nav ${isSidebarOpen ? 'open' : ''}`}>
           <ul className="header__nav-list">
             <li className="header__nav-item"><a href="#home">Home</a></li>
