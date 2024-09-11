@@ -1,0 +1,86 @@
+.About_main_container {
+  height: auto;
+  width: auto;
+}
+
+.child_about_main_container {
+  display: flex;
+  background-color: #4d566f;
+  justify-content: space-around;
+}
+.text_about{
+    font-size: 70px;
+    color: #ffff;
+}
+.content_text p{
+    color: #ffff;
+    font-size: 20px;
+    font-weight: 600;
+}
+.text_about1{
+    font-size: 75px;
+    color: #ed7d0e;
+}
+.food-image{
+    height: 70vh;
+    width: auto;
+
+}
+.content_text{
+ padding: 80px;
+}
+.button_donate_volunteer{
+    display: flex;
+    gap: 50px;
+    padding: 30px;
+}
+.donated_button{
+    padding: 10px;
+    width: 30%;
+    color: #ffff;
+    font-size: 20px;
+    background-color: rgb(241, 98, 3);
+    border: 1px solid rgb(241, 98, 3);
+}
+
+/* mission section */
+.mission_child_food{
+    display: flex;
+    padding: 90px;
+    justify-content: space-around;
+}
+.text_mission{
+    text-align: center;
+    padding: 20px;
+    font-size: 65px;
+    color: #ed7d0e;
+    font-weight: 600;
+
+}
+.mission_content{
+    width: 600px;
+}
+.mission_content p{
+    font-size: 20px;
+}
+.mission_content h1{
+    color: rgb(1, 38, 63);
+    font-size: 25px;
+}
+.mission_image{
+    height: 40vh;
+    filter: brightness(85%);
+}
+/* how it's work */
+.How_it_work h1{
+    text-align: center;
+     font-size: 65px;
+ 
+    font-weight: 600;
+}
+.How_it_work{
+width: 1900px;
+}
+.How_it_work p{
+    text-align: center;
+}
