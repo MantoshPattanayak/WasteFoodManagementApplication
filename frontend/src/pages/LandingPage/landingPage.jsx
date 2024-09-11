@@ -7,7 +7,8 @@ import Bike_ride_drivery_body from "../../assets/bike_ride_boyd.png"
 import dis from "../../assets/dis.png"
 import community_image from "../../assets/community.png"
 import Header from "../../common/Header"
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faArrowLeft, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 const LandingPage = () => {
     
@@ -45,21 +46,24 @@ const LandingPage = () => {
                 <div className="each_image_ads">
                     <img className="image_logo" src={what_to_do_1st_image} alt="Rescue Food"></img>
                     <p className="text_color">We rescue fresh leftover food from individuals, restaurants, grocery stores, caterers, and events.</p>
-                    <h2 className="b_donor">Be a Donor </h2>
+                    <h2 className="b_donor">Be a Donor    <FontAwesomeIcon icon={faArrowRight} size="x" /> </h2>
                 </div>
                 <div className="each_image_ads">
                     <img className="image_logo" src={Bike_ride_drivery_body} alt="Bike Ride"></img>
-                    <p className="text_color">We ensure efficient transportation of rescued food to those in need.</p>
+                    <p className="text_color">Volunteers can join our team to help by collecting food donations directly from donors, ensuring it reaches those in need.</p>
+                    <h2 className="b_donor">Be a Volunteer    <FontAwesomeIcon icon={faArrowRight} size="x" /> </h2>
                 </div>
             </div>
             <div className="image_text_ads">
                 <div className="each_image_ads">
                     <img className="image_logo" src={dis} alt="Distribution"></img>
-                    <p className="text_color">We distribute rescued food to charities and individuals in need.</p>
+                    <p className="text_color">We donate rescued food directly to people or through charities, and facilitate communication between donors and volunteers.</p>
+                    <h2 className="b_donor">Register Charity   <FontAwesomeIcon icon={faArrowRight} size="x" /> </h2>
                 </div>
                 <div className="each_image_ads">
                     <img className="image_logo" src={community_image} alt="Community"></img>
-                    <p className="text_color">We foster community involvement to combat hunger effectively.</p>
+                    <p className="text_color">We are building a compassionate community united to fight hunger by connecting donors, volunteers, and those in need.</p>
+                    <h2 className="b_donor">Join    <FontAwesomeIcon icon={faArrowRight} size="x" /> </h2>
                 </div>
             </div>
         </div>
