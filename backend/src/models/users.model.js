@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
+        email: {
+            type: DataTypes.STRING(100),
+        },
         phoneNumber: {
             type: DataTypes.STRING(20),
             allowNull: true,
@@ -32,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
         facebookAccountId: {
             type: DataTypes.STRING(150),
             allowNull: true,
+        },
+        lastLogin: {
+            type: DataTypes.INTEGER,
+            default: sequelize.literal('CURRENT_TIMESTAMP'),
         },
         createdBy: {
             type: DataTypes.INTEGER,
