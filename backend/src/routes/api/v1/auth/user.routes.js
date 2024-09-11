@@ -18,4 +18,6 @@ router.post('/logout', authenticateToken, authController.logout);
 
 router.post('/signup', authenticateToken, authController.signUp);
 
+router.get('/initialData', authController.initialData);
+
 module.exports = router

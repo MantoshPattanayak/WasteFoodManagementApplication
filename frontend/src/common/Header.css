@@ -21,8 +21,21 @@
   
   /* Logo styles */
   .header__logo {
+    height: 100%;
     font-size: 1.5rem;
     font-weight: bold;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    background-color: white;
+    border-radius: 8px;
+    color: #040273;
+    padding: 0px 5px 0px 5px;
+  }
+
+  .header__logo p {
+    height: 100%;
+    padding-top: 14px;
   }
   
   /* Navigation */

@@ -61,6 +61,10 @@ const api = {
     SIGNUP: {
         url: baseURL + "/auth/signup",
         method: "post",
+    },
+    USER_INITIALDATA: {
+        url: baseURL + '/auth/initialData',
+        method: "get",
     }
 }
 

@@ -607,6 +607,26 @@ function parseUserAgent(userAgent) {
   return { deviceType, deviceName };
 }
 
+let initialData = async (req, res) => {
+  try {
+    let fetchRoles = await db.roles.findAll({
+      where: {
+        statusId: 1
+      }
+    });
+    
+    return res.status(statusCode.SUCCESS.code).json({
+      message: "roles category data",
+      roles: fetchRoles
+    });
+  }
+  catch (error) {
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: error.message
+    })
+  }
+}
+
 module.exports = {
   createOtp,
   verifyOtp,
@@ -614,6 +634,7 @@ module.exports = {
   loginWithOAuth,
   viewUserProfile,
   logout,
-  signUp
+  signUp,
+  initialData
 }
 
