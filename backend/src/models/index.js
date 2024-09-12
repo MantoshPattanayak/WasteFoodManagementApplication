@@ -46,9 +46,10 @@ db1.units = require("./units.model")(sequelize, DataTypes)
 db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
 db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
 db1.device = require('./device.model')(sequelize, DataTypes)
+db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
 
-db1.users.sync({
-  alter: true,
+db1.files.sync({
+  alter: false,
 });
 
 module.exports = db1;

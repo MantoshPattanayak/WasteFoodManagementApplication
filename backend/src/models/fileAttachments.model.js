@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(50),
         },
         fileType: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(50),
             // references: {
             //     model: "fileTypes",
             //     key: "fileTypeId"
