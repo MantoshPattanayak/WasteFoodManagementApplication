@@ -10,9 +10,9 @@
 .formSection {
   flex: 1;
   padding: 20px;
-  background-color: #fff;
+  /* background-color: #fff; */
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
 }
 
 .profilePhotoSection {
@@ -42,8 +42,8 @@
   width: 20vw;
 }
 
-.tac{
-    color: blue;
+.tac {
+  color: blue;
 }
 
 .profileImage {
@@ -54,22 +54,22 @@
 }
 
 .profilePlaceholder {
-    width: 136px;
-    height: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /* background-color: #e0e0e0; */
-    border-radius: 50%;
-    cursor: pointer;
-    color: #555;
-    /* gap: 10px; */
+  width: 136px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* background-color: #e0e0e0; */
+  border-radius: 50%;
+  cursor: pointer;
+  color: #555;
+  /* gap: 10px; */
 }
 
 .defaultProfileIcon {
-    width: 100px;
-    height: auto;
+  width: 100px;
+  height: auto;
 }
 
 .uploadProfileImg {
@@ -178,4 +178,116 @@
   color: red;
   font-size: 12px;
   margin-top: 5px;
+}
+
+@media (max-width: 1024px) {
+  .registrationContainer {
+    /* flex-direction: column; */
+    align-items: center;
+  }
+
+  .formSection {
+    width: 90%;
+    margin-bottom: 20px;
+  }
+
+  .imageSection {
+    width: 90%;
+    margin-bottom: 20px;
+    /* display: none; */
+  }
+
+  .info {
+    flex-direction: column;
+  }
+
+  .leftInfo {
+    width: 100%;
+    font-size: 32px;
+  }
+
+  .rightInfo {
+    width: 100%;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+
+  .inputRow {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .profileImage,
+  .defaultProfileIcon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .uploadProfileImg,
+  .removeProfileImg {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .registrationContainer {
+    flex-direction: column;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .formSection {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .imageSection {
+    width: 100%;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .info {
+    flex-direction: column;
+  }
+
+  .leftInfo {
+    width: 100%;
+    font-size: 24px;
+  }
+
+  .rightInfo {
+    width: 100%;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+
+  .inputRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .profileImage,
+  .defaultProfileIcon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .uploadProfileImg,
+  .removeProfileImg {
+    font-size: 10px;
+  }
+
+  .userTypeButtons {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .proceedButton {
+    width: 30%;
+    text-align: center;
+  }
 }
