@@ -16,8 +16,8 @@ function Registration() {
     phoneNumber: "",
     email: "",
     location: {
-      latitude: '',
-      longitude: '',
+      latitude: "",
+      longitude: "",
     },
     landmark: "",
     userType: "",
@@ -29,7 +29,6 @@ function Registration() {
   const location = useLocation();
   const [userTypeList, setUserTypeList] = useState([]);
 
-
   function getUserGeoLocation() {
     console.log("getUserGeoLocation");
     if (navigator.geolocation) {
@@ -38,31 +37,48 @@ function Registration() {
           const { latitude, longitude } = position.coords;
           setFormData({
             ...formData,
-            ['location']: { latitude, longitude }
+            ["location"]: { latitude, longitude },
           });
           return;
-        }, (error) => {
+        },
+        (error) => {
           console.log("error", error);
           let response;
           switch (error.code) {
             case error.PERMISSION_DENIED:
-              console.error('User denied the request for Geolocation.');
-              response = { success: 0, error: 'Location access denied. Please enable location services to use this feature.' }
+              console.error("User denied the request for Geolocation.");
+              response = {
+                success: 0,
+                error:
+                  "Location access denied. Please enable location services to use this feature.",
+              };
               // alert('Location access denied. Please enable location services to use this feature.');
               break;
             case error.POSITION_UNAVAILABLE:
-              console.error('Location information is unavailable.');
-              response = { success: 0, error: 'Location information is currently unavailable. Please try again later.' }
+              console.error("Location information is unavailable.");
+              response = {
+                success: 0,
+                error:
+                  "Location information is currently unavailable. Please try again later.",
+              };
               // alert('Location information is currently unavailable. Please try again later.');
               break;
             case error.TIMEOUT:
-              console.error('The request to get user location timed out.');
-              response = { success: 0, error: 'Request to access location timed out. Please try again.' }
+              console.error("The request to get user location timed out.");
+              response = {
+                success: 0,
+                error:
+                  "Request to access location timed out. Please try again.",
+              };
               // alert('Request to access location timed out. Please try again.');
               break;
             default:
-              console.error('An unknown error occurred.');
-              response = { success: 0, error: 'An unknown error occurred while accessing your location.' }
+              console.error("An unknown error occurred.");
+              response = {
+                success: 0,
+                error:
+                  "An unknown error occurred while accessing your location.",
+              };
             // alert('An unknown error occurred while accessing your location.');
           }
           alert(response.error);
@@ -71,7 +87,10 @@ function Registration() {
       );
     } else {
       console.error("Geolocation is not supported by this browser");
-      let response = { success: 0, error: 'Geolocation is not supported by this browser' }
+      let response = {
+        success: 0,
+        error: "Geolocation is not supported by this browser",
+      };
       toast.error(response.error);
     }
     return;
@@ -81,8 +100,7 @@ function Registration() {
     const { name, value, type, checked } = e.target;
     if (name == "location") {
       const res = getUserGeoLocation();
-    }
-    else {
+    } else {
       setFormData({
         ...formData,
         [name]: type === "checkbox" ? checked : value,
@@ -101,13 +119,12 @@ function Registration() {
       reader.onloadend = () => {
         setFormData({
           ...formData,
-          ["userImage"]: reader.result
-        })
-      }
-    }
-    else {
+          ["userImage"]: reader.result,
+        });
+      };
+    } else {
       toast.dismiss();
-      toast.error("Choose an image with size less than 500 KB.")
+      toast.error("Choose an image with size less than 500 KB.");
     }
   };
 
@@ -137,9 +154,9 @@ function Registration() {
     if (validateForm()) {
       let modifiedData = {
         ...formData,
-        name: formData.firstName + ' ' + formData.lastName,
+        name: formData.firstName + " " + formData.lastName,
         latitude: formData.latitude,
-        longitude: formData.longitude
+        longitude: formData.longitude,
       };
       delete modifiedData.firstName;
       delete modifiedData.lastName;
@@ -149,9 +166,8 @@ function Registration() {
         let res = await axiosInstance.post(api.SIGNUP.url, modifiedData);
         console.log("response of sign up API", res.data);
         tokenService.setUser(res.data?.user);
-        navigate('/DonorLandingPage');
-      }
-      catch (error) {
+        navigate("/DonorLandingPage");
+      } catch (error) {
         console.error("error of sign up api", error);
       }
     }
@@ -162,8 +178,7 @@ function Registration() {
       let res = await axiosInstance.get(api.USER_INITIALDATA.url);
       console.log("response of fetchUserTypeList", res.data.roles);
       setUserTypeList(res.data.roles);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("error while fetching user type list", error);
     }
   }
@@ -171,7 +186,7 @@ function Registration() {
   useEffect(() => {
     // fetch user type list
     fetchUserTypeList();
-  }, [])
+  }, []);
 
   return (
     <div className="registrationContainer">
@@ -180,8 +195,8 @@ function Registration() {
           <div className="leftInfo">Input your information</div>
           <div className="rightInfo">
             We need you to help us with some basic information for your account
-            creation. Here are our <a className="tac"> terms and conditions</a>. Please read them
-            carefully.
+            creation. Here are our <a className="tac"> terms and conditions</a>.
+            Please read them carefully.
           </div>
         </div>
         <form onSubmit={handleSubmit}>
@@ -290,10 +305,16 @@ function Registration() {
                   type="text"
                   id="location"
                   name="location"
-                  value={formData.location.latitude ? formData.location.latitude + ", " + formData.location.longitude : ''}
+                  value={
+                    formData.location.latitude
+                      ? formData.location.latitude +
+                        ", " +
+                        formData.location.longitude
+                      : ""
+                  }
                   onClick={handleInputChange}
                   readOnly={true}
-                // onChange={handleInputChange}
+                  // onChange={handleInputChange}
                 />
               </div>
               <div className="inputGroup">
@@ -313,21 +334,21 @@ function Registration() {
           <div className="userTypeSection">
             <label>Individual / Food Business</label>
             <div className="userTypeButtons">
-              {
-                userTypeList.map((userType) => {
-                  return (
-                    <button
-                      type="button"
-                      className={formData.userType === userType.roleId ? "selected" : ""}
-                      onClick={() =>
-                        setFormData({ ...formData, userType: userType.roleId })
-                      }
-                    >
-                      {userType.roleName}
-                    </button>
-                  )
-                })
-              }
+              {userTypeList.map((userType) => {
+                return (
+                  <button
+                    type="button"
+                    className={
+                      formData.userType === userType.roleId ? "selected" : ""
+                    }
+                    onClick={() =>
+                      setFormData({ ...formData, userType: userType.roleId })
+                    }
+                  >
+                    {userType.roleName}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -340,7 +361,9 @@ function Registration() {
                 checked={formData.termsAccepted}
                 onChange={handleInputChange}
               />
-              <label htmlFor="termsAccepted">&nbsp;Accept terms and conditions</label>
+              <label htmlFor="termsAccepted">
+                &nbsp;Accept terms and conditions
+              </label>
               {errors.termsAccepted && (
                 <span className="error">{errors.termsAccepted}</span>
               )}

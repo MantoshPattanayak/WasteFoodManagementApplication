@@ -13,6 +13,7 @@ const statusCode = require("./utils/statusCode");
 const authRoutes = require("./routes/api/" + api_version + "/auth/user.routes");
 const foodsRoutes = require("./routes/api/" + api_version + "/foods/foods.routes");
 const notificationRoutes = require("./routes/api/" + api_version + "/notifications/notifications.routes");
+const activityRoutes = require('./routes/api/' + api_version + '/activity/activity.routes');
 //-------------------------------------------------------------------------------------------------------------//
 
 
@@ -46,6 +47,7 @@ app.use((err, req, res, next)=>{
 app.use("/auth", authRoutes);
 app.use("/food", foodsRoutes);
 app.use("/notification", notificationRoutes);
+app.use("/activity", activityRoutes);
 //-------------------------------------------------------------------------------------------------------------//
 
 

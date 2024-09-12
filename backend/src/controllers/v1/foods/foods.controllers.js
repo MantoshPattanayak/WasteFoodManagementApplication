@@ -43,10 +43,10 @@ let addFoodDonationRequest = async (req, res) => {
         }
         console.log("check submitted details end");
         // fetch entity types data
-        let entityTypesMasterData = await fetchMasterData('entityTypes');
-        console.log("entityTypesMasterData", entityTypesMasterData);
-        entityTypesMasterData = entityTypesMasterData.filter((data) => { return data.entityTypeName == "foodDonation" });
-        console.log("entityTypesMasterData filtered foodDonation", entityTypesMasterData);
+        // let entityTypesMasterData = await fetchMasterData('entityTypes');
+        // console.log("entityTypesMasterData", entityTypesMasterData);
+        // entityTypesMasterData = entityTypesMasterData.filter((data) => { return data.entityTypeName == "foodDonation" });
+        // console.log("entityTypesMasterData filtered foodDonation", entityTypesMasterData);
         // insert into foodListing table
         let insertFoodListing = await foodListings.create({
             userId: userId,
@@ -76,7 +76,7 @@ let addFoodDonationRequest = async (req, res) => {
                 name: foodItem.foodName + "_" + foodItem.foodCategory + "_" + formatDateToDDMMYYYYHHMMSSMS()
             }
             // insert into food image file
-            let imageFileUpload = imageUpload(foodItem.imageData, entityTypesMasterData[0].entityTypeName, subDir, insertionData, userId, errors, serialNumber, transaction);
+            let imageFileUpload = imageUpload(foodItem.imageData, "foodDonation", subDir, insertionData, userId, errors, serialNumber, transaction);
             if (errors.length > 0) {
                 transaction.rollback();
                 return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
