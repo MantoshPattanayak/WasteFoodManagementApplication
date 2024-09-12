@@ -9,6 +9,12 @@ const sequelize = new Sequelize(
   host: db.HOST,
   dialect: db.DIALECT,
   logging: false,
+  pool:{
+    max:40,
+    min:0,
+    acquire:30000,
+    idle:10000
+  }
 });
 
 // Test the connection
@@ -47,8 +53,8 @@ db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
 db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
 db1.device = require('./device.model')(sequelize, DataTypes)
 
-db1.users.sync({
-  alter: true,
+db1.foodCategories.sync({
+  alter: false,
 });
 
 module.exports = db1;
