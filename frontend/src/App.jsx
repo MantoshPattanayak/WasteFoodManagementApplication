@@ -11,7 +11,9 @@ const AvailableFood = React.lazy(() => import('./pages/AvailableFood/AvailableFo
 const LogInSignUp = React.lazy(() => import('./pages/LoginPage/LogInSignUp'))
 const DonorDetails = (React.lazy(() => import('./pages/DonorPage/DonorDetails')))
 const ReceivedHistoryPage = withAuth(React.lazy(() => import('./pages/ReceivedHistory/ReceivedHistoryPage')))
-import About from './pages/AboutPage/AboutPage';
+const About = React.lazy(() => import('./pages/AboutPage/AboutPage'));
+const Registration = React.lazy(() => import('./pages/RegistrationForm/Registration'))
+
 function App() {
   const [count, setCount] = useState(0)
 
@@ -31,6 +33,7 @@ function App() {
                   <Route path="/ReceivedHistoryPage" element={<ReceivedHistoryPage />} />
                   <Route path="/DonorDetails" element={<DonorDetails />} />
                   <Route path="/About" element={<About />} />
+                  <Route path="/Registration" element={<Registration />} />
                 </Routes>
               </Suspense>
             </div>

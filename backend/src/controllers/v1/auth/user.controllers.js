@@ -13,6 +13,7 @@ const { encrypt } = require('../../../middlewares/encryption.middlewares')
 const { decrypt } = require('../../../middlewares/decryption.middlewares')
 const { Op } = require("sequelize");
 let generateToken = require('../../../utils/generateToken');
+const imageUpload = require('../../../utils/imageUpload');
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
   console.log('incoming');
@@ -479,21 +480,19 @@ let signUp = async (req, res) => {
     transaction = await sequelize.transaction();
     console.log('1')
     let roleId = 4;
-
-    console.log(req.body, 'req.body')
     let statusId = 1;
     let { name, email, phoneNumber, longitude, latitude, userType, userImage } = req.body;
 
-    console.log('req.body', { name, phoneNumber, longitude, latitude, userType })
-    let createdOn = new Date();
+    // console.log('req.body', { name, phoneNumber, longitude, latitude, userType })
     // let updatedOn = new Date();
     if (!name && !phoneNumber && !longitude && !latitude && !userType) {
+      console.log(2)
       await transaction.rollback();
       return res.status(statusCode.BAD_REQUEST.code).json({
         message: `please provide all required data to set up the profile`
       })
     }
-
+    console.log(3)
     let checkDuplicateMobile = await users.findOne({
       where:
       {
@@ -505,16 +504,17 @@ let signUp = async (req, res) => {
       transaction
     })
     console.log('checkDuplicateMobile', checkDuplicateMobile);
-
+    console.log(4)
     if (checkDuplicateMobile) {
+      console.log(5)
       await transaction.rollback();
       return res.status(statusCode.CONFLICT.code).json({
         message: "This phone number is already allocated to existing user."
       })
     }
-
-    let lastLogin = new Date();
-
+    console.log(6)
+    let lastLogin = Date.now();
+    console.log(7)
     const newUser = await users.create({
       name: name,
       email: email,
@@ -524,22 +524,25 @@ let signUp = async (req, res) => {
       latitude: latitude,
       lastLogin: lastLogin, // Example of setting a default value
       statusId: 1, // Example of setting a default value
-      createdOn: createdOn, // Set current timestamp for createdOn
+      createdBy: 1,
       updatedOn: null, // Set current timestamp for updatedOn
     },
       {
         transaction
       });
+      console.log(8)
 
     if (!newUser) {
+      console.log(9)
       await transaction.rollback();
       return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
         message: "Something went wrong"
       })
     }
-
+    console.log(10)
     // after the user created successfully then the image can be added 
     if (userImage) {
+      console.log(11)
       let insertionData = {
         id: newUser.userId,
         name: name
@@ -552,6 +555,7 @@ let signUp = async (req, res) => {
       let uploadSingleImage = await imageUpload(userImage, entityType, subDir, filePurpose, insertionData, newUser.userId, errors, 1, transaction)
       console.log(uploadSingleImage, 'error image')
       if (errors.length > 0) {
+        console.log(12)
         await transaction.rollback();
         if (errors.some(error => error.includes("something went wrong"))) {
           return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
@@ -560,6 +564,7 @@ let signUp = async (req, res) => {
       }
     }
     if (newUser) {
+      console.log(13)
       await transaction.commit();
       // Return success response
       return res.status(statusCode.SUCCESS.code).json({
@@ -567,6 +572,7 @@ let signUp = async (req, res) => {
       })
     }
     else {
+      console.log(14)
       await transaction.rollback();
       return res.status(statusCode.BAD_REQUEST.code).json({
         message: `User signup failed.`
@@ -574,6 +580,7 @@ let signUp = async (req, res) => {
     }
   } catch (err) {
     // Handle errors
+    console.log(15)
     if (transaction) await transaction.rollback();
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: err.message

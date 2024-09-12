@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Registration.css";
 import Regd_image from "../../assets/Regd_image.png";
 import profile_image from "../../assets/profileImgLogo.png";
 import tokenService from "../../services/token.service";
+import { toast, ToastContainer } from "react-toastify";
+import axiosInstance from "../../services/axios";
+import api from "../../utils/apiList";
+import { useLocation, useNavigate } from "react-router-dom";
+
 function Registration() {
   const [profileImg, setProfileImg] = useState(null);
   const [formData, setFormData] = useState({
@@ -10,23 +15,100 @@ function Registration() {
     lastName: "",
     phoneNumber: "",
     email: "",
-    location: "",
+    location: {
+      latitude: '',
+      longitude: '',
+    },
     landmark: "",
     userType: "",
+    userImage: "",
     termsAccepted: false,
   });
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [userTypeList, setUserTypeList] = useState([]);
+
+
+  function getUserGeoLocation() {
+    console.log("getUserGeoLocation");
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData({
+            ...formData,
+            ['location']: { latitude, longitude }
+          });
+          return;
+        }, (error) => {
+          console.log("error", error);
+          let response;
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.error('User denied the request for Geolocation.');
+              response = { success: 0, error: 'Location access denied. Please enable location services to use this feature.' }
+              // alert('Location access denied. Please enable location services to use this feature.');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.error('Location information is unavailable.');
+              response = { success: 0, error: 'Location information is currently unavailable. Please try again later.' }
+              // alert('Location information is currently unavailable. Please try again later.');
+              break;
+            case error.TIMEOUT:
+              console.error('The request to get user location timed out.');
+              response = { success: 0, error: 'Request to access location timed out. Please try again.' }
+              // alert('Request to access location timed out. Please try again.');
+              break;
+            default:
+              console.error('An unknown error occurred.');
+              response = { success: 0, error: 'An unknown error occurred while accessing your location.' }
+            // alert('An unknown error occurred while accessing your location.');
+          }
+          alert(response.error);
+          return;
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser");
+      let response = { success: 0, error: 'Geolocation is not supported by this browser' }
+      toast.error(response.error);
+    }
+    return;
+  }
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    if (name == "location") {
+      const res = getUserGeoLocation();
+    }
+    else {
+      setFormData({
+        ...formData,
+        [name]: type === "checkbox" ? checked : value,
+      });
+    }
+    console.log("formData", formData);
   };
 
   const handleProfileImgChange = (e) => {
-    setProfileImg(URL.createObjectURL(e.target.files[0]));
+    let image = e.target.files[0];
+    console.log("image", image);
+    if (parseInt(image.size / 1024) <= 500) {
+      setProfileImg(URL.createObjectURL(e.target.files[0]));
+      const reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          ["userImage"]: reader.result
+        })
+      }
+    }
+    else {
+      toast.dismiss();
+      toast.error("Choose an image with size less than 500 KB.")
+    }
   };
 
   const handleProfileImgRemove = () => {
@@ -50,21 +132,46 @@ function Registration() {
     return Object.keys(formErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      alert("Form submitted successfully!");
+      let modifiedData = {
+        ...formData,
+        name: formData.firstName + ' ' + formData.lastName,
+        latitude: formData.latitude,
+        longitude: formData.longitude
+      };
+      delete modifiedData.firstName;
+      delete modifiedData.lastName;
+      delete modifiedData.location;
+
+      try {
+        let res = await axiosInstance.post(api.SIGNUP.url, modifiedData);
+        console.log("response of sign up API", res.data);
+        tokenService.setUser(res.data?.user);
+        navigate('/DonorLandingPage');
+      }
+      catch (error) {
+        console.error("error of sign up api", error);
+      }
     }
   };
 
-  // Retrieve the user data
-const userData = tokenService.getUser();
+  async function fetchUserTypeList() {
+    try {
+      let res = await axiosInstance.get(api.USER_INITIALDATA.url);
+      console.log("response of fetchUserTypeList", res.data.roles);
+      setUserTypeList(res.data.roles);
+    }
+    catch (error) {
+      console.error("error while fetching user type list", error);
+    }
+  }
 
-if (userData) {
-  console.log("User Data:", userData);
-} else {
-  console.log("No user is logged in.");
-}
+  useEffect(() => {
+    // fetch user type list
+    fetchUserTypeList();
+  }, [])
 
   return (
     <div className="registrationContainer">
@@ -183,8 +290,10 @@ if (userData) {
                   type="text"
                   id="location"
                   name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
+                  value={formData.location.latitude ? formData.location.latitude + ", " + formData.location.longitude : ''}
+                  onClick={handleInputChange}
+                  readOnly={true}
+                // onChange={handleInputChange}
                 />
               </div>
               <div className="inputGroup">
@@ -204,26 +313,21 @@ if (userData) {
           <div className="userTypeSection">
             <label>Individual / Food Business</label>
             <div className="userTypeButtons">
-              <button
-                type="button"
-                className={formData.userType === "Individual" ? "selected" : ""}
-                onClick={() =>
-                  setFormData({ ...formData, userType: "Individual" })
-                }
-              >
-                Individual
-              </button>
-              <button
-                type="button"
-                className={
-                  formData.userType === "Food Business" ? "selected" : ""
-                }
-                onClick={() =>
-                  setFormData({ ...formData, userType: "Food Business" })
-                }
-              >
-                Food Business
-              </button>
+              {
+                userTypeList.map((userType) => {
+                  return (
+                    <button
+                      type="button"
+                      className={formData.userType === userType.roleId ? "selected" : ""}
+                      onClick={() =>
+                        setFormData({ ...formData, userType: userType.roleId })
+                      }
+                    >
+                      {userType.roleName}
+                    </button>
+                  )
+                })
+              }
             </div>
           </div>
 
@@ -236,7 +340,7 @@ if (userData) {
                 checked={formData.termsAccepted}
                 onChange={handleInputChange}
               />
-              <label htmlFor="termsAccepted">Accept terms and conditions</label>
+              <label htmlFor="termsAccepted">&nbsp;Accept terms and conditions</label>
               {errors.termsAccepted && (
                 <span className="error">{errors.termsAccepted}</span>
               )}

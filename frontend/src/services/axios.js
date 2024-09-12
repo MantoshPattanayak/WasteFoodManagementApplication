@@ -41,7 +41,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use((res) => res, async (err) => {
     const origReqConfig = err.config;
     // console.log("error", err);
-    if (err.code != "ERR_NETWORK" && err.response?.status >= 500 && _retry_count < 4) {
+    if (err.code != "ERR_NETWORK" && err.response?.status >= 500 && _retry_count < 1) {
         _retry_count++;
         return wait(timeDelay(_retry_count)).then(() => axiosInstance.request(origReqConfig))
     }

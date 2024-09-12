@@ -17,7 +17,7 @@ const uploadDir = process.env.UPLOAD_DIR;
  * @param {Object} transaction 
  * @returns 
  */
-let imageUpload = async (imageData, entityType, subDir, insertionData, userId, errors, serialNumber, transaction) => {
+let imageUpload = async (imageData, entityType, subDir, insertionData, userId, errors = [], serialNumber, transaction) => {
   // e.g.  sub dir = "facility Images"
   // insertionData is the object whose work is to give the data in the format {id:2, name:'US'}
   try {
