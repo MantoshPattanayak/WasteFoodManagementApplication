@@ -2,6 +2,7 @@ const db = require("../../../models/index");
 const { advertisements, files, fileAttachments, sequelize } = db;
 let statusCode = require("../../../utils/statusCode");
 const imageUpload = require("../../../utils/imageUpload");
+const { QueryTypes } = require("sequelize");
 
 
 let addNewAdvertisement = async (req, res) => {
@@ -84,15 +85,22 @@ let getAdvertisementList = async (req, res) => {
             from soulshare.advertisements a
             inner join soulshare.files f on a."advertisementId" = f."entityId" and f."entityType" = 'advertisement'
             inner join soulshare."fileAttachments" fa on fa."fileId" = f."fileId"
-            where a."statusId" = 1`, {
-                type: db.DataTypes.SELECT
-        });
+            where a."statusId" = 1`,
+            {
+                type: QueryTypes.SELECT
+            }
+        );
 
         console.log('fetchAdvertisementList', fetchAdvertisementList);
 
         return res.status(statusCode.SUCCESS.code).json({
             message: "list of advertisements",
-            advertisements: fetchAdvertisementList
+            advertisements: fetchAdvertisementList.map((ad) => {
+                return {
+                    ...ad,
+                    "url": encodeURI(ad.url)
+                }
+            })
         })
     }
     catch (error) {
