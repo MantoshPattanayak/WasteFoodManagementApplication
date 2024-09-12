@@ -48,7 +48,7 @@ db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
 db1.device = require('./device.model')(sequelize, DataTypes)
 
 db1.users.sync({
-  alter: false,
+  alter: true,
 });
 
 module.exports = db1;

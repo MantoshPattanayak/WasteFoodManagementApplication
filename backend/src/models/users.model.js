@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         },
         lastLogin: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DATE,
             default: sequelize.literal('CURRENT_TIMESTAMP'),
         },
         createdBy: {

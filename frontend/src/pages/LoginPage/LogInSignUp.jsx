@@ -86,7 +86,7 @@ function LogInSignUp() {
           autoClose: 1000,
           onClose: () => {
             setTimeout(() => {
-              navigate('/Signup');
+              navigate('/Registration');
             }, 500);
           }
         })

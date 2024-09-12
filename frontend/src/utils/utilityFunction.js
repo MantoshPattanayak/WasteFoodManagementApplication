@@ -28,12 +28,12 @@ function formatDateAsYYYYMMDD(date) { //format input date as DD-MM-YYYY
     return `${year}-${month}-${day}`;
 }
 
-function truncateName (name, maxLength) {
+function truncateName(name, maxLength) {
     return name.length > maxLength ? name.slice(0, maxLength) + '...' : name;
 };
 
 function calculateTimeDifferenceinHours(startTime, endTime) {
-    if(startTime.toString().includes('T') && endTime.toString().includes("T")){ //if datetime as input params then modify as time
+    if (startTime.toString().includes('T') && endTime.toString().includes("T")) { //if datetime as input params then modify as time
         startTime = startTime.split('T')[1].replace("Z", '');
         endTime = endTime.split("T")[1].replace("Z", '');
     }
@@ -53,4 +53,46 @@ function calculateTimeDifferenceinHours(startTime, endTime) {
     return timeDiffHours;
 }
 
-export  { formatTime, formatDateAsDDMMYYYY, formatDateAsDDMMYYYY, truncateName, calculateTimeDifferenceinHours }
+// here set the userLocation -------------------------------------------------------
+function getUserGeoLocation() {
+    console.log("getUserGeoLocation");
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                return { success: 1, latitude, longitude };
+            }, (error) => {
+                console.log("error", error);
+                let response;
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        console.error('User denied the request for Geolocation.');
+                        response = { success: 0, error: 'Location access denied. Please enable location services to use this feature.' }
+                        // alert('Location access denied. Please enable location services to use this feature.');
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        console.error('Location information is unavailable.');
+                        response = { success: 0, error: 'Location information is currently unavailable. Please try again later.' }
+                        // alert('Location information is currently unavailable. Please try again later.');
+                        break;
+                    case error.TIMEOUT:
+                        console.error('The request to get user location timed out.');
+                        response = { success: 0, error: 'Request to access location timed out. Please try again.' }
+                        // alert('Request to access location timed out. Please try again.');
+                        break;
+                    default:
+                        console.error('An unknown error occurred.');
+                        response = { success: 0, error: 'An unknown error occurred while accessing your location.' }
+                        // alert('An unknown error occurred while accessing your location.');
+                }
+                return response;
+            }
+        );
+    } else {
+        console.error("Geolocation is not supported by this browser");
+        return { success: 0, error: 'Geolocation is not supported by this browser' }
+    }
+    return;
+}
+
+export { formatTime, formatDateAsDDMMYYYY, getUserGeoLocation, truncateName, calculateTimeDifferenceinHours }
