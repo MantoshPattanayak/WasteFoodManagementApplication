@@ -423,14 +423,14 @@ const viewUserProfile = async (req, res) => {
 
 
 
-    let showpublic_user = await sequelize.query(`select u.* from amabhoomi.usermasters u where u.statusId = ? and u.roleId =? and u.userId = ?
+    let showpublic_user = await sequelize.query(`select u.* from amabhoomi.users u where u.statusId = ? and u.roleId =? and u.userId = ?
    `, {
       type: QueryTypes.SELECT,
       replacements: [statusId, publicRole, userId]
     })
 
-    let findTheImageUrl = await sequelize.query(`select fl.url,fl.fileId from amabhoomi.usermasters u inner join fileattachments f on u.userId = f.entityId  
-   inner join files fl on fl.fileId = f.fileId where f.entityType = ? and f.filePurpose =? and u.statusId = ? and u.roleId =? and u.userId = ? and fl.statusId = ? and f.statusId = ?`,
+    let findTheImageUrl = await sequelize.query(`select fl.url,fl.fileId from amabhoomi.users u inner join files f on u.userId = f.entityId  
+   inner join fileAttachments fl on fl.fileId = f.fileId where f.entityType = ? and f.filePurpose =? and u.statusId = ? and u.roleId =? and u.userId = ? and fl.statusId = ? and f.statusId = ?`,
       {
         type: QueryTypes.SELECT,
         replacements: [entityType, filePurpose, statusId, publicRole, userId, statusId, statusId]

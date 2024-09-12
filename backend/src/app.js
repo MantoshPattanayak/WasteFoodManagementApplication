@@ -32,6 +32,8 @@ app.use(
     limit: "20mb"
   })
 );
+app.use('/static', express.static(uploadDir));
+
 app.use(cookieParser());
 app.use((err, req, res, next)=>{
   if(err){
