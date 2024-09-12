@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
         foodSubCategoryName: {
             type: DataTypes.STRING(80),
         },
+        statusId: {
+            type: DataTypes.INTEGER,
+        },
         createdBy: {
             type: DataTypes.INTEGER,
             // references: {

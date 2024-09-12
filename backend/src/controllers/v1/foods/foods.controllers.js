@@ -6,7 +6,7 @@ const imageUpload = require("../../../utils/imageUpload");
 const fetchMasterData = require("../../../utils/fetchMasterData");
 const { formatDateToDDMMYYYYHHMMSSMS, calculateDistance, validateAndConvertDate } = require("../../../utils/commonFunctions");
 const timeZone = process.env.TIMEZONE;
-
+let foodCategories = db.foodCategories
 let addFoodDonationRequest = async (req, res) => {
     let transaction = await sequelize.transaction();
     try {
@@ -101,6 +101,7 @@ let addFoodDonationRequest = async (req, res) => {
 
 let initialData = async (req, res) => {
     try {
+        console.log('232')
         let timeRange = [{Today: 'Today'}, {Yesterday: 'Yesterday'}];
         let distanceRange = [
             {0: 1},
@@ -108,7 +109,7 @@ let initialData = async (req, res) => {
             {2: 5},
             {3: 10}
         ]
-        let foodType = await db.foodCategories.findAll({
+        let foodType = await foodCategories.findAll({
             where: {
                 statusId: 1
             },

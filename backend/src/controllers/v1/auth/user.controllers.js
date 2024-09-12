@@ -28,15 +28,17 @@ function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
 let createOtp = async (req, res) => {
   try {
     let { encryptMobile: mobileNo } = req.body;
+    console.log(req.body)
     console.log("encrypted mobile number", mobileNo);
     const generatedOTP = generateRandomOTP();
     console.log("generated OTP", generatedOTP);
-    mobileNo = decrypt(mobileNo.toString()); //get the decrypted mobile number
+    mobileNo = decrypt(mobileNo); //get the decrypted mobile number
     console.log("decrypted mobile number", mobileNo);
     let expiryTime = new Date();
     expiryTime = expiryTime.setMinutes(expiryTime.getMinutes() + 1);
     let otp = "123456";
     let insertOtp;
+    console.log(expiryTime,'expiryTime')
 
     if (mobileNo) { // if proper mobile number
       let isOtpValid = await otpVerifications.findOne({
@@ -59,15 +61,23 @@ let createOtp = async (req, res) => {
         });
         console.log(3, expireOtp);
         insertOtp = await otpVerifications.create({
-          mobileNo, code: encrypt(otp), expiryTime, verified: 0, createdBy: 1
+          mobileNo:encrypt(mobileNo), 
+          code: encrypt(otp), 
+          expireTime:expiryTime, 
+          verified: 0
         });
         console.log(4, insertOtp);
       }
       else {
         console.log(5)
         insertOtp = await otpVerifications.create({
-          mobileNo: encrypt(mobileNo), code: encrypt(otp), expiryTime, verified: 0, createdBy: 1
+          mobileNo:encrypt(mobileNo), 
+          code: encrypt(otp),
+          expiryTime:expiryTime,
+          verified: 0,
+          
         });
+     
       }
     }
     console.log("insertOTP", insertOtp);
@@ -106,14 +116,15 @@ let verifyOtp = async (req, res) => {
 
 let tokenAndSessionCreation = async (isUserExist, lastLoginTime, deviceInfo) => {
   try {
+    console.log("tokenAndSessionCreationFunction")
     let userName = isUserExist.name;
     let sessionId;
 
     let userId = isUserExist.userId
-    let roleId = isUserExist.roleId
-    console.log(isUserExist.userId, userName)
+    let roleId = isUserExist.userType
+    console.log(isUserExist, 'user exist near token and session creation')
 
-    console.log(userId, userName, emailId, roleId, 'roleId')
+    console.log(userId, userName, roleId, 'roleId')
 
     let accessAndRefreshToken = await generateToken(userId, userName);
 
@@ -291,8 +302,9 @@ let tokenAndSessionCreation = async (isUserExist, lastLoginTime, deviceInfo) => 
 
 let loginWithOTP = async (req, res) => {
   try {
-    // console.log('loginwithotp', req.body)
+    console.log('loginwithotp', req.body)
     let statusId = 1;
+    
     let { encryptMobile: mobileNo, encryptOtp: otp } = req.body
 
     let userAgent = req.headers['user-agent'];
@@ -321,7 +333,7 @@ let loginWithOTP = async (req, res) => {
           }
         )
         console.log(updateTheVerifiedValue, 'update the verified value')
-        let isUserExist = await db.users.findOne({
+        let isUserExist = await users.findOne({
           where: {
             [Op.and]: [{ phoneNumber: decrypt(mobileNo) }, { statusId: statusId }]
           }
