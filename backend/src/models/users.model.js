@@ -28,6 +28,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        address: {
+            type: DataTypes.JSON,
+        },
         googleAccountId: {
             type: DataTypes.STRING(150),
             allowNull: true,

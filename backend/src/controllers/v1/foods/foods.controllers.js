@@ -10,7 +10,7 @@ let foodCategories = db.foodCategories
 let addFoodDonationRequest = async (req, res) => {
     let transaction = await sequelize.transaction();
     try {
-        let { foodItemsArray, receiverId } = req.body;
+        let { foodItemsArray, receiverId, address } = req.body;
         let userId = req.user?.userId || 1;
         let subDir = '/foodDonation';
         //check if any detail is missing
@@ -51,6 +51,7 @@ let addFoodDonationRequest = async (req, res) => {
         let insertFoodListing = await foodListings.create({
             userId: userId,
             statusId: 1,
+            address: address,
             receiverId: receiverId || null,
             createdBy: userId
         }, { transaction, returning: true });

@@ -503,7 +503,7 @@ let signUp = async (req, res) => {
     console.log('1')
     let roleId = 4;
     let statusId = 1;
-    let { name, email, phoneNumber, longitude, latitude, userType, userImage } = req.body;
+    let { name, email, phoneNumber, longitude, latitude, address, userType, userImage } = req.body;
 
     // console.log('req.body', { name, phoneNumber, longitude, latitude, userType })
     // let updatedOn = new Date();
@@ -542,6 +542,7 @@ let signUp = async (req, res) => {
       email: email,
       phoneNumber: phoneNumber,
       userType: userType || null,
+      address: address,
       longitude: longitude,
       latitude: latitude,
       lastLogin: lastLogin, // Example of setting a default value
