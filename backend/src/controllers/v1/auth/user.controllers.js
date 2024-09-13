@@ -507,6 +507,16 @@ let signUp = async (req, res) => {
 
     // console.log('req.body', { name, phoneNumber, longitude, latitude, userType })
     // let updatedOn = new Date();
+    
+    //check if address details present correctly
+    let addressDetails = [ 'building', 'area', 'landmark', 'pincode', 'townCity', 'state' ];
+    for(let key of Object.keys(address)) {
+      if (!addressDetails.includes(key)) {
+        return res.status(statusCode.BAD_REQUEST.code).json({
+          message: `please provide all required data to set up the profile`
+        });
+      }
+    }
     if (!name && !phoneNumber && !longitude && !latitude && !userType) {
       console.log(2)
       await transaction.rollback();
