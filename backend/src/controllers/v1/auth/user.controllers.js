@@ -564,7 +564,7 @@ let signUp = async (req, res) => {
       let errors = [];
       let subDir = "userDir"
       let filePurpose = "User Image"
-      let uploadSingleImage = await imageUpload(userImage, entityType, subDir, filePurpose, insertionData, newUser.userId, errors, 1, transaction)
+      let uploadSingleImage = await imageUpload(userImage, entityType, subDir, insertionData, newUser.userId, errors, 1, transaction)
       console.log(uploadSingleImage, 'error image')
       if (errors.length > 0) {
         console.log(12)

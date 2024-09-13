@@ -72,6 +72,7 @@ function LogInSignUp() {
       });
       console.log("response of verify otp api", res.data);
       if(res.data.decideSignUpOrLogin) {
+        toast.dismiss();
         toast.success("Login successful!", {
           autoClose: 1000,
           onClose: () => {
@@ -82,6 +83,7 @@ function LogInSignUp() {
         })
       }
       else {
+        toast.dismiss();
         toast.success("Please create your profile.", {
           autoClose: 1000,
           onClose: () => {
