@@ -41,6 +41,16 @@ let addFoodDonationRequest = async (req, res) => {
                 });
             }
         }
+
+        //check if address details present correctly
+        let addressDetails = ['building', 'area', 'landmark', 'pincode', 'townCity', 'state'];
+        for (let key of Object.keys(address)) {
+            if (!addressDetails.includes(key)) {
+                return res.status(statusCode.BAD_REQUEST.code).json({
+                    message: `please provide all required data to set up the profile`
+                });
+            }
+        }
         console.log("check submitted details end");
         // fetch entity types data
         // let entityTypesMasterData = await fetchMasterData('entityTypes');
@@ -103,12 +113,12 @@ let addFoodDonationRequest = async (req, res) => {
 let initialData = async (req, res) => {
     try {
         console.log('232')
-        let timeRange = [{Today: 'Today'}, {Yesterday: 'Yesterday'}];
+        let timeRange = [{ Today: 'Today' }, { Yesterday: 'Yesterday' }];
         let distanceRange = [
-            {0: 1},
-            {1: 2},
-            {2: 5},
-            {3: 10}
+            { 0: 1 },
+            { 1: 2 },
+            { 2: 5 },
+            { 3: 10 }
         ]
         let foodType = await foodCategories.findAll({
             where: {
@@ -129,7 +139,7 @@ let initialData = async (req, res) => {
     }
 }
 
-let viewFoodDonationList = async (req, res) => { 
+let viewFoodDonationList = async (req, res) => {
     try {
         let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq } = req.body;
         let limit = page_size || 50;
@@ -332,7 +342,7 @@ let closeFoodDonation = async (req, res) => {
             statusId: statusMasterData[0].statusId,
             updatedBy: userId,
             updatedOn: today
-            }, {
+        }, {
             where: {
                 foodListingId: foodListingId
             },
@@ -343,12 +353,12 @@ let closeFoodDonation = async (req, res) => {
             transaction.commit();
             return res.status(statusCode.SUCCESS.code).json({
                 message: "Food donation is closed."
-            });   
+            });
         } else {
             transaction.rollback();
             return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
                 message: "Something went wrong."
-            }); 
+            });
         }
     }
     catch (error) {
