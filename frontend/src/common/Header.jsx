@@ -20,9 +20,8 @@ const Header = () => {
         <nav className={`header__nav ${isSidebarOpen ? 'open' : ''}`}>
           <ul className="header__nav-list">
             <li className="header__nav-item"> <Link to={'/'}>Home</Link> </li>
-            <li className="header__nav-item"><a href="#services">Donate Now</a></li>
+            <li className="header__nav-item"><Link to={'/DonorDetails'} >  Donate Now</Link> </li>
             <li className="header__nav-item"> <Link to={"/About"}>About</Link></li>
-            <li className="header__nav-item"><a href="#services"></a></li>
             <li className="header__nav-item"><a href="#contact">Contact</a></li>
              <li className="header__nav-item">
               <Link className='Login_button' onClick={toggleSidebar} to={'/Login'}>

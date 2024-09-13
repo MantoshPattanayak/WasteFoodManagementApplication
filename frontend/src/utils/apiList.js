@@ -9,6 +9,8 @@ const api = {
          * 1. foodItemsArray [Object]:-
          *      foodItemsArray = [{ foodName, foodCategory, quantity, unit, expirationDate, imageData }, ...]
          * 2. receiverId integer
+         * 3. address = {building: area: landmark: pincode: townCity: state:}
+         * 
          */
     },
     INITIAL_FOOD_DROPDOWN_DATA: {

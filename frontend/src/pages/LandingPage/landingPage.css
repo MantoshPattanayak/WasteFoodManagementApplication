@@ -1,12 +1,7 @@
 
   
   .image_content_conatiner {
-    background-image: linear-gradient(
-      10deg,
-      rgba(0, 0, 0, 0.9),
-      rgba(0, 0, 0, 0.2)
-    ),
-    url("../../assets/food_donation_home.jpeg");
+  
     height: 100vh;
     background-size: cover;
     background-repeat: no-repeat;
@@ -33,6 +28,8 @@
     line-height: 1.6; 
     font-size: 20px;
   }
+
+
   .Button_on_image{
     display: flex;
     justify-content: space-between;
