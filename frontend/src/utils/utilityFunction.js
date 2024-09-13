@@ -22,10 +22,19 @@ function formatDateAsDDMMYYYY(date) { //format input date as DD-MM-YYYY
     return `${day}-${month}-${year}`;
 }
 
-function formatDateAsYYYYMMDD(date) { //format input date as DD-MM-YYYY
+function formatDateAsYYYYMMDD(date) { //format input date as YYYY-MM-DD
     if (!date) return;
     const [year, month, day] = date.split('-');
     return `${year}-${month}-${day}`;
+}
+
+function formatDateAsDDMMYYYYHHMMSS(date) { //format input date as DD-MM-YYYY HH:MM:SS
+    if (!date) return;
+    let time = date?.split('T')[1];
+    time = formatTime(time);
+    date = date?.split('T')[0] ? date.split('T')[0] : date;
+    const [year, month, day] = date.split('-');
+    return `${day}-${month}-${year} ${time}`;
 }
 
 function truncateName(name, maxLength) {
@@ -95,4 +104,4 @@ function getUserGeoLocation() {
     return;
 }
 
-export { formatTime, formatDateAsDDMMYYYY, getUserGeoLocation, truncateName, calculateTimeDifferenceinHours }
+export { formatTime, formatDateAsDDMMYYYY, formatDateAsYYYYMMDD, formatDateAsDDMMYYYYHHMMSS, getUserGeoLocation, truncateName, calculateTimeDifferenceinHours }

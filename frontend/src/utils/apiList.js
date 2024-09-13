@@ -72,6 +72,10 @@ const api = {
     REFRESH_TOKEN: {
         url: baseURL + '/auth/refresh-token',
         method: "post",
+    },
+    SEARCH_PLACE_BY_PINCODE: {
+        url: "https://api.postalpincode.in/pincode/",
+        method: "get"
     }
 }
 

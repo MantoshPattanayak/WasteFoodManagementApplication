@@ -128,7 +128,7 @@ let initialData = async (req, res) => {
     }
 }
 
-let viewFoodDonationList = async (req, res) => {
+let viewFoodDonationList = async (req, res) => { 
     try {
         let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq } = req.body;
         let limit = page_size || 50;
@@ -161,7 +161,7 @@ let viewFoodDonationList = async (req, res) => {
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
             inner join soulshare.users u on u."userId" = fl."userId"
             where sm."statusCode" = 'ACTIVE'
-            group by u."userId", u."name", u."createdOn", u.latitude, u.longitude
+            group by u."userId", u."name", u."createdOn", u.latitude, u.longitude, fl."createdOn"
             order by u."createdOn" desc
         `;
         let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {

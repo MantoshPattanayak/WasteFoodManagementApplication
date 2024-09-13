@@ -14,6 +14,7 @@ const instance = () => {
             baseName: '/soul',
             REACT_APP_GOOGLE_MAPS_API_KEY: "AIzaSyBYFMsMIXQ8SCVPzf7NucdVR1cF1DZTcao",
             APPLICATION_MODE: 'production', // production, development
+            GOOGLE_MAPS_BASE_URL : 'https://www.google.com/maps/dir/?api=1'
         }
     )
 }
