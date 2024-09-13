@@ -45,7 +45,7 @@ let addFoodDonationRequest = async (req, res) => {
         //check if address details present correctly
         let addressDetails = ['building', 'area', 'landmark', 'pincode', 'townCity', 'state'];
         for (let key of Object.keys(address)) {
-            if (!addressDetails.includes(key)) {
+            if (!addressDetails.includes(key) || (key != 'landmark' && !address[key])) {
                 return res.status(statusCode.BAD_REQUEST.code).json({
                     message: `please provide all required data to set up the profile`
                 });
