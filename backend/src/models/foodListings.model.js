@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
             //     key: "userId"
             // }
         },
+        address: {
+            type: DataTypes.JSON,
+        },
         receiverId: {   // if chartity org or individual selected
             type: DataTypes.INTEGER,
         },
