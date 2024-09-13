@@ -1,13 +1,13 @@
 let jwt = require('jsonwebtoken');
 let statusCode = require('../utils/statusCode.js');
 const db = require("../models/index.js");
-const User = db.usermaster;
+const User = db.users;
 let {Op}= require('sequelize')
 let {encrypt} = require('./encryption.middlewares.js')
 let {decrypt} = require('./decryption.middlewares.js')
 function authenticateToken(req, res, next) {
   try {
-    console.log('new date', new Date())
+    console.log('new date', req.headers['authorization'])
     const authHeader = req.headers['authorization']; 
     const tokens = req.cookies;
     const sessionId = req.headers['sid']

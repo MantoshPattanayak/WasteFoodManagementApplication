@@ -416,24 +416,35 @@ const viewUserProfile = async (req, res) => {
     console.log(21, req.user.userId)
     let userId = req.user?.userId || 1;
 
-    let publicRole = 4
-    let statusId = 1;
-    let entityType = 'usermaster'
-    let filePurpose = 'User Image'
-
-
-
-    let showpublic_user = await sequelize.query(`select u.* from amabhoomi.users u where u.statusId = ? and u.roleId =? and u.userId = ?
-   `, {
-      type: QueryTypes.SELECT,
-      replacements: [statusId, publicRole, userId]
+    let publicRole = await users.findOne({
+      where:{
+        userId:userId
+      }
     })
 
-    let findTheImageUrl = await sequelize.query(`select fl.url,fl.fileId from amabhoomi.users u inner join files f on u.userId = f.entityId  
-   inner join fileAttachments fl on fl.fileId = f.fileId where f.entityType = ? and f.filePurpose =? and u.statusId = ? and u.roleId =? and u.userId = ? and fl.statusId = ? and f.statusId = ?`,
+    if(!publicRole){
+      return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+        message:`Something went wrong`
+      })
+    }
+    let statusId = 1;
+    let entityType = 'users'
+ 
+
+
+
+    let showpublic_user = await sequelize.query(`select u.* from soulshare.users u where u."statusId" = ? and u."userType" =? and u."userId" = ?
+   `, {
+      type: QueryTypes.SELECT,
+      replacements: [statusId, publicRole.userType, userId]
+    })
+
+    let findTheImageUrl = await sequelize.query(` select f."fileId", fl."url"  from soulshare.users u 
+    inner join soulshare.files f on u."userId" = f."entityId" 
+    inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  where f."entityType" = ? and u."statusId" = ? and u."userType" =? and u."userId" = ? and fl."statusId" = ? and f."statusId" = ?`,
       {
         type: QueryTypes.SELECT,
-        replacements: [entityType, filePurpose, statusId, publicRole, userId, statusId, statusId]
+        replacements: [entityType, statusId, publicRole.userType, userId, statusId, statusId]
       })
 
     if (findTheImageUrl.length > 0) {
@@ -446,10 +457,9 @@ const viewUserProfile = async (req, res) => {
     return res.status(statusCode.SUCCESS.code).json({
       message: "Show Public User",
       public_user: showpublic_user,
-      activityDetails: showActivities
     });
   } catch (err) {
-    logger.error(`An error occurred: ${err.message}`); // Log the error
+    // logger.error(`An error occurred: ${err.message}`); // Log the error
 
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: err.message,
@@ -634,6 +644,7 @@ function parseUserAgent(userAgent) {
 
 let initialData = async (req, res) => {
   try {
+    console.log('inside initial data')
     let fetchRoles = await db.roles.findAll({
       where: {
         statusId: 1

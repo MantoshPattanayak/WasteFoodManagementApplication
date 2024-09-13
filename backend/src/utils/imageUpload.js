@@ -1,6 +1,7 @@
 let fs = require('fs');
 const db = require('../models');
 const files = db.files;
+const fileTypeDb = db.fileTypes;
 const fileAttachments = db.fileAttachments
 const path = require('path');
 const uploadDir = process.env.UPLOAD_DIR;
@@ -17,7 +18,7 @@ const uploadDir = process.env.UPLOAD_DIR;
  * @param {Object} transaction 
  * @returns 
  */
-let imageUpload = async (imageData, entityType, subDir, insertionData, userId, errors = [], serialNumber, transaction) => {
+let imageUpload = async (imageData, entityType, subDir, insertionData, userId, errors, serialNumber, transaction) => {
   // e.g.  sub dir = "facility Images"
   // insertionData is the object whose work is to give the data in the format {id:2, name:'US'}
   try {
@@ -32,7 +33,7 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
     const mimeMatch = imageData.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/);
     const mime = mimeMatch ? mimeMatch[1] : null;
 
-    console.log(mime, mimeMatch, 'mime match')
+    console.log(mime, 'mime match',mimeMatch)
     if ([
       "image/jpeg",
       "image/jpg",
@@ -58,6 +59,15 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
         const fileExtension = mime ? mime.split("/")[1] : "txt";
 
         console.log(fileExtension, '34 file extension image file buffer')
+        let findTheFileType = await fileTypeDb.findOne({
+          where:{
+            fileTypeExtension: fileExtension
+          },
+          transaction
+        })
+        if(!findTheFileType){
+          return errors.push(`Failed to fetch the image extension for facility file at index ${i}`);
+        }
 
         uploadFilePath = `${imageFileDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
 
@@ -65,10 +75,10 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
         uploadFilePath2 = `/${subDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
         console.log(uploadFilePath2, "upload file path2 43")
         let fileName = `${insertionData.id}${insertionData.name}.${fileExtension}`;
-        let fileType = mime ? mime.split("/")[0] : 'unknown';
-        console.log(fileName, fileType, "file path2 46")
+        // let fileType = mime ? mime.split("/")[0] : 'unknown';
+        console.log(fileName, "file path2 46")
         // insert to file table and file attachment table
-        console.log(fileName, fileType, uploadFilePath2, 'create file data parameters')
+        console.log(fileName, uploadFilePath2, 'create file data parameters')
         let createFile = await files.create({
           entityId: insertionData.id,
           entityType: entityType,
@@ -88,7 +98,7 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
           // Insert into file attachment table
           let createFileAttachment = await fileAttachments.create({
             fileName: fileName,
-            fileType: fileType,
+            fileType: findTheFileType.fileTypeId,
             fileId: createFile.fileId,
             url: uploadFilePath2,
             statusId: 1,
