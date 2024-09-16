@@ -183,7 +183,7 @@ const AvailableFood = () => {
                             setShowRecentOptions(prevState => !prevState);
                             setShowItemTypeOptions(false);
                         }}
-                        ref={recentRef}
+                        // ref={recentRef}
                     >
                         <FontAwesomeIcon icon={faCalendar} /> Recent
                     </button>
@@ -220,7 +220,7 @@ const AvailableFood = () => {
                             setShowItemTypeOptions(prevState => !prevState);
                             setShowRecentOptions(false);
                         }}
-                        ref={itemTypeRef}
+                        // ref={itemTypeRef}
                     >
                         <FontAwesomeIcon icon={faBagShopping} /> Item type
                     </button>
