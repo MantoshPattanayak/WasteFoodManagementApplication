@@ -130,10 +130,15 @@ let initialData = async (req, res) => {
             },
             type: QueryTypes.SELECT
         });
+        let unitsData = await db.units.findAll({
+            where: {
+                statusId: 1
+            }
+        });
 
         return res.status(statusCode.SUCCESS.code).json({
             message: 'food donation list filter dropdown data',
-            timeRange, distanceRange, foodType
+            timeRange, distanceRange, foodType, unitsData
         })
     }
     catch (error) {
