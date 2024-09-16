@@ -113,7 +113,7 @@ let addFoodDonationRequest = async (req, res) => {
 let initialData = async (req, res) => {
     try {
         console.log('232')
-        let timeRange = [{ Today: 'Today' }, { Yesterday: 'Yesterday' }];
+        let timeRange = [{ time: 'Today' }, { time: 'Yesterday' }];
         let distanceRange = [
             { 0: 1 },
             { 1: 2 },
@@ -166,13 +166,15 @@ let viewFoodDonationList = async (req, res) => {
                     fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
                 ) as createdOn,
-                u.latitude, u.longitude, count(fli."foodListingItemId") as totalItems 
+                u.latitude, u.longitude, fli."foodName", TO_CHAR(
+                    fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
+                    'YYYY-MM-DD"T"HH24:MI:SS.MS'
+                ) as expirationDate, u."phoneNumber", fl."address"
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
             inner join soulshare.users u on u."userId" = fl."userId"
             where sm."statusCode" = 'ACTIVE'
-            group by u."userId", u."name", u."createdOn", u.latitude, u.longitude, fl."createdOn"
             order by u."createdOn" desc
         `;
         let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {
