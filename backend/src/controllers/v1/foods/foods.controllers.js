@@ -7,6 +7,8 @@ const fetchMasterData = require("../../../utils/fetchMasterData");
 const { formatDateToDDMMYYYYHHMMSSMS, calculateDistance, validateAndConvertDate } = require("../../../utils/commonFunctions");
 const timeZone = process.env.TIMEZONE;
 let foodCategories = db.foodCategories
+const logger = require('../../../logger/index.logger')
+
 let addFoodDonationRequest = async (req, res) => {
     let transaction = await sequelize.transaction();
     try {
@@ -104,6 +106,8 @@ let addFoodDonationRequest = async (req, res) => {
     }
     catch (error) {
         transaction.rollback();
+        logger.error(`An error occurred: ${error.message}`); // Log the error
+
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         })
@@ -133,6 +137,8 @@ let initialData = async (req, res) => {
         })
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
+
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         })
@@ -263,6 +269,8 @@ let viewFoodDonationList = async (req, res) => {
         });
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
+
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         });
@@ -311,6 +319,8 @@ let viewFoodDonationById = async (req, res) => {
         }
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
+
         res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         })
@@ -322,6 +332,7 @@ let acceptFoodDonation = async (req, res) => {
 
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
 
     }
 }
@@ -365,6 +376,8 @@ let closeFoodDonation = async (req, res) => {
     }
     catch (error) {
         transaction.rollback();
+        logger.error(`An error occurred: ${error.message}`); // Log the error
+
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         });
@@ -376,6 +389,7 @@ let viewFoodPickupList = async (req, res) => {
 
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
 
     }
 }
@@ -385,6 +399,7 @@ let viewFoodPickupById = async (req, res) => {
 
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
 
     }
 }

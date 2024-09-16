@@ -14,6 +14,7 @@ const { decrypt } = require('../../../middlewares/decryption.middlewares')
 const { Op } = require("sequelize");
 let generateToken = require('../../../utils/generateToken');
 const imageUpload = require('../../../utils/imageUpload');
+const logger = require('../../../logger/index.logger')
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
   console.log('incoming');
@@ -96,6 +97,8 @@ let createOtp = async (req, res) => {
     }
   }
   catch (error) {
+    logger.error(`An error occurred: ${error.message}`); // Log the error
+
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: error.message
     })
@@ -110,6 +113,7 @@ let verifyOtp = async (req, res) => {
 
   }
   catch (error) {
+    logger.error(`An error occurred: ${error.message}`); // Log the error
 
   }
 }
@@ -394,6 +398,8 @@ let loginWithOTP = async (req, res) => {
     }
   }
   catch (err) {
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: err.message
     })
@@ -405,6 +411,7 @@ let loginWithOAuth = async (req, res) => {
 
   }
   catch (error) {
+    logger.error(`An error occurred: ${error.message}`); // Log the error
 
   }
 }
@@ -460,6 +467,7 @@ const viewUserProfile = async (req, res) => {
     });
   } catch (err) {
     // logger.error(`An error occurred: ${err.message}`); // Log the error
+    logger.error(`An error occurred: ${err.message}`); // Log the error
 
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: err.message,
@@ -489,6 +497,8 @@ let logout = async (req, res) => {
 
     res.status(statusCode.SUCCESS.code).json({ message: 'Logged out successfully', sessionExpired: true });
   } catch (err) {
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+
     res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: err.message, sessionExpired: true });
 
   }
@@ -615,6 +625,8 @@ let signUp = async (req, res) => {
     // Handle errors
     console.log(15)
     if (transaction) await transaction.rollback();
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: err.message
     })
@@ -668,6 +680,8 @@ let initialData = async (req, res) => {
     });
   }
   catch (error) {
+    logger.error(`An error occurred: ${error.message}`); // Log the error
+
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: error.message
     })

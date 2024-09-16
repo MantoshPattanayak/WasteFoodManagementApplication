@@ -8,6 +8,7 @@ let api_version = process.env.API_VERSION;
 const uploadDir = process.env.UPLOAD_DIR;
 const statusCode = require("./utils/statusCode");
 
+const logger = require('./logger/index.logger')
 
 //------------------------------------------path all files-----------------------------------------------------//
 const authRoutes = require("./routes/api/" + api_version + "/auth/user.routes");
@@ -35,13 +36,15 @@ app.use(
 app.use('/static', express.static(uploadDir));
 
 app.use(cookieParser());
-app.use((err, req, res, next)=>{
-  if(err){
-    res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-      message:"something went wrong"
-    })
-  }
+// app.use(requestLogger);
+
+app.use((req,res,next)=>{
+  console.log('inside logger info')
+  logger.info(`Received ${req.method} request for ${req.url}`);
+  next();
 })
+
+
 //-------------------------------------------------------------------------------------------------------------//
 
 
@@ -52,7 +55,13 @@ app.use("/notification", notificationRoutes);
 app.use("/activity", activityRoutes);
 //-------------------------------------------------------------------------------------------------------------//
 
-
+app.use((err, req, res, next)=>{
+  if(err){
+    res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message:"something went wrong"
+    })
+  }
+})
 
 module.exports = {
   app
