@@ -5,6 +5,8 @@ const User = db.users;
 let {Op}= require('sequelize')
 let {encrypt} = require('./encryption.middlewares.js')
 let {decrypt} = require('./decryption.middlewares.js')
+const logger = require('../logger/index.logger.js')
+
 function authenticateToken(req, res, next) {
   try {
     console.log('new date', req.headers['authorization'])
@@ -39,6 +41,8 @@ function authenticateToken(req, res, next) {
       }
     });
   } catch (err) {
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+
     return res.status(statusCode.UNAUTHORIZED.code).json({ message: err.message });
   }
 }
