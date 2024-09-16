@@ -75,6 +75,7 @@ font-weight: 600;
 .input_text_conatiner11{
     display: flex;
     justify-content: center;
+    padding-top: 20px;
 
 }
 
