@@ -3,7 +3,7 @@ const { advertisements, files, fileAttachments, sequelize } = db;
 let statusCode = require("../../../utils/statusCode");
 const imageUpload = require("../../../utils/imageUpload");
 const { QueryTypes } = require("sequelize");
-
+const logger = require('../../../logger/index.logger')
 
 let addNewAdvertisement = async (req, res) => {
     try {
@@ -72,6 +72,7 @@ let addNewAdvertisement = async (req, res) => {
     catch (error) {
         console.log(13)
         if (transaction) await transaction.rollback();
+        logger.error(`An error occurred: ${error.message}`); // Log the error
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         })
@@ -104,6 +105,8 @@ let getAdvertisementList = async (req, res) => {
         })
     }
     catch (error) {
+        logger.error(`An error occurred: ${error.message}`); // Log the error
+
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         })

@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
 const db = require("../config/db");
-console.log(db,'db credentials')
+// console.log(db,'db credentials')
 
 const sequelize = new Sequelize(
   db.DATABASE, 
@@ -33,6 +33,7 @@ db1.sequelize = sequelize;
 db1.DataTypes = DataTypes;
 db1.QueryTypes = QueryTypes;
 
+console.log('all details')
 // import all table models
 db1.users = require("./users.model")(sequelize, DataTypes)
 db1.foodListings = require("./foodListings.model")(sequelize, DataTypes)
@@ -53,6 +54,7 @@ db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
 db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
 db1.device = require('./device.model')(sequelize, DataTypes)
 db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
+console.log('all details 2')
 
 db1.files.sync({
   alter: false,
