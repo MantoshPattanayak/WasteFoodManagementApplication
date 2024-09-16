@@ -31,7 +31,7 @@ const AvailableFood = () => {
     const itemTypeRef = useRef();
 
     // API to fetch list of available food donations
-    async function fetchAvailableFood() {
+    async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user) {
         try {
             let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url, {
                 page_size: recordsCount,
@@ -168,8 +168,9 @@ const AvailableFood = () => {
 
     useEffect(() => {
         console.log({ timeLimit, foodTypeChoice });
-        debouncedFetchAvailableFood();
-    }, [timeLimit, foodTypeChoice, debouncedFetchAvailableFood])
+        debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition);
+    }, [timeLimit, foodTypeChoice, userPosition, debouncedFetchAvailableFood]);
+
     return (
         <div className='Mian_conatiner_doner_his'>
             <Header />

@@ -169,7 +169,7 @@ let viewFoodDonationList = async (req, res) => {
                 u.latitude, u.longitude, fli."foodName", TO_CHAR(
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as expirationDate, u."phoneNumber", fl."address"
+                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
@@ -238,7 +238,7 @@ let viewFoodDonationList = async (req, res) => {
         if (foodType) {     // filter records according to food type selected
             console.log("foodType filter");
             foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
-                return food.foodType == foodType;
+                return food.foodtype == foodType;
             })
         }
 
