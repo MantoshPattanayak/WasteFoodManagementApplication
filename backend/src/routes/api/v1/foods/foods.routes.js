@@ -4,20 +4,20 @@ const api_version = process.env.API_VERSION
 const foodsController = require('../../../../controllers/'+api_version+'/foods/foods.controllers');
 let authenticateToken = require('../../../../middlewares/authToken.middlewares')
 
-router.post("/addFoodDonationRequest", foodsController.addFoodDonationRequest);
+router.post("/addFoodDonationRequest", authenticateToken, foodsController.addFoodDonationRequest);
 
-router.get("/initialData", foodsController.initialData);
+router.get("/initialData", authenticateToken, foodsController.initialData);
 
-router.post("/viewFoodDonationList", foodsController.viewFoodDonationList);
+router.post("/viewFoodDonationList", authenticateToken, foodsController.viewFoodDonationList);
 
-router.get("/viewFoodDonationById/:id", foodsController.viewFoodDonationById);
+router.get("/viewFoodDonationById/:id", authenticateToken, foodsController.viewFoodDonationById);
 
-router.put("/acceptFoodDonation", foodsController.acceptFoodDonation);
+router.put("/acceptFoodDonation", authenticateToken, foodsController.acceptFoodDonation);
 
-router.put("/closeFoodDonation", foodsController.closeFoodDonation);
+router.put("/closeFoodDonation", authenticateToken, foodsController.closeFoodDonation);
 
-router.post("/viewFoodPickupList", foodsController.viewFoodPickupList);
+router.post("/viewFoodPickupList", authenticateToken, foodsController.viewFoodPickupList);
 
-router.get("/viewFoodPickupById/:id", foodsController.viewFoodPickupById);
+router.get("/viewFoodPickupById/:id", authenticateToken, foodsController.viewFoodPickupById);
 
 module.exports = router;
