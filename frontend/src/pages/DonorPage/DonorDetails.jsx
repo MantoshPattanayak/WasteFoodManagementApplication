@@ -159,11 +159,10 @@ const DonorDetails = () => {
         }
     }
 
-    // Validation --------------------
+    // Validation of donor food--------------------
     const DonorValidation = (value) => {
         const err = {};
         const checkSpecialChar = /^(?!\s*$)[a-zA-Z0-9\s]*$/;
-
         const UnitCheck = /^(?!0$)(?!0\.[0]*$)([1-9]\d*|0\.[1-9]\d*)$/;
         const RegexPincode=/^\d{6}$/;
         const Addresspattern = /^(?!\s*$)[\w\s,.\-\/]+$/;
