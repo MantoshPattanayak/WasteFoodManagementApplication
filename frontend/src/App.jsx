@@ -5,7 +5,7 @@ import persistor from './store/store';
 import { Provider } from 'react-redux';
 
 const LandingPage = React.lazy(() => import('./pages/LandingPage/landingPage'))
-const DonorLandingPage = (React.lazy(() => import('./pages/DonorPage/DonorLandingPage')))
+const DonorLandingPage = withAuth(React.lazy(() => import('./pages/DonorPage/DonorLandingPage')))
 const DonateHistory = React.lazy(() => import('./pages/DonateHis/DonateHistory'))
 const AvailableFood = React.lazy(() => import('./pages/AvailableFood/AvailableFood'))
 const LogInSignUp = React.lazy(() => import('./pages/LoginPage/LogInSignUp'))
@@ -16,7 +16,6 @@ const Registration = React.lazy(() => import('./pages/RegistrationForm/Registrat
 const Fooddetails=React.lazy(()=>import('./pages/fooddetails/fooddetails'))
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>

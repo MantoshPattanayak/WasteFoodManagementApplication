@@ -4,7 +4,12 @@ import "./DonorLandingPage.css";
 import Ads_image from "../../assets/ad.jpg"
 import dis_image from "../../assets/dis.png"
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+
 const DonorLandingPage = () => {
+    const user = useSelector((state) => state.auth.user);
+
     return (
         <div className="main_conatiner_DonorPage">
             <Header />

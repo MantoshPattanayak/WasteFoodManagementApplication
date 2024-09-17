@@ -9,21 +9,23 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
-    const user = useSelector((state) => state.auth.user) || tokenService.getUser();
+    const user = useSelector((state) => state.auth.user);
     const rtoken = tokenService.getLocalRefreshToken();
     const [isAuthenticated, setIsAuthenticated] = useState(user ? true : false);
-
+    // console.log("user", user);
     useEffect(() => {
         const initializeAuth = async () => {
             if (!user) {
                 const newTokenBoolean = await refresh(rtoken);
+                // console.log("newTokenBoolean", newTokenBoolean);
                 setIsAuthenticated(newTokenBoolean);
             }
             else {
-                setIsAuthenticated(false);
+                setIsAuthenticated(true);
             }
             setLoading(false);
         }
+        // console.log("isAuthenticated", isAuthenticated);
         initializeAuth();
     }, []);
 

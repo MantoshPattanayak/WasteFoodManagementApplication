@@ -10,6 +10,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../store/reducers/authReducer";
+import tokenService from "../../services/token.service";
 function LogInSignUp() {
   const [userType, setUserType] = useState("Donor");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -17,7 +20,7 @@ function LogInSignUp() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(60);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   // Handles the radio button change for user type
   const handleUserTypeChange = (event) => {
     setUserType(event.target.value);
@@ -72,6 +75,8 @@ function LogInSignUp() {
       });
       console.log("response of verify otp api", res.data);
       if(res.data.decideSignUpOrLogin) {
+        dispatch(login(res.data.user));
+        tokenService.setUser(res.data.user);
         toast.dismiss();
         toast.success("Login successful!", {
           autoClose: 1000,
