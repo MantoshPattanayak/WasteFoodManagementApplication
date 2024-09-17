@@ -380,9 +380,10 @@ let loginWithOTP = async (req, res) => {
         return res.status(statusCode.SUCCESS.code)
           .header('Authorization', `Bearer ${accessToken}`)
           .json({
-            message: "please render the login page",
+            message: "please render the donor landing page",
+            decideSignUpOrLogin: 1,
             user: {
-              username: isUserExist.name,
+              username: isUserExist,
               accessToken: accessToken,
               refreshToken: refreshToken,
               decideSignUpOrLogin: 1,
@@ -520,13 +521,16 @@ let signUp = async (req, res) => {
 
     //check if address details present correctly
     let addressDetails = [ 'building', 'area', 'landmark', 'pincode', 'townCity', 'state' ];
-    for(let key of Object.keys(address)) {
-      if (!addressDetails.includes(key) || (key != 'landmark' && !address[key])) {
-        return res.status(statusCode.BAD_REQUEST.code).json({
-          message: `please provide all required data to set up the profile`
-        });
+    if (address != null || typeof address != 'undefined') {
+      for(let key of Object.keys(address)) {
+        if (!addressDetails.includes(key) || (key != 'landmark' && !address[key])) {
+          return res.status(statusCode.BAD_REQUEST.code).json({
+            message: `please provide all required data to set up the profile`
+          });
+        }
       }
     }
+    
     if (!name && !phoneNumber && !longitude && !latitude && !userType) {
       console.log(2)
       await transaction.rollback();

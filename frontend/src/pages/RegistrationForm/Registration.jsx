@@ -7,6 +7,8 @@ import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
 import { useLocation, useNavigate } from "react-router-dom";
+import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Registration() {
   const [profileImg, setProfileImg] = useState(null);
@@ -157,6 +159,7 @@ function Registration() {
         name: formData.firstName + " " + formData.lastName,
         latitude: formData.latitude,
         longitude: formData.longitude,
+        userImage: formData.userImage || null
       };
       delete modifiedData.firstName;
       delete modifiedData.lastName;
@@ -301,7 +304,16 @@ function Registration() {
             <div className="inputRow">
               <div className="inputGroup">
                 <label htmlFor="location">Location</label>
-                <input
+                <button
+                  name="location"
+                  type="button"
+                  className={`locationButton ${formData.location.latitude ? 'active' : ''}`}
+                  onClick={handleInputChange}
+                >
+                  <FontAwesomeIcon icon={faLocationCrosshairs} /> &nbsp;
+                  {formData.location.latitude ? 'Location captured' : 'Use my location'}
+                </button>
+                {/* <input
                   type="text"
                   id="location"
                   name="location"
@@ -315,7 +327,7 @@ function Registration() {
                   onClick={handleInputChange}
                   readOnly={true}
                   // onChange={handleInputChange}
-                />
+                /> */}
               </div>
               <div className="inputGroup">
                 <label htmlFor="landmark">Landmark</label>
@@ -332,11 +344,12 @@ function Registration() {
 
           {/* for Donors */}
           <div className="userTypeSection">
-            <label>Individual / Food Business</label>
+            <label>Sign in as</label>
             <div className="userTypeButtons">
-              {userTypeList.map((userType) => {
+              {userTypeList.map((userType, index) => {
                 return (
                   <button
+                    key={index}
                     type="button"
                     className={
                       formData.userType === userType.roleId ? "selected" : ""
