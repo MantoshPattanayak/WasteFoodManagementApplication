@@ -8,9 +8,10 @@ import axios from "axios";
 import { ToastContainer } from "react-toastify";
 
 const DonorDetails = () => {
-    // Initialize state
+    // Initialize state ---------
     const [DonorType, setDonorType] = useState([]);
     const [getUnit, setgetUnit] = useState([]);
+    const [showError, setshowError] = useState('')
     const [DonorData, setDonorData] = useState({
         foodName: "",
         foodCategory: "",
@@ -28,7 +29,6 @@ const DonorDetails = () => {
             country: ""
         }
     });
-
     // Function to handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -36,6 +36,9 @@ const DonorDetails = () => {
             ...prevState,
             [name]: value
         }));
+        setshowError(prevState => ({
+            ...prevState, [name]: ''
+        }))
     };
     // Function to handle address input changes
     const handleAddressChange = (e) => {
@@ -121,7 +124,6 @@ const DonorDetails = () => {
             AutoSugestion(value);
         }
     };
-
     // Fetch donor type on component mount
     useEffect(() => {
         GetDonorType();
@@ -129,10 +131,14 @@ const DonorDetails = () => {
             AutoSugestion(DonorData.address.pincode)
         }
     }, [DonorData.address.pincode]);
-
     // Post donor data to backend
     async function PostDonorData(e) {
         e.preventDefault()
+        const Error = DonorValidation(DonorData)
+        if (Object.keys(Error).length > 0) {
+            setshowError(Error) // set error state
+            return
+        }
         try {
             let res = await axiosInstance.post(api.ADD_FOOD_DONATION.url, {
                 foodItemsArray: [
@@ -156,8 +162,52 @@ const DonorDetails = () => {
     // Validation --------------------
     const DonorValidation = (value) => {
         const err = {};
+        const checkSpecialChar = /^(?!\s*$)[a-zA-Z0-9\s]*$/;
+
+        const UnitCheck = /^(?!0$)(?!0\.[0]*$)([1-9]\d*|0\.[1-9]\d*)$/;
+        const RegexPincode=/^\d{6}$/;
+        const Addresspattern = /^(?!\s*$)[\w\s,.\-\/]+$/;
+
+
         if (!value.foodName) {
             err.foodName = "Please enter food name";
+        }else if(!checkSpecialChar .test(value.foodName)){
+            err.foodName = "Please enter valid food name  (no special characters)"
+        }
+        if (!value.foodCategory) {
+            err.foodCategory = "Please select a food category"
+        }
+        if (!value.quantity) {
+            err.quantity = "Please enter quantity"
+        } else if(!UnitCheck.test(value.quantity)){
+            err.quantity = "Please enter valid quantity (cannot be zero and no special characters)";
+        }
+        if (!value.unit) {
+            err.unit = "Please select a unit"
+        }
+        if (!value.expirationDate) {
+            err.expirationDate = "Please select a expirationDate"
+        } 
+        if (!value.address.building) {
+            err.building = "Please enter flat,house No, sector"
+        }else if(!Addresspattern.test(value.address.building)){
+            err.building="Please enter vaild flat,house No, sector"
+        }
+        if(!value.address.area){
+            err.area = "Please enter area"
+        }else if(!Addresspattern.test(value.address.area)){
+            err.area = "Please enter vaild Area"
+        }
+        if(value.address.landmark){
+            if(!Addresspattern.test(value.address.landmark)){
+                err.landmark="Please enter  vaild landmark"
+            }
+        }
+
+        if(!value.address.pincode){
+            err.pincode = "Please enter pincode"
+        }else if(!RegexPincode.test(value.address.pincode)){
+            err.pincode = "Please enter valid pincode (6 digit number)";
         }
         return err;
     }
@@ -179,6 +229,7 @@ const DonorDetails = () => {
                                 value={DonorData.foodName}
                                 onChange={handleChange}
                             />
+                            {showError.foodName && <span className="error_msg">{showError.foodName} </span>}
                         </span>
                         <span className="input_text_conatiner1">
                             <label htmlFor="foodType">Food Type*</label>
@@ -188,12 +239,14 @@ const DonorDetails = () => {
                                 value={DonorData.foodCategory}
                                 onChange={handleChange}
                             >
+                                <option value="">Select Food Category</option>
                                 {DonorType?.length > 0 && DonorType.map((item, index) => (
                                     <option key={index} value={item.foodCategoryId}>
                                         {item.foodCategoryName}
                                     </option>
                                 ))}
                             </select>
+                            {showError.foodCategory && <span className="error_msg">{showError.foodCategory} </span>}
                         </span>
 
                         <span className="input_text_conatiner">
@@ -205,6 +258,7 @@ const DonorDetails = () => {
                                 value={DonorData.quantity}
                                 onChange={handleChange}
                             />
+                            {showError.quantity && <span className="error_msg">{showError.quantity} </span>}
                         </span>
                         <span className="input_text_conatiner1">
                             <label htmlFor="foodType">Select the Unit</label>
@@ -214,12 +268,14 @@ const DonorDetails = () => {
                                 value={DonorData.unit}
                                 onChange={handleChange}
                             >
+                                <option value="">Select unit</option>
                                 {getUnit?.length > 0 && getUnit.map((item, index) => (
                                     <option key={index} value={item.unitId}>
                                         {item.unitName}
                                     </option>
                                 ))}
                             </select>
+                            {showError.unit && <span className="error_msg"> {showError.unit}</span>}
                         </span>
                         <span className="input_text_conatiner">
                             <label>Food Expiry Date</label>
@@ -229,6 +285,7 @@ const DonorDetails = () => {
                                 value={DonorData.expirationDate}
                                 onChange={handleChange}
                             />
+                            {showError.expirationDate && <span className="error_msg"> {showError.expirationDate}</span>}
                         </span>
                         <span className="input_text_conatiner">
                             <label>Food Photo</label>
@@ -246,6 +303,7 @@ const DonorDetails = () => {
                                 value={DonorData.address.building}
                                 onChange={handleAddressChange}
                             />
+                             {showError.building && <span className="error_msg">{showError.building} </span>}
                             <label className="ads_name">Landmark</label>
                             <input
                                 type="text"
@@ -254,6 +312,7 @@ const DonorDetails = () => {
                                 value={DonorData.address.landmark}
                                 onChange={handleAddressChange}
                             />
+                            {showError.landmark && <span className="error_msg">{showError.landmark}</span>}
                             <label className="ads_name">Area</label>
                             <input
                                 type="text"
@@ -262,6 +321,7 @@ const DonorDetails = () => {
                                 value={DonorData.address.area}
                                 onChange={handleAddressChange}
                             />
+                            {showError.area &&  <span className="error_msg">{showError.area}</span>}
                             <div className="ads_two_input">
                                 <div className="input_group">
                                     <label>PinCode</label>
@@ -272,6 +332,7 @@ const DonorDetails = () => {
                                         onChange={handlePincode}
                                         placeholder="Pin Code"
                                     />
+                                    {showError.pincode && <span className="error_msg">{showError.pincode}</span>}
                                 </div>
 
                                 <div className="input_group">
