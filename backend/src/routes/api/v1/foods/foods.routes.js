@@ -20,4 +20,6 @@ router.post("/viewFoodPickupList", authenticateToken, foodsController.viewFoodPi
 
 router.get("/viewFoodPickupById/:id", authenticateToken, foodsController.viewFoodPickupById);
 
+router.post('/donationHistory', authenticateToken, foodsController.donationHistory);
+
 module.exports = router;
