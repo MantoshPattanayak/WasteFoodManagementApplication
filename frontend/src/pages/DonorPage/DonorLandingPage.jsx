@@ -6,6 +6,7 @@ import dis_image from "../../assets/dis.png"
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import Footer from "../../common/footer";
 
 const DonorLandingPage = () => {
     const user = useSelector((state) => state.auth.user);
@@ -30,7 +31,7 @@ const DonorLandingPage = () => {
             <div className="exp_donot">
                 <div className="Button_donor">
                     <Link to={"/DonorDetails"}><button className="button-5" role="button">Donate</button></Link>
-                    <Link to={"/DonateHistory"}><button className="button-5" role="button">Donation history</button></Link>
+                    {/* <Link to={"/DonateHistory"}><button className="button-5" role="button">Donation history</button></Link> */}
                     <Link to={"/AvailableFood"}><button className="button-5" role="button">Explore food requests</button></Link>
                 </div>
                 <div className="donor_details">
@@ -39,6 +40,7 @@ const DonorLandingPage = () => {
                     <h5>Donate</h5>
                 </div>
             </div>
+            <Footer />
         </div>
     )
 }

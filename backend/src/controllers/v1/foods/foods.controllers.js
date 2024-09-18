@@ -409,6 +409,138 @@ let viewFoodPickupById = async (req, res) => {
     }
 }
 
+let donationHistory = async (req, res) => {
+    try {
+        let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq } = req.body;
+        let limit = page_size || 50;
+        let page = page_number || 1;
+        let offset = (page - 1) * limit;
+        let isDate = validateAndConvertDate(givenReq).isValid;
+        console.log("isDate", isDate);
+        let { userId } = req.user || req.body;
+        if (givenReq) {
+            if (isDate) {
+                givenReq = validateAndConvertDate(givenReq).data;
+            }
+            else {
+                givenReq = givenReq.toLowerCase();
+            }
+        }
+        else {
+            givenReq = null;
+        }
+        console.log({ page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq });
+        let foodDonationListQuery = `
+            select
+                u."userId", u."name", u."phoneNumber",
+                TO_CHAR(
+                    fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
+                    'YYYY-MM-DD"T"HH24:MI:SS.MS'
+                ) as createdOn,
+                u.latitude, u.longitude, fli."foodName", TO_CHAR(
+                    fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
+                    'YYYY-MM-DD"T"HH24:MI:SS.MS'
+                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType
+            from soulshare."foodListings" fl
+            inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
+            inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
+            inner join soulshare.users u on u."userId" = fl."userId"
+            where sm."statusCode" = 'ACTIVE' and u."userId" = ?
+            order by u."createdOn" desc
+        `;
+        let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {
+            replacements: [userId],
+            type: Sequelize.QueryTypes.SELECT,
+        });
+        console.log("fetchFoodDonationListData", fetchFoodDonationListData);
+        let foodDonationData = fetchFoodDonationListData;
+        if (timeLimit) {   //if timelimit provided, then filter records accordingly
+            console.log("timeLimit filter");
+            switch (timeLimit) {
+                case "Today":
+                    foodDonationData = foodDonationData.filter((data) => {
+                        const today = new Date(); // Current date and time
+                        // Set to start of today
+                        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+                        // Set to end of today
+                        const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+                        return new Date(data.createdOn) >= startOfToday && new Date(data.createdOn) <= endOfToday;
+                    });
+                    break;
+                case "Yesterday":
+                    foodDonationData = foodDonationData.filter((data) => {
+                        const today = new Date(); // Current date and time
+                        // Set to start of today
+                        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, 0, 0, 0, 0);
+                        // Set to end of today
+                        const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, 23, 59, 59, 999);
+                        return new Date(data.createdOn) >= startOfToday && new Date(data.createdOn) <= endOfToday;
+                    });
+                    break;
+                case "Last 7 days":
+                    foodDonationData = foodDonationData.filter((data) => {
+                        const today = new Date(); // Current date and time
+                        // Set to start of today
+                        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6, 0, 0, 0, 0);
+                        // Set to end of today
+                        const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6, 23, 59, 59, 999);
+                        return new Date(data.createdOn) >= startOfToday && new Date(data.createdOn) <= endOfToday;
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (distanceRange) {    // filter records whose distance falls within user provided range(kms)
+            console.log("distanceRange filter");
+            if (!userLatitude || !userLongitude) {
+                return res.status(statusCode.BAD_REQUEST.code).json({
+                    message: "Please provide location access."
+                })
+            }
+            else {
+                foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
+                    let distance = calculateDistance(userLatitude, userLongitude, food.latitude, food.longitude);
+                    food.distance = distance;
+                    if (distance <= distanceRange)
+                        return food;
+                });
+            }
+        }
+        if (foodType) {     // filter records according to food type selected
+            console.log("foodType filter");
+            foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
+                return food.foodtype == foodType;
+            })
+        }
+
+        if (givenReq) {
+            foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
+                console.log("givenReq", givenReq, isDate);
+                if (isDate) {
+                    console.log("food createdon", food.createdon, food.createdon?.toString().includes(givenReq));
+                    return food.createdon?.toString().includes(givenReq);
+                }
+                else {
+                    return food.name?.toLowerCase().includes(givenReq) ||
+                        food.createdon?.toString().includes(givenReq);
+                }
+            })
+        }
+        console.log("foodDonationData", foodDonationData);
+        foodDonationData = foodDonationData.slice(offset, offset + limit);
+        res.status(statusCode.SUCCESS.code).json({
+            message: "view food donation list",
+            foodDonationData
+        });
+    }
+    catch(error) {
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: error.message
+        })
+    }
+}
+
 module.exports = {
     addFoodDonationRequest,
     initialData,
@@ -417,5 +549,6 @@ module.exports = {
     acceptFoodDonation,
     closeFoodDonation,
     viewFoodPickupList,
-    viewFoodPickupById
+    viewFoodPickupById,
+    donationHistory
 }

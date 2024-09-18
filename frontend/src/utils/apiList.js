@@ -78,6 +78,13 @@ const api = {
     SEARCH_PLACE_BY_PINCODE: {
         url: "https://api.postalpincode.in/pincode/",
         method: "get"
+    },
+    DONATION_HISTORY: {
+        url: baseURL + "/food/donationHistory",
+        method: "post"
+        /**
+         * page_size, page_number
+         */
     }
 }
 
