@@ -418,6 +418,7 @@ let donationHistory = async (req, res) => {
         let isDate = validateAndConvertDate(givenReq).isValid;
         console.log("isDate", isDate);
         let { userId } = req.user || req.body;
+        console.log("userId", userId);
         if (givenReq) {
             if (isDate) {
                 givenReq = validateAndConvertDate(givenReq).data;
@@ -454,6 +455,7 @@ let donationHistory = async (req, res) => {
         });
         console.log("fetchFoodDonationListData", fetchFoodDonationListData);
         let foodDonationData = fetchFoodDonationListData;
+        /*
         if (timeLimit) {   //if timelimit provided, then filter records accordingly
             console.log("timeLimit filter");
             switch (timeLimit) {
@@ -528,6 +530,7 @@ let donationHistory = async (req, res) => {
             })
         }
         console.log("foodDonationData", foodDonationData);
+        */
         foodDonationData = foodDonationData.slice(offset, offset + limit);
         res.status(statusCode.SUCCESS.code).json({
             message: "view food donation list",

@@ -16,7 +16,7 @@ const DonorLandingPage = () => {
             <Header />
             <div className="Child_conatiner_DonorPage">
                 <span className="Profile_details_section">
-                    <h1>Mantosh Das</h1>
+                    <h1>{user.username.name}</h1>
                 </span>
                 <span className="Profile_section">
                     <img className="image_profile" src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.2008272138.1725494400&semt=ais_hybrid"></img>
@@ -31,7 +31,7 @@ const DonorLandingPage = () => {
             <div className="exp_donot">
                 <div className="Button_donor">
                     <Link to={"/DonorDetails"}><button className="button-5" role="button">Donate</button></Link>
-                    {/* <Link to={"/DonateHistory"}><button className="button-5" role="button">Donation history</button></Link> */}
+                    <Link to={"/DonateHistory"}><button className="button-5" role="button">Donation history</button></Link>
                     <Link to={"/AvailableFood"}><button className="button-5" role="button">Explore food requests</button></Link>
                 </div>
                 <div className="donor_details">
