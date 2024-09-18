@@ -12,12 +12,12 @@ export function AuthProvider({ children }) {
     const user = useSelector((state) => state.auth.user);
     const rtoken = tokenService.getLocalRefreshToken();
     const [isAuthenticated, setIsAuthenticated] = useState(user ? true : false);
-    // console.log("user", user);
+    console.log("user", user);
     useEffect(() => {
         const initializeAuth = async () => {
             if (!user) {
                 const newTokenBoolean = await refresh(rtoken);
-                // console.log("newTokenBoolean", newTokenBoolean);
+                console.log("newTokenBoolean", newTokenBoolean);
                 setIsAuthenticated(newTokenBoolean);
             }
             else {
@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
             }
             setLoading(false);
         }
-        // console.log("isAuthenticated", isAuthenticated);
+        console.log("isAuthenticated", isAuthenticated);
         initializeAuth();
     }, []);
 
@@ -47,10 +47,10 @@ export function useAuth() {
 export function withAuth(Component) {
     return function AuthComponent(props) {
         const { isAuthenticated } = useAuth();
-        // console.log("withAuth", isAuthenticated);
+        console.log("withAuth", isAuthenticated);
         if (!isAuthenticated) {
-            window.location.href = instance().baseName ? instance().baseName + '/login' : '/login';
-            return null;
+            // window.location.href = instance().baseName;
+            // return null;
         }
         return <Component {...props} />;
     };
