@@ -9,7 +9,7 @@ const DonorLandingPage = withAuth(React.lazy(() => import('./pages/DonorPage/Don
 const DonateHistory = React.lazy(() => import('./pages/DonateHis/DonateHistory'))
 const AvailableFood = React.lazy(() => import('./pages/AvailableFood/AvailableFood'))
 const LogInSignUp = React.lazy(() => import('./pages/LoginPage/LogInSignUp'))
-const DonorDetails = (React.lazy(() => import('./pages/DonorPage/DonorDetails')))
+const DonorDetails = withAuth(React.lazy(() => import('./pages/DonorPage/DonorDetails')))
 const ReceivedHistoryPage = withAuth(React.lazy(() => import('./pages/ReceivedHistory/ReceivedHistoryPage')))
 const About = React.lazy(() => import('./pages/AboutPage/AboutPage'));
 const Registration = React.lazy(() => import('./pages/RegistrationForm/Registration'))
