@@ -6,6 +6,7 @@ import dis_image from "../../assets/dis.png"
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import Footer from "../../common/footer";
 
 const DonorLandingPage = () => {
     const user = useSelector((state) => state.auth.user);
@@ -15,7 +16,7 @@ const DonorLandingPage = () => {
             <Header />
             <div className="Child_conatiner_DonorPage">
                 <span className="Profile_details_section">
-                    <h1>Mantosh Das</h1>
+                    <h1>{user.username.name}</h1>
                 </span>
                 <span className="Profile_section">
                     <img className="image_profile" src="https://img.freepik.com/free-photo/portrait-man-laughing_23-2148859448.jpg?size=338&ext=jpg&ga=GA1.1.2008272138.1725494400&semt=ais_hybrid"></img>
@@ -39,6 +40,7 @@ const DonorLandingPage = () => {
                     <h5>Donate</h5>
                 </div>
             </div>
+            <Footer />
         </div>
     )
 }

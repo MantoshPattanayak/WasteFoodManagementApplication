@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 
 const LandingPage = React.lazy(() => import('./pages/LandingPage/landingPage'))
 const DonorLandingPage = withAuth(React.lazy(() => import('./pages/DonorPage/DonorLandingPage')))
-const DonateHistory = React.lazy(() => import('./pages/DonateHis/DonateHistory'))
+const DonateHistory = withAuth(React.lazy(() => import('./pages/DonateHis/DonateHistory')))
 const AvailableFood = React.lazy(() => import('./pages/AvailableFood/AvailableFood'))
 const LogInSignUp = React.lazy(() => import('./pages/LoginPage/LogInSignUp'))
 const DonorDetails = withAuth(React.lazy(() => import('./pages/DonorPage/DonorDetails')))
