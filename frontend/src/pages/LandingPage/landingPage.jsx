@@ -56,7 +56,7 @@ const LandingPage = () => {
                         community.</p>
                     <span className="Button_on_image">
                         <button className="button-19" role="button" onClick={() => navigate('/DonorDetails')} > Donate Now</button>
-                        <button className="button-9" role="button" onClick={() => navigate('')}>Join as a volunteer</button>
+                        <button className="button-9" role="button" onClick={() => navigate('/AvailableFood')}>Explore donations</button>
                     </span>
                 </span>
             </div>

@@ -52,7 +52,7 @@ const Header = () => {
             </li>
             <li className="header__nav-item"><Link to={'/DonorDetails'} >  Donate Now</Link> </li>
             <li className="header__nav-item"> <Link to={"/About"}>About</Link></li>
-            <li className="header__nav-item"><a href="#contact">Contact</a></li>
+            {/* <li className="header__nav-item"><a href="#contact">Contact</a></li> */}
             <li className="header__nav-item">
               {
                 !user &&
@@ -84,7 +84,7 @@ const Header = () => {
           <li className="sidebar__item"><a href="#home" onClick={toggleSidebar}>Home</a></li>
           <li className="sidebar__item"><a href="#about" onClick={toggleSidebar}>About</a></li>
           <li className="sidebar__item"><a href="#services" onClick={toggleSidebar}>Services</a></li>
-          <li className="sidebar__item"><a href="#contact" onClick={toggleSidebar}>Contact</a></li>
+          {/* <li className="sidebar__item"><a href="#contact" onClick={toggleSidebar}>Contact</a></li> */}
           <li className="header__nav-item">
             {
               !user &&
