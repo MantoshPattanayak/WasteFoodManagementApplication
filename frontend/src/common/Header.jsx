@@ -8,6 +8,7 @@ import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { logout } from '../store/reducers/authReducer';
 import axiosInstance from "../services/axios";
 import api from '../utils/apiList';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -32,6 +33,8 @@ const Header = () => {
       sessionStorage.clear();
       localStorage.clear();
       navigate('/');
+      toast.dismiss();
+      toast.success("Logged out successfully!");
     }
     catch(error) {
       console.error("error in log out api", error);
@@ -94,7 +97,7 @@ const Header = () => {
             }
             {
               user &&
-                <Link className='Login_button' onClick={logoutUser} to={'/'}>
+                <Link className='Login_button' onClick={logoutUser}>
                   <FontAwesomeIcon icon={faRightFromBracket} />&nbsp; Logout
                 </Link>
             }
