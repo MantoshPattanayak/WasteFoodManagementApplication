@@ -56,7 +56,7 @@ function LogInSignUp() {
         encryptMobile: encryptData(phoneNumber)
       });
       console.log("response of get otp api", res.data);
-      sessionStorage.setItem('check', res.data);
+      sessionStorage.setItem('check', encryptData(res.data.otp));
       setOtpSent(true);
       setTimer(60);
       toast.success(res.data.message);
@@ -75,6 +75,8 @@ function LogInSignUp() {
         encryptMobile: encryptData(phoneNumber), encryptOtp: encryptData(otp)
       });
       console.log("response of verify otp api", res.data);
+      let checkOTP = (sessionStorage.getItem('check')) == encryptData(otp);
+      console.log("checkOTP", checkOTP);
       if(res.data.decideSignUpOrLogin) {
         dispatch(login(res.data.user));
         tokenService.setUser(res.data.user);

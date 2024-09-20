@@ -4,6 +4,7 @@ import Regd_image from "../../assets/Regd_image.png";
 import profile_image from "../../assets/profileImgLogo.png";
 import tokenService from "../../services/token.service";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
 import { useLocation, useNavigate } from "react-router-dom";

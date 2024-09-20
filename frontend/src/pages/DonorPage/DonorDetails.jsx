@@ -1,11 +1,12 @@
 import "./DonorDetails.css";
 import Header from "../../common/Header";
 import Donor_image from "../../assets/Donor_details_image.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DonorDetails = () => {
     // Initialize state ---------
@@ -17,7 +18,7 @@ const DonorDetails = () => {
         foodCategory: "",
         quantity: "",
         unit: "",
-        expirationDate: "",
+        expirationDate: new Date().toISOString().split("T")[0],
         imageData: "",
         address: {
             building: "",
@@ -81,7 +82,7 @@ const DonorDetails = () => {
             setgetUnit(res.data.unitsData);
             console.log("Response of initial data", res);
         } catch (err) {
-            console.log("Error getting initial data", err);
+            console.log("Error getting initial data GetDonorType", err);
         }
     }
     // Auto suggestion of address based on pincode
@@ -110,6 +111,7 @@ const DonorDetails = () => {
             console.log("Error in auto-suggestion", err);
         }
     }
+
     // Handle pincode input change
     const handlePincode = (e) => {
         const value = e.target.value;
@@ -120,17 +122,34 @@ const DonorDetails = () => {
                 pincode: value
             }
         }));
-        if (value.length === 6) { // Assuming pincode length is 6
-            AutoSugestion(value);
-        }
+        // if (value.length === 6) { // Assuming pincode length is 6
+        //     AutoSugestion(value);
+        // }
     };
+
+    function debounce (fn, delay) {
+        let timeoutId;
+        return function(...args) {
+            timeoutId = setTimeout(() => {
+                fn(...args)
+            }, [])
+        }
+    }
+
+    let debouncedFetchPincodeDetails = useCallback(debounce(AutoSugestion, 1000), []);
+
     // Fetch donor type on component mount
     useEffect(() => {
-        GetDonorType();
-        if (DonorData.address.pincode) {
-            AutoSugestion(DonorData.address.pincode)
+        // GetDonorType();
+        if (DonorData.address.pincode && DonorData.address.pincode.length == 6) {
+            debouncedFetchPincodeDetails(DonorData.address.pincode)
         }
-    }, [DonorData.address.pincode]);
+    }, [DonorData.address.pincode, debouncedFetchPincodeDetails]);
+
+    useEffect(() => {
+        GetDonorType();
+    }, [])
+
     // Post donor data to backend
     async function PostDonorData(e) {
         e.preventDefault()
@@ -283,6 +302,7 @@ const DonorDetails = () => {
                                 name="expirationDate"
                                 value={DonorData.expirationDate}
                                 onChange={handleChange}
+                                min={new Date().toISOString().split("T")[0]}
                             />
                             {showError.expirationDate && <span className="error_msg"> {showError.expirationDate}</span>}
                         </span>
