@@ -16,7 +16,7 @@ const authReducer = createSlice({
         logout(state = initialState, action) {
             state.user = null;
             state.isLoggedin = false;
-        }
+        },
     },
 })
 

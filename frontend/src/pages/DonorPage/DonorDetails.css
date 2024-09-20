@@ -75,6 +75,7 @@ font-weight: 600;
 .input_text_conatiner11{
     display: flex;
     justify-content: center;
+    padding-top: 20px;
 
 }
 
@@ -146,3 +147,10 @@ font-weight: 600;
     padding: 5px;
   }
   
+
+
+  /* error msg */
+  .error_msg{
+    color: red;
+    font-size: 17px;
+  }
