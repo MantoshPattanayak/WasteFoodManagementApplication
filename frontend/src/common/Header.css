@@ -6,8 +6,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 20px;
-    background-color: #343333;
-    color: #fff;
+    background-color: #d9e7fc;
+    color: #000000;
     z-index: 1000; /* Ensure it's above other content */
   }
   
@@ -22,15 +22,18 @@
   /* Logo styles */
   .header__logo {
     height: 100%;
-    font-size: 1.5rem;
+    
     font-weight: bold;
     display: flex;
     justify-content: center;
     gap: 10px;
-    background-color: white;
+ 
     border-radius: 8px;
     color: #040273;
     padding: 0px 5px 0px 5px;
+  }
+  .header__logo img{
+    height: 7vh;
   }
 
   .header__logo p {
@@ -58,16 +61,17 @@
   }
   
   .header__nav-item a {
-    color: #fff;
+    color: #201f1f;
     text-decoration: none;
     font-size: 20px;
     padding: 8px 16px;
+    font-weight: 600;
     border-radius: 4px;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   .header__nav-item a:hover {
-    color: #fff;
+    color: #010101;
   }
   
   /* Hamburger Menu */
@@ -153,7 +157,7 @@
   .Login_button {
     align-items: center;
     background-clip: padding-box;
-    background-color: #fa6400;
+    background-color: #60b6f9;
     border: 1px solid transparent;
     border-radius: .25rem;
     box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
