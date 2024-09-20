@@ -476,6 +476,10 @@ const viewUserProfile = async (req, res) => {
   }
 };
 
+let updateUserProfile = async (req, res) => {
+
+}
+
 
 
 let logout = async (req, res) => {
@@ -700,6 +704,7 @@ module.exports = {
   viewUserProfile,
   logout,
   signUp,
-  initialData
+  initialData,
+  updateUserProfile
 }
 

@@ -8,6 +8,7 @@ import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { logout } from '../store/reducers/authReducer';
 import axiosInstance from "../services/axios";
 import api from '../utils/apiList';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -16,7 +17,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // console.log("user", user);
+    console.log("user", user);
   }, [])
 
   const toggleSidebar = () => {
@@ -32,8 +33,10 @@ const Header = () => {
       sessionStorage.clear();
       localStorage.clear();
       navigate('/');
+      toast.dismiss();
+      toast.success("Logged out successfully!");
     }
-    catch(error) {
+    catch (error) {
       console.error("error in log out api", error);
     }
   }
@@ -53,18 +56,26 @@ const Header = () => {
             <li className="header__nav-item"><Link to={'/DonorDetails'} >  Donate Now</Link> </li>
             <li className="header__nav-item"> <Link to={"/About"}>About</Link></li>
             {/* <li className="header__nav-item"><a href="#contact">Contact</a></li> */}
+            {
+              user &&
+              <li className="header__nav-item">
+                <Link to={'/DonateHistory'}>
+                  Donation History
+                </Link>
+              </li>
+            }
             <li className="header__nav-item">
               {
                 !user &&
-                  <Link className='Login_button' to={'/Login'}>
-                    Login
-                  </Link>
+                <Link className='Login_button' to={'/Login'}>
+                  Login
+                </Link>
               }
               {
                 user &&
-                  <Link className='Login_button' onClick={logoutUser} to={'/'}>
-                    <FontAwesomeIcon icon={faRightFromBracket} />&nbsp; Logout
-                  </Link>
+                <Link className='Login_button' onClick={logoutUser} to={'/'}>
+                  <FontAwesomeIcon icon={faRightFromBracket} />&nbsp; Logout
+                </Link>
               }
               {/* <button className='Login_button'>
                 Login
@@ -88,15 +99,15 @@ const Header = () => {
           <li className="header__nav-item">
             {
               !user &&
-                <Link className='Login_button' to={'/Login'}>
-                  Login
-                </Link>
+              <Link className='Login_button' to={'/Login'}>
+                Login
+              </Link>
             }
             {
               user &&
-                <Link className='Login_button' onClick={logoutUser} to={'/'}>
-                  <FontAwesomeIcon icon={faRightFromBracket} />&nbsp; Logout
-                </Link>
+              <Link className='Login_button' onClick={logoutUser}>
+                <FontAwesomeIcon icon={faRightFromBracket} />&nbsp; Logout
+              </Link>
             }
 
             {/* <button className='Login_button' onClick={toggleSidebar}>
