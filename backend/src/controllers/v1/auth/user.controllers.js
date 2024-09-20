@@ -35,66 +35,66 @@ let createOtp = async (req, res) => {
     console.log("generated OTP", generatedOTP);
     mobileNo = decrypt(mobileNo); //get the decrypted mobile number
     console.log("decrypted mobile number", mobileNo);
-    let expiryTime = new Date();
-    expiryTime = expiryTime.setMinutes(expiryTime.getMinutes() + 1);
+    // let expiryTime = new Date();
+    // expiryTime = expiryTime.setMinutes(expiryTime.getMinutes() + 1);
     let otp = "123456";
-    let insertOtp;
-    console.log(expiryTime,'expiryTime')
+    // let insertOtp;
+    // console.log(expiryTime,'expiryTime')
 
-    if (mobileNo) { // if proper mobile number
-      let isOtpValid = await otpVerifications.findOne({
-        where: {
-          expiryTime: {
-            [Op.gte]: new Date(),
-          },
-          mobileNo: mobileNo
-        }
-      });
-      console.log(1, isOtpValid)
-      if (isOtpValid != null) { // if otp present, then expire the otp
-        console.log(2)
-        let expireOtp = await otpVerifications.update({
-          expiryTime: new Date(Date.now() - 24 * 60 * 60 * 1000)
-        }, {
-          where: {
-            mobileNo: mobileNo
-          }
-        });
-        console.log(3, expireOtp);
-        insertOtp = await otpVerifications.create({
-          mobileNo:encrypt(mobileNo), 
-          code: encrypt(otp), 
-          expireTime:expiryTime, 
-          verified: 0
-        });
-        console.log(4, insertOtp);
-      }
-      else {
-        console.log(5)
-        insertOtp = await otpVerifications.create({
-          mobileNo:encrypt(mobileNo), 
-          code: encrypt(otp),
-          expiryTime:expiryTime,
-          verified: 0,
+    // if (mobileNo) { // if proper mobile number
+    //   let isOtpValid = await otpVerifications.findOne({
+    //     where: {
+    //       expiryTime: {
+    //         [Op.gte]: new Date(),
+    //       },
+    //       mobileNo: mobileNo
+    //     }
+    //   });
+    //   console.log(1, isOtpValid)
+    //   if (isOtpValid != null) { // if otp present, then expire the otp
+    //     console.log(2)
+    //     let expireOtp = await otpVerifications.update({
+    //       expiryTime: new Date(Date.now() - 24 * 60 * 60 * 1000)
+    //     }, {
+    //       where: {
+    //         mobileNo: mobileNo
+    //       }
+    //     });
+    //     console.log(3, expireOtp);
+    //     insertOtp = await otpVerifications.create({
+    //       mobileNo:encrypt(mobileNo), 
+    //       code: encrypt(otp), 
+    //       expireTime:expiryTime, 
+    //       verified: 0
+    //     });
+    //     console.log(4, insertOtp);
+    //   }
+    //   else {
+    //     console.log(5)
+    //     insertOtp = await otpVerifications.create({
+    //       mobileNo:encrypt(mobileNo), 
+    //       code: encrypt(otp),
+    //       expiryTime:expiryTime,
+    //       verified: 0,
           
-        });
+    //     });
      
-      }
-    }
-    console.log("insertOTP", insertOtp);
-    if (insertOtp != null) {
-      console.log(6)
+    //   }
+    // }
+    // console.log("insertOTP", insertOtp);
+    // if (insertOtp != null) {
+    //   console.log(6)
       return res.status(statusCode.SUCCESS.code).json({
         message: "OTP sent successfully. OTP is valid for 1 minute.",
         otp: otp,
       });
-    }
-    else {
-      console.log(7)
-      return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-        message: "Something went wrong!"
-      })
-    }
+    // }
+    // else {
+    //   console.log(7)
+    //   return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+    //     message: "Something went wrong!"
+    //   })
+    // }
   }
   catch (error) {
     logger.error(`An error occurred: ${error.message}`); // Log the error
@@ -320,23 +320,23 @@ let loginWithOTP = async (req, res) => {
     // otp = decrypt(otp);
 
     if (mobileNo && otp) {
-      let isOtpValid = await otpVerifications.findOne({
-        where: {
-          expiryTime: { [Op.gte]: new Date() },
-          code: otp,
-          mobileNo: mobileNo
-        }
-      })
-      console.log('207 line', isOtpValid)
-      if (isOtpValid) {
-        let updateTheVerifiedValue = await otpVerifications.update({ verified: 1 }
-          , {
-            where: {
-              id: isOtpValid.id || isOtpValid.dataValues.id
-            }
-          }
-        )
-        console.log(updateTheVerifiedValue, 'update the verified value')
+      // let isOtpValid = await otpVerifications.findOne({
+      //   where: {
+      //     expiryTime: { [Op.gte]: new Date() },
+      //     code: otp,
+      //     mobileNo: mobileNo
+      //   }
+      // })
+      // console.log('207 line', isOtpValid)
+      // if (isOtpValid) {
+        // let updateTheVerifiedValue = await otpVerifications.update({ verified: 1 }
+        //   , {
+        //     where: {
+        //       id: isOtpValid.id || isOtpValid.dataValues.id
+        //     }
+        //   }
+        // )
+        // console.log(updateTheVerifiedValue, 'update the verified value')
         let isUserExist = await users.findOne({
           where: {
             [Op.and]: [{ phoneNumber: decrypt(mobileNo) }, { statusId: statusId }]
@@ -389,12 +389,12 @@ let loginWithOTP = async (req, res) => {
               sid: sessionId
             }
           });
-      }
-      else {
-        return res.status(statusCode.BAD_REQUEST.code).json({
-          message: "Invalid Otp"
-        })
-      }
+      // }
+      // else {
+      //   return res.status(statusCode.BAD_REQUEST.code).json({
+      //     message: "Invalid Otp"
+      //   })
+      // }
     }
   }
   catch (err) {
