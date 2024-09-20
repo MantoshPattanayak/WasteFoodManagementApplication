@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Header.css'; // Import the CSS file for styling
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from '../assets/food-donation-icon 1.svg'
+import Logo from '../assets/soul_share.svg'
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
@@ -42,8 +42,8 @@ const Header = () => {
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          <img src={Logo} />
-          <p>SOUL SHARE</p>
+          <img     src={Logo} />
+        
         </div>
         <nav className={`header__nav ${isSidebarOpen ? 'open' : ''}`}>
           <ul className="header__nav-list">

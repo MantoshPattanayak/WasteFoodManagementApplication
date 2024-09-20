@@ -152,7 +152,7 @@ const AvailableFood = () => {
                 setShowRecentOptions(false);
                 setShowItemTypeOptions(false);
             }
-            if(
+            if (
                 itemTypeRef.current && !itemTypeRef.current.contains(event.target)
             ) {
                 setShowRecentOptions(false);
@@ -174,8 +174,10 @@ const AvailableFood = () => {
     return (
         <div className='Mian_conatiner_doner_his'>
             <Header />
+            <div className="child_conatiner_donor_details">
             <span className='text_his'>
-                <h1>Available Donations</h1>
+                <h1 className="Avil_text">Available Donations</h1>
+                <h></h>
             </span>
             <div className="parent-container">
                 <div className="Child_conatiner_doner_his1">
@@ -258,34 +260,39 @@ const AvailableFood = () => {
                 </div>
             </div>
 
-            {
-                foodDonationList?.map((food, index) => {
-                    return (
-                        <div key={index} className="parent-container">
-                            <div className="Child_conatiner_doner_his">
-                                <div className='list_his'>
-                                    <span className='image_list_his'>
-                                        <img src={image_his_list}></img>
-                                    </span>
-                                    <span className='list_content'>
-                                        <p>Items name - {food.foodName}</p>
-                                        <p>Address - {food.address || 'NA'}</p>
-                                        <p>Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p>
-                                        <p>Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;{food.phoneNumber} </p>
-                                        <p onClick={(e) => { window.open(instance().GOOGLE_MAPS_BASE_URL + `&destination=${food.latitude},${food.longitude}`) }}>
-                                            <span className="map-location">
-                                                <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
-                                            </span>
-                                        </p>
-                                        <button className='Details_button'>Details</button>
-                                    </span>
-                                </div>
-                            </div>
+            <div className="cards-grid">
+                {foodDonationList?.map((food, index) => (
+                    <div key={index} className="card">
+                        <img src={image_his_list} alt="Food Item" className="card-image" />
+                        <div className="card-content">
+                            <p className="item_name">{food.foodName}</p>
+                            <p className="exp_date">Address - {food.address || "NA"}</p>
+                            <p className="exp_date">Expiration date - <p1>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p1></p>
+                            <p className="exp_date">
+                                Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
+                                {food.phoneNumber}
+                            </p>
+                            <p
+                                className="map-location"
+                                onClick={() =>
+                                    window.open(
+                                        instance().GOOGLE_MAPS_BASE_URL +
+                                        `&destination=${food.latitude},${food.longitude}`
+                                    )
+                                }
+                            >
+                                <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
+                            </p>
+
                         </div>
-                    )
-                })
-            }
+                    </div>
+                ))}
+            </div>
+            </div>
+            
+
         </div>
+
     )
 }
 export default AvailableFood;
