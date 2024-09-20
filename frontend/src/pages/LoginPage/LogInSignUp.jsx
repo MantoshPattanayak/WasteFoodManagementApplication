@@ -56,6 +56,7 @@ function LogInSignUp() {
         encryptMobile: encryptData(phoneNumber)
       });
       console.log("response of get otp api", res.data);
+      sessionStorage.setItem('check', res.data);
       setOtpSent(true);
       setTimer(60);
       toast.success(res.data.message);
@@ -82,7 +83,7 @@ function LogInSignUp() {
           autoClose: 1000,
           onClose: () => {
             setTimeout(() => {
-              navigate('/DonorLandingPage');
+              navigate('/DonorDetails');
             }, 500);
           }
         })

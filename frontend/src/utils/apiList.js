@@ -85,6 +85,10 @@ const api = {
         /**
          * page_size, page_number
          */
+    },
+    VIEW_PROFILE: {
+        url: baseURL + "/auth/viewUserProfile",
+        method: "get"
     }
 }
 
