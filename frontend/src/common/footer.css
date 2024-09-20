@@ -81,6 +81,8 @@ footer {
 .copy_right{
     display: flex;
     justify-content: center;
+    background-color: #0A122A;
+    border-top: 1px solid white;
 }
 .copy_right h1{
     font-size: 16px;

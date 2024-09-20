@@ -279,3 +279,8 @@
 .filter-selected {
   background-color: #85bcf3;
 }
+
+.no_data_message {
+  margin-left: 40%;
+  font-size: 17px;
+}

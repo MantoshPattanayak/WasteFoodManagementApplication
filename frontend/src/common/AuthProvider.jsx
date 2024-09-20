@@ -49,7 +49,7 @@ export function withAuth(Component) {
         const { isAuthenticated } = useAuth();
         console.log("withAuth", isAuthenticated);
         if (!isAuthenticated) {
-            // window.location.href = instance().baseName;
+            window.location.href = instance().baseName;
             // return null;
         }
         return <Component {...props} />;

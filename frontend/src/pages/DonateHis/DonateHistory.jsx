@@ -286,6 +286,10 @@ const DonateHistory = () => {
                     )
                 })
             }
+            {
+                foodDonationList.length == 0 &&
+                <p className="no_data_message">No donations made.</p>
+            }
             <Footer />
         </div>
     )

@@ -15,9 +15,13 @@ import { useState, useEffect } from "react"
 import landing_image from "../../assets/food_donation_home.jpeg"
 import Landing_image2 from "../../assets/save_food_image1.jpg"
 import Landing_image3 from "../../assets/Save_food_image_3.jpg"
+import { useSelector } from "react-redux"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css";
 
 const LandingPage = () => {
     const navigate = useNavigate()
+    const user = useSelector((state) => state.auth.user);
     // track the current image
     // Array of images to be swapped
     const images = [landing_image, Landing_image2, Landing_image3];
@@ -35,7 +39,14 @@ const LandingPage = () => {
         return () => clearInterval(intervalId);
     }, [images.length]);
 
-
+    function handleNavigation(e) {
+        if (user) {
+            navigate('/DonorDetails')
+        }
+        else {
+            toast.error('Kindly log in or register first!')
+        }
+    }
 
     return (
         <div className="Landing_page_main_conatiner">
@@ -55,7 +66,7 @@ const LandingPage = () => {
                         healthier
                         community.</p>
                     <span className="Button_on_image">
-                        <button className="button-19" role="button" onClick={() => navigate('/DonorDetails')} > Donate Now</button>
+                        <button className="button-19" role="button" onClick={(e) => handleNavigation(e)}>Donate Now</button>
                         <button className="button-9" role="button" onClick={() => navigate('/AvailableFood')}>Explore donations</button>
                     </span>
                 </span>
@@ -101,7 +112,7 @@ const LandingPage = () => {
                 </div>
             </div>
             <Footer />
-
+            <ToastContainer />
         </div>
     )
 }
