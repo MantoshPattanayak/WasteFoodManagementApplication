@@ -54,9 +54,10 @@ db1.otpVerifications = require('./otpverifications.model')(sequelize, DataTypes)
 db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
 db1.device = require('./device.model')(sequelize, DataTypes)
 db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
+db1.categories = require('./categories.models')(sequelize, DataTypes)
 console.log('all details 2')
 
-db1.files.sync({
+db1.foodCategories.sync({
   alter: false,
 });
 

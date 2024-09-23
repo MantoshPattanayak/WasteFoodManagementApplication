@@ -1,16 +1,16 @@
-module.exports = (sequelize, DataTypes) => {
-    const foodCategories = sequelize.define("foodCategories", {
-        foodCategoryId: {
+module.exports = (sequelize,DataTypes)=>{
+    let category = sequelize.define('categories',{
+        categoryId: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
-        categoryId: {
-            type: DataTypes.INTEGER,
-        },
-        foodCategoryName: {
+        categoryType: {
             type: DataTypes.STRING(80),
             allowNull: false,
+        },
+        description: {
+            type: DataTypes.STRING(80),
         },
         statusId: {
             type: DataTypes.INTEGER,
@@ -41,6 +41,8 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         schema: "soulshare",
         timestamps: false //disable Sequelize's automatic timestamps
-    })
-    return foodCategories;
+    }
+    )
+
+    return category
 }
