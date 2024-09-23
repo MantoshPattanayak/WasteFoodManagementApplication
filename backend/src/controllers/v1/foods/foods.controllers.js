@@ -156,6 +156,7 @@ let viewFoodDonationList = async (req, res) => {
         let limit = page_size || 50;
         let page = page_number || 1;
         let offset = (page - 1) * limit;
+        let currDate = new Date();
         let isDate = validateAndConvertDate(givenReq).isValid;
         console.log("isDate", isDate);
         if (givenReq) {
@@ -185,11 +186,14 @@ let viewFoodDonationList = async (req, res) => {
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
             inner join soulshare.users u on u."userId" = fl."userId"
-            where sm."statusCode" = 'ACTIVE'
+            where sm."statusCode" = 'ACTIVE' and "expirationDate" >= :currDate
             order by u."createdOn" desc
         `;
+        console.log('foodDonationListQuery', foodDonationListQuery)
+
         let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {
             type: Sequelize.QueryTypes.SELECT,
+            replacements:{currDate:currDate}
         });
         console.log("fetchFoodDonationListData", fetchFoodDonationListData);
         let foodDonationData = fetchFoodDonationListData;
