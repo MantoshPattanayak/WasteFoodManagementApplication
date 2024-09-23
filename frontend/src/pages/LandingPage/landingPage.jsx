@@ -40,6 +40,7 @@ const LandingPage = () => {
     }, [images.length]);
 
     function handleNavigation(e) {
+        // console.log("handle navigation");
         if (user) {
             navigate('/DonorDetails')
         }

@@ -4,10 +4,28 @@ import SaveImage from "../../assets/Save_food.png"
 import "./AboutPage.css"
 import Footer from "../../common/footer.jsx"
 import Mission_image from "../../assets/dis.png"
+import { useSelector } from "react-redux"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css";
+
 const About = () => {
+    const user = useSelector((state) => state.auth.user);
+    function handleNavigation(e) {
+        // console.log("handle navigation");
+        if (user) {
+            console.log(1)
+            navigate('/DonorDetails')
+        }
+        else {
+            console.log(2)
+            toast.error('Kindly log in or register first!')
+        }
+    }
+
     return (
         <div className="About_main_container">
             <Header />
+            <ToastContainer />
             <div className="child_about_main_container">
                 <div className="content_text">
                     <h1 className="text_about">Imagine a world <br></br>
@@ -15,7 +33,7 @@ const About = () => {
                     <p><p>Food wastement contributes to hunger worldwide.Reducing food waste not only  <br></br>helps alleviate hunger but also conserves resources and reduces environmental impact.</p>
                     </p>
                     <span className="button_donate_volunteer">
-                        <button className="donated_button">Donated Now</button>
+                        <button className="donated_button" onClick={handleNavigation}>Donate Now</button>
                         {/* <button className="donated_button">Join as a volunteer</button> */}
                     </span>
                 </div>
@@ -23,11 +41,11 @@ const About = () => {
                     <img className="food-image" src={SaveImage}></img>
                 </div>
             </div>
-              <div className="mission_conatiner">
+            <div className="mission_conatiner">
                 <h1 className="text_mission">Our Mission</h1>
                 <div className="mission_child_food">
                     <div className="image_mission_div">
-                       <img className="mission_image" src={Mission_image}></img>
+                        <img className="mission_image" src={Mission_image}></img>
                     </div>
                     <div className="mission_content">
                         <h1>Mission</h1>
@@ -35,15 +53,15 @@ const About = () => {
                         <h1>Belief</h1>
                         <p>Our core belief is that food is far too valuable to waste, and that technology can transform the way we use food.</p>
                     </div>
-                 
-                </div>
-              </div>
-              <div className="How_it_work">
-                 <h1>  How It Works</h1>
-                  <p>Through our platform, food donors—whether </p>
-              </div>
 
-        <Footer/>
+                </div>
+            </div>
+            <div className="How_it_work">
+                <h1>  How It Works</h1>
+                <p>Through our platform, food donors—whether </p>
+            </div>
+
+            <Footer />
         </div>
     )
 }
