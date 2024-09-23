@@ -358,7 +358,7 @@ const DonorDetails = () => {
                             {showError.area &&  <span className="error_msg">{showError.area}</span>}
                             <div className="ads_two_input">
                                 <div className="input_group">
-                                    <label>PinCode</label>
+                                    <label>Pincode</label>
                                     <input
                                         type="text"
                                         name="pincode"
@@ -409,7 +409,9 @@ const DonorDetails = () => {
                         </span>
                     </form>
                 </div>
-                <img className="donor_image" src={Donor_image} alt="Donor Image" />
+                <div className="donor_image">
+                    <img src={Donor_image} alt="Donor Image" />
+                </div>
             </div>
             <Footer />
         </div>

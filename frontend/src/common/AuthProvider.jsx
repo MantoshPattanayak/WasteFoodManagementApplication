@@ -16,9 +16,9 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const initializeAuth = async () => {
             if (!user) {
-                const newTokenBoolean = await refresh(rtoken);
-                console.log("newTokenBoolean", newTokenBoolean);
-                setIsAuthenticated(newTokenBoolean);
+                // const newTokenBoolean = await refresh(rtoken);
+                // console.log("newTokenBoolean", newTokenBoolean);
+                setIsAuthenticated(true);
             }
             else {
                 setIsAuthenticated(true);
@@ -49,7 +49,8 @@ export function withAuth(Component) {
         const { isAuthenticated } = useAuth();
         console.log("withAuth", isAuthenticated);
         if (!isAuthenticated) {
-            window.location.href = instance().baseName;
+            // window.location.href = instance().baseName;
+            alert('Session expired!! Login again.')
             // return null;
         }
         return <Component {...props} />;
