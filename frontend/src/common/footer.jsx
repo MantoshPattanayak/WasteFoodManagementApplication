@@ -1,11 +1,13 @@
 
 import "./footer.css"
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
 
 const Footer = () => {
     const user = useSelector((state) => state.auth.user);
+    const navigate = useNavigate();
     function handleNavigation(e) {
         // console.log("handle navigation");
         if (user) {
