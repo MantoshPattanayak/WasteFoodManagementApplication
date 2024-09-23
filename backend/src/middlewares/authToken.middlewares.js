@@ -28,7 +28,7 @@ function authenticateToken(req, res, next) {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (error, user) => {
       // console.log(user);
       if (error) return res.status(statusCode.UNAUTHORIZED.code).json({ error: error.message });
-      // console.log(user,'user')
+      console.log(user,'user auth token ')
       const findUser = await User.findByPk(user.userId);
       // console.log(findUser,'findUser')
       // // console.log(query.rows);
