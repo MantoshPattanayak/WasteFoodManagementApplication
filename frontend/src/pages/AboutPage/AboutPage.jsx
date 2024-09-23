@@ -56,12 +56,13 @@ const About = () => {
 
                 </div>
             </div>
-            <div className="How_it_work">
-                <h1>  How It Works</h1>
-                <p>Through our platform, food donors—whether </p>
+            <div className="mission_child_food">
+                <div className="mission_content">
+                    <h1>How It Works</h1>
+                    <p>Through our platform, food donors - whether</p>
+                </div>
             </div>
-
-            <Footer />
+            {/* <Footer /> */}
         </div>
     )
 }
