@@ -5,8 +5,10 @@ import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
 import axios from "axios";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Footer from "../../common/footer";
+import { useNavigate } from "react-router-dom";
 
 const DonorDetails = () => {
     // Initialize state ---------
@@ -30,6 +32,7 @@ const DonorDetails = () => {
             country: ""
         }
     });
+    const navigate = useNavigate();
     // Function to handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -153,6 +156,7 @@ const DonorDetails = () => {
     // Post donor data to backend
     async function PostDonorData(e) {
         e.preventDefault()
+        console.log("post donor data");
         const Error = DonorValidation(DonorData)
         if (Object.keys(Error).length > 0) {
             setshowError(Error) // set error state
@@ -173,6 +177,14 @@ const DonorDetails = () => {
                 ]
             });
             console.log("Response of Donor Data", res);
+            toast.success(res.data.message, {
+                autoClose: 1000,
+                onClose: () => {
+                    setTimeout(() => {
+                        navigate('/DonateHistory');
+                    }, 500)
+                }
+            })
         } catch (err) {
             console.log("Donor Response Error", err);
         }
@@ -180,8 +192,9 @@ const DonorDetails = () => {
 
     // Validation of donor food--------------------
     const DonorValidation = (value) => {
+        console.log("donor validation");
         const err = {};
-        const checkSpecialChar = /^(?!\s*$)[a-zA-Z0-9\s]*$/;
+        const checkSpecialChar = /^(?!\s*$)[a-zA-Z0-9,-\s]*$/;
         const UnitCheck = /^(?!0$)(?!0\.[0]*$)([1-9]\d*|0\.[1-9]\d*)$/;
         // here is the regex code ..
         const RegexPincode=/^\d{6}$/;
@@ -235,6 +248,7 @@ const DonorDetails = () => {
     return (
         <div className="main_conatiner_donor_details">
             <Header />
+            <ToastContainer />
             <div className="Child_container_donor_details">
                 <div className="form_conainer">
                     <h1>Donation Details</h1>
@@ -391,12 +405,13 @@ const DonorDetails = () => {
                         </div>
 
                         <span className="input_text_conatiner11">
-                            <button className="send_Req_button">Send request</button>
+                            <button type="submit" className="send_Req_button" onClick={PostDonorData}>Submit</button>
                         </span>
                     </form>
                 </div>
                 <img className="donor_image" src={Donor_image} alt="Donor Image" />
             </div>
+            <Footer />
         </div>
     );
 };

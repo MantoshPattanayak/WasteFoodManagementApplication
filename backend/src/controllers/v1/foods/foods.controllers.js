@@ -16,7 +16,7 @@ let addFoodDonationRequest = async (req, res) => {
         let userId = req.user?.userId || 1;
         let subDir = '/foodDonation';
         //check if any detail is missing
-        console.log("check submitted details start");
+        // console.log("check submitted details start");
         for (let foodItem of foodItemsArray) {
             if (foodItem.foodName == undefined || !foodItem.foodName) {
                 console.log("foodItem.foodName not provided");
@@ -42,24 +42,32 @@ let addFoodDonationRequest = async (req, res) => {
                     message: "Please provide all data."
                 });
             }
+            if (foodItem.address == undefined || !foodItem.address) {
+                console.log("foodItem.address not provided");
+                return res.status(statusCode.BAD_REQUEST.code).json({
+                    message: "Please provide all data."
+                });
+            }
         }
 
         //check if address details present correctly
-        let addressDetails = ['building', 'area', 'landmark', 'pincode', 'townCity', 'state'];
-        for (let key of Object.keys(address)) {
-            if (!addressDetails.includes(key) || (key != 'landmark' && !address[key])) {
+        let addressDetails = ['building', 'area', 'landmark', 'pincode', 'townCity', 'state', 'country'];
+        // console.log("abcdedg", Object.keys(foodItemsArray[0].address));
+        for (let key of Object.keys(foodItemsArray[0].address)) {
+            if (!addressDetails.includes(key) || (key != 'landmark' && !foodItemsArray[0].address[key])) {
                 return res.status(statusCode.BAD_REQUEST.code).json({
                     message: `please provide all required data to set up the profile`
                 });
             }
         }
-        console.log("check submitted details end");
+        // console.log("check submitted details end");
         // fetch entity types data
         // let entityTypesMasterData = await fetchMasterData('entityTypes');
         // console.log("entityTypesMasterData", entityTypesMasterData);
         // entityTypesMasterData = entityTypesMasterData.filter((data) => { return data.entityTypeName == "foodDonation" });
         // console.log("entityTypesMasterData filtered foodDonation", entityTypesMasterData);
         // insert into foodListing table
+        // console.log("userid", userId);
         let insertFoodListing = await foodListings.create({
             userId: userId,
             statusId: 1,
@@ -67,11 +75,11 @@ let addFoodDonationRequest = async (req, res) => {
             receiverId: receiverId || null,
             createdBy: userId
         }, { transaction, returning: true });
-        console.log("insertFoodListing", insertFoodListing);
+        // console.log("insertFoodListing", insertFoodListing);
 
         // insert into foodListingItems table
         let serialNumber = 0;
-        console.log("insert into foodListingItems table start");
+        // console.log("insert into foodListingItems table start");
         for (let foodItem of foodItemsArray) {
             serialNumber += 1;
             let insertFoodListingItem = await foodListingItems.create({
@@ -81,6 +89,7 @@ let addFoodDonationRequest = async (req, res) => {
                 quantity: foodItem.quantity,
                 unit: foodItem.unit,
                 expirationDate: foodItem.expirationDate,
+                createdBy: userId,
                 statusId: 1
             }, { transaction, returning: true });
 
@@ -89,7 +98,9 @@ let addFoodDonationRequest = async (req, res) => {
                 name: foodItem.foodName + "_" + foodItem.foodCategory + "_" + formatDateToDDMMYYYYHHMMSSMS()
             }
             // insert into food image file
+            let errors = [];
             let imageFileUpload = imageUpload(foodItem.imageData, "foodDonation", subDir, insertionData, userId, errors, serialNumber, transaction);
+            console.log("errors", errors);
             if (errors.length > 0) {
                 transaction.rollback();
                 return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
