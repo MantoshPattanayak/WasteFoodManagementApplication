@@ -154,3 +154,12 @@ font-weight: 600;
     color: red;
     font-size: 17px;
   }
+
+@media screen and (max-width: 768px) {
+    .form_conainer {
+        width: 100%;
+    }
+    .donor_image {
+        display: hidden;
+    }
+}

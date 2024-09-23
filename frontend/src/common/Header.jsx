@@ -18,7 +18,7 @@ const Header = () => {
 
   useEffect(() => {
     console.log("user", user);
-  }, [])
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -41,19 +41,39 @@ const Header = () => {
     }
   }
 
+  function handleNavigation(e) {
+    // console.log("handle navigation");
+    if (user) {
+      navigate('/DonorDetails')
+    }
+    else {
+      toast.error('Kindly log in or register first!')
+    }
+  }
+
   return (
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          <img     src={Logo} />
-        
+          <img src={Logo} />
+
         </div>
         <nav className={`header__nav ${isSidebarOpen ? 'open' : ''}`}>
           <ul className="header__nav-list">
             <li className="header__nav-item">
-              <Link to={user ? '/DonorLandingPage' : '/'}>Home</Link>
+              {
+                !user && (
+                  <Link to={user ? '/DonorLandingPage' : '/'}>Home</Link>
+                )
+              }
             </li>
-            <li className="header__nav-item"><Link to={'/DonorDetails'} >  Donate Now</Link> </li>
+            <li className="header__nav-item">
+              {
+                !user && (
+                  <Link to={user ? '/DonorDetails' : ''} onClick={handleNavigation}>Donate Now</Link>
+                )
+              }
+            </li>
             <li className="header__nav-item"> <Link to={"/About"}>About</Link></li>
             {/* <li className="header__nav-item"><a href="#contact">Contact</a></li> */}
             {
@@ -84,19 +104,39 @@ const Header = () => {
           </ul>
         </nav>
         <div className="header__hamburger" onClick={toggleSidebar}>
-          <span className="header__hamburger-line"></span>
-          <span className="header__hamburger-line"></span>
-          <span className="header__hamburger-line"></span>
+          <span className="header__hamburger-line" onClick={toggleSidebar}></span>
+          <span className="header__hamburger-line" onClick={toggleSidebar}></span>
+          <span className="header__hamburger-line" onClick={toggleSidebar}></span>
         </div>
       </div>
       <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <button className="sidebar__close" onClick={toggleSidebar}>X</button>
         <ul className="sidebar__list">
-          <li className="sidebar__item"><a href="#home" onClick={toggleSidebar}>Home</a></li>
-          <li className="sidebar__item"><a href="#about" onClick={toggleSidebar}>About</a></li>
-          <li className="sidebar__item"><a href="#services" onClick={toggleSidebar}>Services</a></li>
-          {/* <li className="sidebar__item"><a href="#contact" onClick={toggleSidebar}>Contact</a></li> */}
-          <li className="header__nav-item">
+          <li className="sidebar__item">
+            {
+              !user && (
+                <Link to={user ? '/DonorLandingPage' : '/'}>Home</Link>
+              )
+            }
+          </li>
+          <li className="sidebar__item">
+            {
+              !user && (
+                <Link to={user ? '/DonorDetails' : ''} onClick={handleNavigation}>Donate Now</Link>
+              )
+            }
+          </li>
+          <li className="sidebar__item"> <Link to={"/About"}>About</Link></li>
+          {/* <li className="header__nav-item"><a href="#contact">Contact</a></li> */}
+          {
+            user &&
+            <li className="sidebar__item">
+              <Link to={'/DonateHistory'}>
+                Donation History
+              </Link>
+            </li>
+          }
+          <li className="sidebar__item">
             {
               !user &&
               <Link className='Login_button' to={'/Login'}>
@@ -105,14 +145,13 @@ const Header = () => {
             }
             {
               user &&
-              <Link className='Login_button' onClick={logoutUser}>
+              <Link className='Login_button' onClick={logoutUser} to={'/'}>
                 <FontAwesomeIcon icon={faRightFromBracket} />&nbsp; Logout
               </Link>
             }
-
-            {/* <button className='Login_button' onClick={toggleSidebar}>
-              Login
-            </button> */}
+            {/* <button className='Login_button'>
+                Login
+              </button> */}
           </li>
         </ul>
       </div>
