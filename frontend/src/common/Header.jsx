@@ -54,7 +54,7 @@ const Header = () => {
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          
+
           <img src={Logo} />
         </div>
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
@@ -88,20 +88,22 @@ const Header = () => {
                   Login
                 </Link>
               )}
-              <li className="header__nav-item profile-container">
-                <FontAwesomeIcon icon={faUser} className="icon_profile" />
-                <ul className="profile-submenu">
-                  <li>
-                    <Link to="/profile">View Profile</Link>
-                  </li>
-                  <li>
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                  <li  className="logout"  onClick={logoutUser}>
-                    <FontAwesomeIcon icon={faRightFromBracket} /> Logout
-                  </li>
-                </ul>
-              </li>
+              {
+                user && <li className="header__nav-item profile-container">
+                  <FontAwesomeIcon icon={faUser} className="icon_profile" />
+                  <ul className="profile-submenu">
+                    <li>
+                      <Link to="/profile">View Profile</Link>
+                    </li>
+                    <li>
+                      <Link to="/settings">Settings</Link>
+                    </li>
+                    <li className="logout" onClick={logoutUser}>
+                      <FontAwesomeIcon icon={faRightFromBracket} /> Logout
+                    </li>
+                  </ul>
+                </li>
+              }
             </li>
           </ul>
         </nav>
