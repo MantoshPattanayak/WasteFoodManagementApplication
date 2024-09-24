@@ -64,7 +64,7 @@ const About = () => {
                     <p>Through our platform, food donors - whether</p>
                 </div>
             </div>
-            {/* <Footer /> */}
+            <Footer />
         </div>
     )
 }
