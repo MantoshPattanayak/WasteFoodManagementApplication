@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { formatDateAsDDMMYYYYHHMMSS } from "../../utils/utilityFunction";
 import instance from "../../../env";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -177,124 +178,119 @@ const AvailableFood = () => {
             <Header />
             <ToastContainer />
             <div className="child_conatiner_donor_details">
-            <span className='text_his'>
-                <h1 className="Avil_text">Available Donations</h1>
-                <h></h>
-            </span>
-            <div className="parent-container">
-                <div className="Child_conatiner_doner_his1">
-                    <button className={`button-4 ${timeLimit ? 'filter-selected' : ''}`} role="button"
-                        onClick={() => {
-                            setShowRecentOptions(prevState => !prevState);
-                            setShowItemTypeOptions(false);
-                        }}
+                <span className='text_his'>
+                    <h1 className="Avil_text">Available Donations</h1>
+                </span>
+                <div className="parent-container">
+                    <div className="Child_conatiner_doner_his1">
+                        <button className={`button-4 ${timeLimit ? 'filter-selected' : ''}`} role="button"
+                            onClick={() => {
+                                setShowRecentOptions(prevState => !prevState);
+                                setShowItemTypeOptions(false);
+                            }}
                         // ref={recentRef}
-                    >
-                        <FontAwesomeIcon icon={faCalendar} /> Recent
-                    </button>
-                    {
-                        showRecentOptions && (
-                            <div ref={recentRef} className="dropdown-options-1">
-                                <ul>
-                                    {
-                                        filterOptions.timeRange?.map((time, index) => {
-                                            if (timeLimit == time.time) {
-                                                return (
-                                                    <li key={index} onClick={(e) => setTimeLimit(time.time)} className="selected">
-                                                        <FontAwesomeIcon icon={faCheck} /> &nbsp;
-                                                        {time.time}
-                                                    </li>
-                                                )
-                                            }
-                                            else {
-                                                return (
-                                                    <li key={index} onClick={(e) => setTimeLimit(time.time)}>
-                                                        {time.time}
-                                                    </li>
-                                                )
-                                            }
-                                        })
-                                    }
-                                </ul>
-                            </div>
-                        )
-                    }
-                    <button className="button-4" role="button" onClick={getUserGeoLocation}><FontAwesomeIcon icon={faMapMarkerAlt} /> Find nearby</button>
-                    <button className={`button-4 ${foodTypeChoice ? 'filter-selected' : ''}`} role="button"
-                        onClick={() => {
-                            setShowItemTypeOptions(prevState => !prevState);
-                            setShowRecentOptions(false);
-                        }}
+                        >
+                            <FontAwesomeIcon icon={faCalendar} /> Recent
+                        </button>
+                        {
+                            showRecentOptions && (
+                                <div ref={recentRef} className="dropdown-options-1">
+                                    <ul>
+                                        {
+                                            filterOptions.timeRange?.map((time, index) => {
+                                                if (timeLimit == time.time) {
+                                                    return (
+                                                        <li key={index} onClick={(e) => setTimeLimit(time.time)} className="selected">
+                                                            <FontAwesomeIcon icon={faCheck} /> &nbsp;
+                                                            {time.time}
+                                                        </li>
+                                                    )
+                                                }
+                                                else {
+                                                    return (
+                                                        <li key={index} onClick={(e) => setTimeLimit(time.time)}>
+                                                            {time.time}
+                                                        </li>
+                                                    )
+                                                }
+                                            })
+                                        }
+                                    </ul>
+                                </div>
+                            )
+                        }
+                        <button className="button-4" role="button" onClick={getUserGeoLocation}><FontAwesomeIcon icon={faMapMarkerAlt} /> Find nearby</button>
+                        <button className={`button-4 ${foodTypeChoice ? 'filter-selected' : ''}`} role="button"
+                            onClick={() => {
+                                setShowItemTypeOptions(prevState => !prevState);
+                                setShowRecentOptions(false);
+                            }}
                         // ref={itemTypeRef}
-                    >
-                        <FontAwesomeIcon icon={faBagShopping} /> Item type
-                    </button>
-                    {
-                        showItemTypeOptions && (
-                            <div ref={itemTypeRef} className="dropdown-options-2">
-                                <ul>
-                                    {
-                                        filterOptions.foodType?.map((foodType, index) => {
-                                            if (foodTypeChoice == foodType.foodCategoryId) {
-                                                return (
-                                                    <li key={index} onClick={(e) => setFoodTypeChoice(foodType.foodCategoryId)} className="selected">
-                                                        <FontAwesomeIcon icon={faCheck} /> &nbsp;
-                                                        {foodType.foodCategoryName}
-                                                    </li>
-                                                )
-                                            }
-                                            else {
-                                                return (
-                                                    <li key={index} onClick={(e) => setFoodTypeChoice(foodType.foodCategoryId)}>
-                                                        {foodType.foodCategoryName}
-                                                    </li>
-                                                )
-                                            }
-                                        })
+                        >
+                            <FontAwesomeIcon icon={faBagShopping} /> Item type
+                        </button>
+                        {
+                            showItemTypeOptions && (
+                                <div ref={itemTypeRef} className="dropdown-options-2">
+                                    <ul>
+                                        {
+                                            filterOptions.foodType?.map((foodType, index) => {
+                                                if (foodTypeChoice == foodType.foodCategoryId) {
+                                                    return (
+                                                        <li key={index} onClick={(e) => setFoodTypeChoice(foodType.foodCategoryId)} className="selected">
+                                                            <FontAwesomeIcon icon={faCheck} /> &nbsp;
+                                                            {foodType.foodCategoryName}
+                                                        </li>
+                                                    )
+                                                }
+                                                else {
+                                                    return (
+                                                        <li key={index} onClick={(e) => setFoodTypeChoice(foodType.foodCategoryId)}>
+                                                            {foodType.foodCategoryName}
+                                                        </li>
+                                                    )
+                                                }
+                                            })
+                                        }
+                                    </ul>
+                                </div>
+                            )
+                        }
+                        <button className="button-4" role="button" onClick={(e) => {
+                            setTimeLimit(""); setFoodTypeChoice("");
+                        }}><FontAwesomeIcon icon={faTimes} /> Reset filters</button>
+                    </div>
+                </div>
+
+                <div className="cards-grid">
+                    {foodDonationList?.map((food, index) => (
+                        <div key={index} className="card">
+                            <img src={image_his_list} alt="Food Item" className="card-image" />
+                            <div className="card-content">
+                                <p className="item_name">{food.foodName}</p>
+                                <p className="exp_date">Address - {food.address || "NA"}</p>
+                                <p className="exp_date">Expiration date - <p1>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p1></p>
+                                <p className="exp_date">
+                                    Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
+                                    <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
+                                </p>
+                                <p
+                                    className="map-location"
+                                    onClick={() =>
+                                        window.open(
+                                            instance().GOOGLE_MAPS_BASE_URL +
+                                            `&destination=${food.latitude},${food.longitude}`
+                                        )
                                     }
-                                </ul>
+                                >
+                                    <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
+                                </p>
                             </div>
-                        )
-                    }
-                    <button className="button-4" role="button" onClick={(e) => {
-                        setTimeLimit(""); setFoodTypeChoice("");
-                    }}><FontAwesomeIcon icon={faTimes} /> Reset filters</button>
+                        </div>
+                    ))}
                 </div>
             </div>
-
-            <div className="cards-grid">
-                {foodDonationList?.map((food, index) => (
-                    <div key={index} className="card">
-                        <img src={image_his_list} alt="Food Item" className="card-image" />
-                        <div className="card-content">
-                            <p className="item_name">{food.foodName}</p>
-                            <p className="exp_date">Address - {food.address || "NA"}</p>
-                            <p className="exp_date">Expiration date - <p1>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p1></p>
-                            <p className="exp_date">
-                                Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
-                                {food.phoneNumber}
-                            </p>
-                            <p
-                                className="map-location"
-                                onClick={() =>
-                                    window.open(
-                                        instance().GOOGLE_MAPS_BASE_URL +
-                                        `&destination=${food.latitude},${food.longitude}`
-                                    )
-                                }
-                            >
-                                <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
-                            </p>
-
-                        </div>
-                    </div>
-                ))}
-            </div>
-            </div>
-            
-
         </div>
-
     )
 }
 export default AvailableFood;
