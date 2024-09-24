@@ -1,8 +1,10 @@
 let fs = require('fs-extra')
 const db = require('../models')
-const file = db.file;
-const fileAttachment = db.fileattachment
+const file = db.files;
+const fileTypeDb = db.fileTypes;
+const fileAttachment = db.fileAttachments
 const path = require('path')
+
 let  imageUpdate = async (imageData,subDir,insertionData,userId,errors,serialNumber,transaction,oldFilePath)=>{
     // e.g.  sub dir = "facility Images"
     // insertionData is the object whose work is to give the data in the format {id:2, name:'US'}
@@ -52,12 +54,19 @@ let  imageUpdate = async (imageData,subDir,insertionData,userId,errors,serialNum
             uploadFilePath2 = `/${subDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
             console.log(uploadFilePath2,"upload file path2 43")
             let fileName = `${insertionData.id}${insertionData.name}.${fileExtension}`;
-            let fileType = mime ? mime.split("/")[0] : 'unknown';
-            console.log(fileName,fileType,'insertion Data',insertionData,"file path2 46")
+            let findTheFileType = await fileTypeDb.findOne({
+              where:{
+                fileTypeExtension: fileExtension
+              },
+              transaction
+            })
+            if(!findTheFileType){
+              return errors.push(`Failed to fetch the image extension for facility file at index ${i}`);
+            }           
             // insert to file table and file attachment table
-            let [createFileCount, createFileData] = await file.update({
+            let [createFileCount, createFileData] = await fileAttachment.update({
               fileName: fileName,
-              fileType: fileType,
+              fileType: findTheFileType.fileTypeId,
               url: uploadFilePath2,
               updatedDt: updatedDt,
               updatedBy:userId
@@ -71,7 +80,7 @@ let  imageUpdate = async (imageData,subDir,insertionData,userId,errors,serialNum
               return errors.push(`Failed to create file  for facility file at index ${i}`);
             } else {
               // Insert into file attachment table
-              let [createFileAttachmentCount, createFiileAttachmentData] = await fileAttachment.update({
+              let [createFileAttachmentCount, createFileAttachmentData] = await file.update({
                 entityId: insertionData.id,
                 statusId: 1,
                 updatedDt: updatedDt,
