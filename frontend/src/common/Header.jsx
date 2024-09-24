@@ -54,7 +54,7 @@ const Header = () => {
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          
+
           <img src={Logo} />
         </div>
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
@@ -63,18 +63,14 @@ const Header = () => {
               {!user && <Link to={user ? "/DonorLandingPage" : "/"}>Home</Link>}
             </li>
             <li className="header__nav-item">
-              {!user && (
+              {/* {!user && ( */}
                 <Link
                   to={user ? "/DonorDetails" : ""}
                   onClick={handleNavigation}
                 >
                   Donate Now
                 </Link>
-              )}
-            </li>
-            <li className="header__nav-item">
-              {" "}
-              <Link to={"/About"}>About</Link>
+              {/* )} */}
             </li>
 
             {user && (
@@ -83,26 +79,32 @@ const Header = () => {
               </li>
             )}
             <li className="header__nav-item">
+              <Link to={"/About"}>About</Link>
+            </li>
+            <li className="header__nav-item">
               {!user && (
                 <Link className="Login_button" to={"/Login"}>
                   Login
                 </Link>
               )}
-              <li className="header__nav-item profile-container">
-                <FontAwesomeIcon icon={faUser} className="icon_profile" />
-                <ul className="profile-submenu">
-                  <li>
-                    <Link to="/profile">View Profile</Link>
-                  </li>
-                  <li>
-                    <Link to="/settings">Settings</Link>
-                  </li>
-                  <li  className="logout"  onClick={logoutUser}>
-                    <FontAwesomeIcon icon={faRightFromBracket} /> Logout
-                  </li>
-                </ul>
-              </li>
+              {
+                user && <li className="header__nav-item profile-container">
+                  <FontAwesomeIcon icon={faUser} className="icon_profile" />
+                  <ul className="profile-submenu">
+                    <li>
+                      <Link to="/profile">View Profile</Link>
+                    </li>
+                    <li>
+                      <Link to="/settings">Settings</Link>
+                    </li>
+                    <li className="logout" onClick={logoutUser}>
+                      <FontAwesomeIcon icon={faRightFromBracket} /> Logout
+                    </li>
+                  </ul>
+                </li>
+              }
             </li>
+            
           </ul>
         </nav>
         <div className="header__hamburger" onClick={toggleSidebar}>
@@ -129,15 +131,11 @@ const Header = () => {
             {!user && <Link to={user ? "/DonorLandingPage" : "/"}>Home</Link>}
           </li>
           <li className="sidebar__item">
-            {!user && (
+            {/* {!user && ( */}
               <Link to={user ? "/DonorDetails" : ""} onClick={handleNavigation}>
                 Donate Now
               </Link>
-            )}
-          </li>
-          <li className="sidebar__item">
-            {" "}
-            <Link to={"/About"}>About</Link>
+            {/* )} */}
           </li>
 
           {user && (
@@ -145,6 +143,10 @@ const Header = () => {
               <Link to={"/DonateHistory"}>Donation History</Link>
             </li>
           )}
+          <li className="sidebar__item">
+            {" "}
+            <Link to={"/About"}>About</Link>
+          </li>
           <li className="sidebar__item">
             {!user && (
               <Link className="Login_button" to={"/Login"}>
