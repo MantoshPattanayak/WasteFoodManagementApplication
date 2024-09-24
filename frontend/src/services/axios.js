@@ -74,6 +74,7 @@ export async function refresh(rtoken) {
     try {
         let response = await axios({
             baseURL: api.REFRESH_TOKEN.url,
+            headers: headers,
             timeout,
             method: 'post',
             data: {

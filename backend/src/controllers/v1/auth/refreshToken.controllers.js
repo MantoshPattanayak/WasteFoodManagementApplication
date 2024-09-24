@@ -5,9 +5,12 @@ const logger = require('../../../logger/index.logger')
 let refresh = async (req, res) => {
     try {
         // Retrieve access token and refresh token from cookies
-        const accessToken = req.headers['authorization'];
+        let accessToken = req.headers['authorization'];
         const refreshToken = req.headers['refreshtoken'];
 
+        accessToken = accessToken?.replace('Bearer', '').trim();
+
+        console.log('accesstoken ', accessToken, 'refreshtoken', refreshToken)
         // Verify access token
         const decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, { ignoreExpiration: true });
         console.log('Decoded access token:', decodedAccessToken, 'checkexp', decodedAccessToken.exp * 1000 <= Date.now());
@@ -29,9 +32,7 @@ let refresh = async (req, res) => {
             // Use refresh token to generate new access token
             newAccessToken = jwt.sign({
                 userId: decodedRefreshToken.userId,
-                userName: decodedRefreshToken.userName,
-                emailId: decodedRefreshToken.emailId,
-                roleId: decodedRefreshToken.roleId
+                userName: decodedRefreshToken.userName
             }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1day' });
             console.log('New access token:', newAccessToken);
 

@@ -63,9 +63,8 @@ const LandingPage = () => {
                     <h1>Imagine a world <br>
                     </br>without HUNGER</h1>
                     <p>Eliminate hunger by donating food, funds, or resources to local food banks and charities.
-                        <br></br>  Your contributions  help provide meals to those in need, creating a stronger, <br></br>
-                        healthier
-                        community.</p>
+                        Your contributions  help provide meals to those in need, creating a stronger,
+                        healthier community.</p>
                     <span className="Button_on_image">
                         <button className="button-19" role="button" onClick={(e) => handleNavigation(e)}>Donate Now</button>
                         <button className="button-9" role="button" onClick={() => navigate('/AvailableFood')}>Explore donations</button>
@@ -81,7 +80,13 @@ const LandingPage = () => {
             <div className="what_to_do">
                 <div className="what_to_do_text">
                     <h1>What We Do ?</h1>
-                    <p>We have built a compassionate community where individuals come together to donate food, and volunteers actively participate in rescuing and distributing it to those in need. Our mission is to ensure that no one goes without a proper meal by delivering food directly to charities and people who cannot afford even one daily meal. Together, we're committed to fighting hunger and nourishing those who need it most.</p>
+                    <p>
+                        We have built a compassionate community where individuals come together to donate food, and 
+                        volunteers actively participate in rescuing and distributing it to those in need. Our mission is to 
+                        ensure that no one goes without a proper meal by delivering food directly to charities and people 
+                        who cannot afford even one daily meal. Together, we're committed to fighting hunger 
+                        and nourishing those who need it most.
+                    </p>
                 </div>
                 <div className="what_to_do_explain">
                     <div className="what_to_do_1st_container">
