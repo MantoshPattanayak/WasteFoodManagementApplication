@@ -11,6 +11,7 @@ import api from "../../utils/apiList";
 import { useSelector } from "react-redux";
 import { formatDateAsDDMMYYYYHHMMSS } from "../../utils/utilityFunction";
 import instance from "../../../env";
+import { ToastContainer } from "react-toastify";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -174,6 +175,7 @@ const AvailableFood = () => {
     return (
         <div className='Mian_conatiner_doner_his'>
             <Header />
+            <ToastContainer />
             <div className="child_conatiner_donor_details">
             <span className='text_his'>
                 <h1 className="Avil_text">Available Donations</h1>
