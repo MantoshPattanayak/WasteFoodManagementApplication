@@ -23,4 +23,7 @@ router.get('/initialData', authController.initialData);
 
 router.post('/refresh-token', refreshTokenController.refresh);
 
+router.put('/updateProfile', authenticateToken, authController.updateUserProfile);
+
+
 module.exports = router

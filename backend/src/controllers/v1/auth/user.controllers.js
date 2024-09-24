@@ -14,7 +14,11 @@ const { decrypt } = require('../../../middlewares/decryption.middlewares')
 const { Op } = require("sequelize");
 let generateToken = require('../../../utils/generateToken');
 const imageUpload = require('../../../utils/imageUpload');
+const imageUpdate = require('../../../utils/imageUpdate')
 const logger = require('../../../logger/index.logger')
+
+const file = db.files;
+const fileAttachement = db.fileAttachments;
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
   console.log('incoming');
@@ -477,7 +481,219 @@ const viewUserProfile = async (req, res) => {
 };
 
 let updateUserProfile = async (req, res) => {
+    let transaction;
+    try {
+      console.log('232')
+      transaction = await sequelize.transaction();
+      console.log('req body', req.body, req.user.userId)
+      let statusId = 1;
+      let inActiveStatus= 2;
+      let userId = req.user.userId;
+      let updatedDt = new Date();
+      let createdDt = new Date();
+      console.log(userId,'userId',req.user.userId)
+      let {
+        name, 
+        email, 
+        phoneNumber, 
+         address,
+        userImage
+      } = req.body;
 
+  // console.log("Update Profile", req.body)
+      console.log("profile Update", req.body)
+      let imageUpdateVariable = 0;
+      let updatepublicUserCount;
+      let params = {};
+      let roleId =1;
+      
+   
+      let findPublicuserWithTheGivenId = await users.findOne({
+        where: {
+          userId: userId,
+        },
+        transaction
+      });
+      console.log('2323')
+
+      if (findPublicuserWithTheGivenId.name != name && name) {
+        params.name = name;
+      } 
+
+       if (findPublicuserWithTheGivenId.phoneNumber != phoneNumber && phoneNumber) {
+        const existingphoneNo = await users.findOne({
+          where: { phoneNumber: phoneNumber,statusId:statusId, userType:roleId },
+        });
+        if (existingphoneNo) {
+          await transaction.rollback();
+          return res
+            .status(statusCode.CONFLICT.code)
+            .json({ message: "User already exist same phoneNo" });
+        } 
+        params.phoneNumber = phoneNumber;
+      } 
+
+   
+       if (findPublicuserWithTheGivenId.email != email && email) {
+        
+          const existingemailId = await users.findOne({
+            where: { email: email ,statusId:statusId, userType:roleId },
+            transaction
+          });
+          if (existingemailId) {
+            await transaction.rollback();
+            return res.status(statusCode.CONFLICT.code).json({
+              message: "User already exist with given emailId",
+            });
+          }
+        params.email = email;
+      }
+
+       if (address) {
+        
+      params.address = address;
+    }
+    
+        if(Object.keys(userImage).length>0){
+          // console.log('profilePicture?.data',profilePicture?.data)
+          if(userImage.fileId!=0 && userImage?.data){
+            console.log('inside image part')
+            let findThePreviousFilePath = await fileAttachement.findOne({
+              where:{
+                statusId:statusId,
+                fileId:userImage.fileId
+              },
+              transaction
+            })
+            let oldFilePath = findThePreviousFilePath?.url
+            console.log('old file path ', findThePreviousFilePath )
+            let errors=[];
+            let insertionData = {
+             id:userId,
+             name:name,
+             fileId:userImage.fileId
+            }
+               let subDir = "userDir"
+            //update the data
+            let updateSingleImage = await imageUpdate(userImage.data,subDir,insertionData,userId,errors,1,transaction,oldFilePath)
+            if(errors.length>0){
+  
+              await transaction.rollback();
+  
+              if(errors.some(error => error.includes("something went wrong"))){
+                return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({message:errors})
+              }
+              return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
+            }
+            imageUpdateVariable = 1;
+        }
+        else if(!userImage.fileId && userImage?.data){
+          console.log('inside new image part')
+          let insertionData = {
+            id:userId,
+            name:name
+           }
+          // create the data
+          let entityType = 'usermaster'
+          let errors = [];
+          let subDir = "users"
+         
+          let uploadSingleImage = await imageUpload(userImage.data,entityType,subDir,insertionData,userId,errors,1,transaction)
+          console.log( uploadSingleImage,'165 line facility image')
+          if(errors.length>0){
+            await transaction.rollback();
+            if(errors.some(error => error.includes("something went wrong"))){
+              return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({message:errors})
+            }
+            return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
+          }
+          imageUpdateVariable = 1;
+  
+      }
+        else if(userImage.fileId!=0){
+          console.log('inside file')
+          let inactiveTheFileId = await file.update({statusId:inActiveStatus},
+           { where:{
+              fileId:userImage.fileId
+            },
+          transaction}
+          )
+  
+          console.log('fileid', inactiveTheFileId)
+          let inActiveTheFileInFileAttachmentTable = await fileAttachement.update({
+            statusId:inActiveStatus
+          },
+        {where:{
+          fileId:userImage.fileId
+        },
+        transaction
+      }
+      )
+      console.log('file update check',  inactiveTheFileId,'file attachemnt ' ,inActiveTheFileInFileAttachmentTable )
+
+      if(inactiveTheFileId.length == 0 || inActiveTheFileInFileAttachmentTable == 0){
+        await transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message:`Something went wrong`
+        })
+      }
+      else{
+        imageUpdateVariable = 1;
+      }
+  
+        }
+        else{
+          await transaction.rollback();
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message:`Something went wrong`
+          })
+        }
+       
+      }
+      console.log('outside profile update part',params)
+  
+      if(Object.keys(params).length>0){
+        console.log('inside update part')
+  
+        params.updatedBy = userId;
+        params.updatedDt = updatedDt;
+        console.log('near 225 line')
+  
+        updatepublicUserCount=
+          await users.update(params, {
+          where: {
+            [Op.and]: [{userId: userId},{statusId:statusId}]
+          },
+          transaction
+        });
+  
+      }
+      if (updatepublicUserCount >= 1 || imageUpdateVariable==1) {
+       
+        await transaction.commit();
+        console.log('data updated')
+        return res.status(statusCode.SUCCESS.code).json({
+          message: "Updated Successfully",
+        });
+      } else {
+        await transaction.rollback();
+        return res.status(statusCode.BAD_REQUEST.code).json({
+          message: "Data not Updated ",
+        });
+      }
+      
+      
+      
+    } catch (error) {
+      if(transaction) await transaction.rollback();
+      logger.error(`An error occurred: ${error.message}`); // Log the error
+  
+      res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+        message: "Internal Server Error",
+        error: error.message,
+      });
+    }
+ 
 }
 
 
