@@ -6,9 +6,10 @@ let refresh = async (req, res) => {
     try {
         // Retrieve access token and refresh token from cookies
         let accessToken = req.headers['authorization'];
-        const refreshToken = req.headers['refreshtoken'];
+        let refreshToken = req.headers['refreshtoken'];
 
         accessToken = accessToken?.replace('Bearer', '').trim();
+        refreshToken = refreshToken?.replace('Bearer', '').trim();
 
         console.log('accesstoken ', accessToken, 'refreshtoken', refreshToken)
         // Verify access token
