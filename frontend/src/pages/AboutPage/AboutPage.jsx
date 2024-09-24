@@ -7,9 +7,11 @@ import Mission_image from "../../assets/dis.png"
 import { useSelector } from "react-redux"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom"
 
 const About = () => {
     const user = useSelector((state) => state.auth.user);
+    const navigate = useNavigate();
     function handleNavigation(e) {
         // console.log("handle navigation");
         if (user) {

@@ -18,7 +18,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("user", user);
+    // console.log("user", user);
   }, []);
 
   const toggleSidebar = () => {
@@ -31,11 +31,16 @@ const Header = () => {
       let res = await axiosInstance.post(api.LOGOUT.url);
       console.log("response of log out API", res);
       dispatch(logout());
-      sessionStorage.clear();
-      localStorage.clear();
-      navigate("/");
-      toast.dismiss();
-      toast.success("Logged out successfully!");
+      toast.success("Logged out successfully!", {
+        autoClose: 1000,
+        onClose: () => {
+          setTimeout(() => {
+            navigate('/');
+            sessionStorage.clear();
+            localStorage.clear();
+          }, 500);
+        }
+      });
     } catch (error) {
       console.error("error in log out api", error);
     }

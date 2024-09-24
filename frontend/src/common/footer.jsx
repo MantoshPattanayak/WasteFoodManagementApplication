@@ -30,7 +30,7 @@ const Footer = () => {
                 <button className="donate_button" onClick={handleNavigation}>DONATE</button>
             </div>
             <div className="content_footer">
-                <div class="footer-section">
+                <div className="footer-section">
                     <h4>Navigation</h4>
                     <ul>
                         <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>
@@ -41,7 +41,7 @@ const Footer = () => {
                     </ul>
                 </div>
                 {/* 2nd */}
-                <div class="footer-section">
+                <div className="footer-section">
                     <h4>TALK TO US</h4>
                     <ul>
                         <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>
@@ -51,7 +51,7 @@ const Footer = () => {
                         <li><a href="https://linkedin.com">LinkedIn</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
+                <div className="footer-section">
                     <h4>TALK TO US</h4>
                     <ul>
                         <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>
@@ -61,7 +61,7 @@ const Footer = () => {
                         <li><a href="https://linkedin.com">LinkedIn</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
+                <div className="footer-section">
                     <h4>TALK TO US</h4>
                     <ul>
                         <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>

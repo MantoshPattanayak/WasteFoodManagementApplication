@@ -385,7 +385,7 @@ let closeFoodDonation = async (req, res) => {
         if (updateCount > 0) {
             transaction.commit();
             return res.status(statusCode.SUCCESS.code).json({
-                message: "Food donation is closed."
+                message: "Donation is closed."
             });
         } else {
             transaction.rollback();
@@ -456,13 +456,12 @@ let donationHistory = async (req, res) => {
                 u.latitude, u.longitude, fli."foodName", TO_CHAR(
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType
+                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType, fl."createdBy", fl."foodListingId"
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
-            inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
-            inner join soulshare.users u on u."userId" = fl."userId"
-            where sm."statusCode" = 'ACTIVE' and u."userId" = ?
-            order by u."createdOn" desc
+            inner join soulshare.users u on u."userId" = fl."createdBy"
+            where u."userId" = ?
+            order by fli."expirationDate" desc
         `;
         let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {
             replacements: [userId],
