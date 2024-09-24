@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider, withAuth } from './common/AuthProvider';
 import persistor from './store/store';
 import { Provider } from 'react-redux';
-
 const LandingPage = React.lazy(() => import('./pages/LandingPage/landingPage'))
 const DonorLandingPage = withAuth(React.lazy(() => import('./pages/DonorPage/DonorLandingPage')))
 const DonateHistory = withAuth(React.lazy(() => import('./pages/DonateHis/DonateHistory')))

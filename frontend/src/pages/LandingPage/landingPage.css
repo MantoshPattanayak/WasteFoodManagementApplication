@@ -271,3 +271,35 @@
     width: 100%;
   }
 }
+
+/* here ads css */
+.ads-carousel {
+  width: 100%; 
+  overflow: hidden; 
+  position: relative;
+  
+}
+
+.ads-track {
+  display: flex;
+  animation: scroll 20s linear infinite; 
+  animation-play-state: running; 
+}
+
+.ads-image {
+  width: 20%; 
+  flex-shrink: 0; 
+  object-fit: cover; 
+  margin-right: 30px;
+  margin-top: 20px;
+}
+
+/* Animation to scroll images from right to left */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); 
+  }
+}

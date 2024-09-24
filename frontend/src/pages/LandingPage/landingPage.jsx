@@ -1,6 +1,5 @@
 import food_dontaion_image from "../../assets/food_donation_home.jpeg"
 import "./landingPage.css"
-
 import ads_image from "../../assets/ad.jpg"
 import what_to_do_1st_image from "../../assets/boy_food_image.png"
 import Bike_ride_drivery_body from "../../assets/bike_ride_boyd.png"
@@ -11,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faArrowLeft, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../common/footer"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import landing_image from "../../assets/food_donation_home.jpeg"
 import Landing_image2 from "../../assets/save_food_image1.jpg"
 import Landing_image3 from "../../assets/Save_food_image_3.jpg"
@@ -28,13 +27,14 @@ const LandingPage = () => {
 
     // State to track the current image index
     const [currentIndex, setCurrentIndex] = useState(0);
+    const trackRef = useRef(null)
 
     // Effect to change the background image every 5 seconds
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
         }, 5000);
-
+        console.log("interval", intervalId);
         // Cleanup the interval on component unmount
         return () => clearInterval(intervalId);
     }, [images.length]);
@@ -48,6 +48,24 @@ const LandingPage = () => {
             toast.error('Kindly log in or register first!')
         }
     }
+    // Ads Auto slide / swap  image ------
+
+    const image_Ads = [ads_image, Landing_image2, ads_image,Landing_image2 ];
+    // handle Mouse Hovor
+    // Function to pause the animation
+    const handleMouseOver = () => {
+        if (trackRef.current) {
+            trackRef.current.style.animationPlayState = 'paused';
+        }
+    };
+
+    // Function to resume the animation
+    const handleMouseOut = () => {
+        if (trackRef.current) {
+            trackRef.current.style.animationPlayState = 'running';
+        }
+    };
+
 
     return (
         <div className="Landing_page_main_conatiner">
@@ -71,20 +89,39 @@ const LandingPage = () => {
                     </span>
                 </span>
             </div>
-            <div className="Ads_conatiner">
-                <img className="Ads_image" src={ads_image}></img>
-                <img className="Ads_image" src={ads_image}></img>
-                <img className="Ads_image" src={ads_image}></img>
-                <img className="Ads_image" src={ads_image}></img>
+            <div
+                className="ads-carousel"
+                onMouseOver={handleMouseOver}
+                onMouseOut={handleMouseOut}
+            >
+                <div className="ads-track" ref={trackRef}>
+                    {image_Ads.map((image, index) => (
+                        <img
+                            key={index}
+                            className="ads-image"
+                            src={image}
+                            alt={`Ad ${index + 1}`}
+                        />
+                    ))}
+                    {/* Duplicating images to make the transition seamless */}
+                    {image_Ads.map((image, index) => (
+                        <img
+                            key={`duplicate-${index}`}
+                            className="ads-image"
+                            src={image}
+                            alt={`Ad duplicate ${index + 1}`}
+                        />
+                    ))}
+                </div>
             </div>
             <div className="what_to_do">
                 <div className="what_to_do_text">
                     <h1>What We Do ?</h1>
                     <p>
-                        We have built a compassionate community where individuals come together to donate food, and 
-                        volunteers actively participate in rescuing and distributing it to those in need. Our mission is to 
-                        ensure that no one goes without a proper meal by delivering food directly to charities and people 
-                        who cannot afford even one daily meal. Together, we're committed to fighting hunger 
+                        We have built a compassionate community where individuals come together to donate food, and
+                        volunteers actively participate in rescuing and distributing it to those in need. Our mission is to
+                        ensure that no one goes without a proper meal by delivering food directly to charities and people
+                        who cannot afford even one daily meal. Together, we're committed to fighting hunger
                         and nourishing those who need it most.
                     </p>
                 </div>
