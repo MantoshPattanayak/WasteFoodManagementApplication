@@ -7,9 +7,11 @@ import Mission_image from "../../assets/dis.png"
 import { useSelector } from "react-redux"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom"
 
 const About = () => {
     const user = useSelector((state) => state.auth.user);
+    const navigate = useNavigate();
     function handleNavigation(e) {
         // console.log("handle navigation");
         if (user) {
@@ -56,11 +58,12 @@ const About = () => {
 
                 </div>
             </div>
-            <div className="How_it_work">
-                <h1>  How It Works</h1>
-                <p>Through our platform, food donors—whether </p>
+            <div className="mission_child_food">
+                <div className="mission_content">
+                    <h1>How It Works</h1>
+                    <p>Through our platform, food donors - whether</p>
+                </div>
             </div>
-
             <Footer />
         </div>
     )

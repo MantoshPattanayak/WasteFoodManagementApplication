@@ -4,8 +4,8 @@ import tokenService from "./token.service";
 import api from "../utils/apiList";
 
 const { headers, urlTimeout: timeout } = instance();
-let _retry_count = 0
-let _retry = null
+let _retry_count = 0;
+let _retry = null;
 
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
@@ -29,9 +29,14 @@ const axiosInstance = axios.create({
 });
 // request interceptor to check if auth-header contains token or not.
 axiosInstance.interceptors.request.use(
-    config => {
-        if (!config.headers['Authorization']) {
-            config.headers['Authorization'] = `Bearer ${tokenService.getLocalAccessToken()}`;
+    (config) => {
+        const accessToken = JSON.parse(localStorage.getItem('user'))?.accessToken || '';
+        const refreshToken = JSON.parse(localStorage.getItem('user'))?.refreshToken || '';
+        const sid = JSON.parse(localStorage.getItem('user'))?.sid || '';
+        if (accessToken && refreshToken && sid) {
+            config.headers['Authorization'] = `Bearer ${tokenService.getLocalAccessToken() || accessToken}`;
+            config.headers['refreshToken'] = `Bearer ${tokenService.getLocalRefreshToken() || refreshToken}`;
+            config.headers['sid'] = sid;
         }
         return config;
     }, (error) => Promise.reject(error)
@@ -45,9 +50,12 @@ axiosInstance.interceptors.response.use((res) => res, async (err) => {
         _retry_count++;
         return wait(timeDelay(_retry_count)).then(() => axiosInstance.request(origReqConfig))
     }
+    console.log("headers",origReqConfig.headers);
 
     if (err.response.status === 401 && origReqConfig.headers.hasOwnProperty('Authorization')) {
         const rtoken = tokenService.getLocalRefreshToken();
+        console.log("rtoken", rtoken);
+
         if (rtoken && _retry_count < 4) {
 
             _retry_count++;
@@ -57,7 +65,7 @@ axiosInstance.interceptors.response.use((res) => res, async (err) => {
             _retry = await refresh(rtoken)
                 .finally(() => _retry = null)
                 .catch(error => Promise.reject(error))
-
+            console.log('_retry', _retry);
             return _retry.then((token) => {
                 origReqConfig.headers['Authorization'] = `Bearer ${token}`
                 return axiosInstance.request(origReqConfig)
@@ -70,19 +78,17 @@ axiosInstance.interceptors.response.use((res) => res, async (err) => {
 export async function refresh(rtoken) {
     let _rtoken = ''
     let _token = ''
-
+    console.log("refresh token");
     try {
         let response = await axios({
             baseURL: api.REFRESH_TOKEN.url,
+            headers: headers,
             timeout,
             method: 'post',
-            data: {
-                refreshToken: rtoken
-            }
         });
 
-        _rtoken = response.data.rtoken
-        _token = response.data.token
+        // _rtoken = response.data?.rtoken;
+        _token = response.data.accessToken;
 
         tokenService.updateLocalAccessToken(_token);
         return true;
