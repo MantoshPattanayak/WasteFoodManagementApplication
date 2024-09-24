@@ -269,7 +269,7 @@ const AvailableFood = () => {
                             <div className="card-content">
                                 <p className="item_name">{food.foodName}</p>
                                 <p className="exp_date">Address - {food.address || "NA"}</p>
-                                <p className="exp_date">Expiration date - <p1>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p1></p>
+                                <p className="exp_date">Expiration date - <p>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p></p>
                                 <p className="exp_date">
                                     Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                     <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>

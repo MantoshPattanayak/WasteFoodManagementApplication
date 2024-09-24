@@ -155,7 +155,7 @@ const DonateHistory = () => {
                             document.querySelectorAll('body')[0].style.opacity = 1;
                             toast.dismiss();
                         }}
-                        className="details-button red"
+                        className="donation-details-button red"
                     >
                         No
                     </button>
@@ -168,7 +168,7 @@ const DonateHistory = () => {
                             document.querySelectorAll('body')[0].style.opacity = 1;
                             toast.dismiss();
                         }}
-                        className="details-button green"
+                        className="donation-details-button green"
                     >
                         Yes
                     </button>
@@ -354,12 +354,12 @@ const DonateHistory = () => {
                                 </p>
                                 <p className="buttons">
                                     {
-                                        new Date(food.expirationdate) > new Date() && <button className="details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)}>Close</button>
+                                        new Date(food.expirationdate) > new Date() && food.statusId == 1 && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)}>Close</button>
                                     }
                                     {/* {
-                                        !(new Date(food.expirationdate) > new Date()) && <button className="details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)} disabled>Close</button>
+                                        !(new Date(food.expirationdate) > new Date()) && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)} disabled>Close</button>
                                     } */}
-                                    {/* <button className="details-button green" onClick={reopenDonation}>Reopen</button> */}
+                                    {/* <button className="donation-details-button green" onClick={reopenDonation}>Reopen</button> */}
                                 </p>
                             </div>
                         </div>
