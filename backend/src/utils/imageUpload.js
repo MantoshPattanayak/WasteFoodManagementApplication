@@ -23,7 +23,7 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
   // insertionData is the object whose work is to give the data in the format {id:2, name:'US'}
   try {
     console.log('image upload function entry')
-    console.log(entityType, subDir, insertionData, userId, errors, serialNumber, 'these are all parameters in upload image function')
+    console.log(imageData,entityType, subDir, insertionData, userId, errors, serialNumber, transaction,  'these are all parameters in upload image function')
     let createdDt = new Date();
     let updatedDt = new Date();
     let uploadFilePath = null;
@@ -59,15 +59,21 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
         const fileExtension = mime ? mime.split("/")[1] : "txt";
 
         console.log(fileExtension, '34 file extension image file buffer')
+
         let findTheFileType = await fileTypeDb.findOne({
           where:{
             fileTypeExtension: fileExtension
           },
           transaction
+          
         })
+        console.log('23232')
+
         if(!findTheFileType){
+          console.log('no file type')
           return errors.push(`Failed to fetch the image extension for facility file at index ${i}`);
         }
+        console.log('find the file type', findTheFileType)
 
         uploadFilePath = `${imageFileDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
 
