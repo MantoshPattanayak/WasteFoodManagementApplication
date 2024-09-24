@@ -197,8 +197,8 @@ let viewFoodDonationList = async (req, res) => {
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
             inner join soulshare.users u on u."userId" = fl."userId"
-            where sm."statusCode" = 'ACTIVE' and "expirationDate" >= :currDate
-            order by u."createdOn" desc
+            where sm."statusCode" = 'ACTIVE' and fli."expirationDate" >= :currDate
+            order by fli."expirationDate" desc
         `;
         console.log('foodDonationListQuery', foodDonationListQuery)
 
@@ -456,7 +456,7 @@ let donationHistory = async (req, res) => {
                 u.latitude, u.longitude, fli."foodName", TO_CHAR(
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType, fl."createdBy", fl."foodListingId"
+                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType, fl."createdBy", fl."foodListingId", fl."statusId"
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare.users u on u."userId" = fl."createdBy"
