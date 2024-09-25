@@ -36,6 +36,7 @@ const Header = () => {
         onClose: () => {
           setTimeout(() => {
             navigate('/');
+            removeLastHistoryEntry();
             sessionStorage.clear();
             localStorage.clear();
           }, 500);
@@ -54,6 +55,11 @@ const Header = () => {
       toast.error("Kindly log in or register first!");
     }
   }
+
+  function removeLastHistoryEntry() {
+    window.history.back(); // Go back one step in history
+    window.history.pushState(null, '', window.location.href); // Replace the current URL with itself
+  };
 
   return (
     <header className="header">
@@ -99,9 +105,9 @@ const Header = () => {
                     <li>
                       <Link to="/profile">View Profile</Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link to="/settings">Settings</Link>
-                    </li>
+                    </li> */}
                     <li className="logout" onClick={logoutUser}>
                       <FontAwesomeIcon icon={faRightFromBracket} /> Logout
                     </li>

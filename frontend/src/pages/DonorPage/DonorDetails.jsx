@@ -33,6 +33,7 @@ const DonorDetails = () => {
         }
     });
     const navigate = useNavigate();
+
     // Function to handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -130,9 +131,9 @@ const DonorDetails = () => {
         // }
     };
 
-    function debounce (fn, delay) {
+    function debounce(fn, delay) {
         let timeoutId;
-        return function(...args) {
+        return function (...args) {
             timeoutId = setTimeout(() => {
                 fn(...args)
             }, [])
@@ -197,13 +198,13 @@ const DonorDetails = () => {
         const checkSpecialChar = /^(?!\s*$)[a-zA-Z0-9,-\s]*$/;
         const UnitCheck = /^(?!0$)(?!0\.[0]*$)([1-9]\d*|0\.[1-9]\d*)$/;
         // here is the regex code ..
-        const RegexPincode=/^\d{6}$/;
+        const RegexPincode = /^\d{6}$/;
         const Addresspattern = /^(?!\s*$)[\w\s,.\-\/]+$/;
 
 
         if (!value.foodName) {
             err.foodName = "Please enter food name";
-        }else if(!checkSpecialChar .test(value.foodName)){
+        } else if (!checkSpecialChar.test(value.foodName)) {
             err.foodName = "Please enter valid food name  (no special characters)"
         }
         if (!value.foodCategory) {
@@ -211,7 +212,7 @@ const DonorDetails = () => {
         }
         if (!value.quantity) {
             err.quantity = "Please enter quantity"
-        } else if(!UnitCheck.test(value.quantity)){
+        } else if (!UnitCheck.test(value.quantity)) {
             err.quantity = "Please enter valid quantity (cannot be zero and no special characters)";
         }
         if (!value.unit) {
@@ -219,31 +220,30 @@ const DonorDetails = () => {
         }
         if (!value.expirationDate) {
             err.expirationDate = "Please select a expirationDate"
-        } 
+        }
         if (!value.address.building) {
             err.building = "Please enter flat,house No, sector"
-        }else if(!Addresspattern.test(value.address.building)){
-            err.building="Please enter vaild flat,house No, sector"
+        } else if (!Addresspattern.test(value.address.building)) {
+            err.building = "Please enter vaild flat,house No, sector"
         }
-        if(!value.address.area){
+        if (!value.address.area) {
             err.area = "Please enter area"
-        }else if(!Addresspattern.test(value.address.area)){
+        } else if (!Addresspattern.test(value.address.area)) {
             err.area = "Please enter vaild Area"
         }
-        if(value.address.landmark){
-            if(!Addresspattern.test(value.address.landmark)){
-                err.landmark="Please enter  vaild landmark"
+        if (value.address.landmark) {
+            if (!Addresspattern.test(value.address.landmark)) {
+                err.landmark = "Please enter  vaild landmark"
             }
         }
 
-        if(!value.address.pincode){
+        if (!value.address.pincode) {
             err.pincode = "Please enter pincode"
-        }else if(!RegexPincode.test(value.address.pincode)){
+        } else if (!RegexPincode.test(value.address.pincode)) {
             err.pincode = "Please enter valid pincode (6 digit number)";
         }
         return err;
     }
-
 
     return (
         <div className="main_conatiner_donor_details">
@@ -337,7 +337,7 @@ const DonorDetails = () => {
                                 value={DonorData.address.building}
                                 onChange={handleAddressChange}
                             />
-                             {showError.building && <span className="error_msg">{showError.building} </span>}
+                            {showError.building && <span className="error_msg">{showError.building} </span>}
                             <label className="ads_name">Landmark</label>
                             <input
                                 type="text"
@@ -355,7 +355,7 @@ const DonorDetails = () => {
                                 value={DonorData.address.area}
                                 onChange={handleAddressChange}
                             />
-                            {showError.area &&  <span className="error_msg">{showError.area}</span>}
+                            {showError.area && <span className="error_msg">{showError.area}</span>}
                             <div className="ads_two_input">
                                 <div className="input_group">
                                     <label>Pincode</label>
