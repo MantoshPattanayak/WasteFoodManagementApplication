@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/soul_share.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
 import { logout } from "../store/reducers/authReducer";
 import axiosInstance from "../services/axios";
 import api from "../utils/apiList";
@@ -135,7 +135,7 @@ const Header = () => {
       </div>
       <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <button className="sidebar__close" onClick={toggleSidebar}>
-          X
+          <FontAwesomeIcon icon={faClose} size="sm"/>
         </button>
         <ul className="sidebar__list">
           <li className="sidebar__item">
