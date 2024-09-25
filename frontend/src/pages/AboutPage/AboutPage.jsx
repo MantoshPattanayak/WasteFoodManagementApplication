@@ -58,12 +58,12 @@ const About = () => {
 
                 </div>
             </div>
-            <div className="mission_child_food">
+            {/* <div className="mission_child_food">
                 <div className="mission_content">
                     <h1>How It Works</h1>
                     <p>Through our platform, food donors - whether</p>
                 </div>
-            </div>
+            </div> */}
             <Footer />
         </div>
     )
