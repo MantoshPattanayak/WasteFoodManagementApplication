@@ -1,46 +1,45 @@
 import React, { useState, useEffect } from "react";
-// import "../RegistrationForm/EnhancedProfile.css";
-import "./Profile.css"
+import "./Profile.css";
 import profile_image from "../../assets/profileImgLogo.png";
 import Regd_image from "../../assets/Regd_image.png";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons";
 import instance from "../../../env";
+import "react-toastify/dist/ReactToastify.css";
 
-function Profile() {
+const Profile = () => {
   const [profileImg, setProfileImg] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     phoneNumber: "",
     email: "",
+    fileId: "",
+    userImage: null,
   });
   const [errors, setErrors] = useState({});
+  const [isPhotoUpdated, setIsPhotoUpdated] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    console.log(`Changed ${name}:`, value); // Log input changes
   };
 
   const handleProfileImgChange = (e) => {
-    let image = e.target.files[0];
-    if (parseInt(image.size / 1024) <= 500) {
-      setProfileImg(URL.createObjectURL(image));
+    const image = e.target.files[0];
+    if (image.size <= 500 * 1024) {
+      const imgURL = URL.createObjectURL(image);
+      setProfileImg(imgURL);
       const reader = new FileReader();
       reader.readAsDataURL(image);
       reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          userImage: reader.result,
-        });
+        setFormData((prev) => ({ ...prev, userImage: reader.result }));
+        setIsPhotoUpdated(true);
+        console.log("Updated userImage:", reader.result); // Log updated image data
       };
     } else {
       toast.error("Choose an image with size less than 500 KB.");
@@ -49,54 +48,79 @@ function Profile() {
 
   const handleProfileImgRemove = () => {
     setProfileImg(null);
-    setFormData({ ...formData, userImage: null });
+    setFormData((prev) => ({ ...prev, userImage: null }));
+    setIsPhotoUpdated(false);
+    console.log("Profile image removed."); // Log when image is removed
   };
 
   const fetchUserProfile = async () => {
     try {
-      const res = await axiosInstance.get(api.VIEW_PROFILE.url);
-      const { name, phoneNumber, email, url } = res.data.public_user[0];
+      const { data } = await axiosInstance.get(api.VIEW_PROFILE.url);
+      console.log("Response of profile data: ", data);
+      const { name, phoneNumber, email, url, fileId } = data.public_user[0];
       const [firstName, lastName] = name.split(" ");
-
       setFormData({
         firstName,
         lastName,
         phoneNumber,
         email,
+        fileId,
+        userImage: url ? `${instance().baseURL}${url}` : null,
       });
-
-      if (url) {
-        setProfileImg(`${instance().baseURL}${url}`);
-      } else {
-        setProfileImg(null);
-      }
+      setProfileImg(url ? `${instance().baseURL}${url}` : null);
     } catch (error) {
       toast.error("Error fetching profile data.");
     }
   };
 
   const validateForm = () => {
-    let formErrors = {};
+    const formErrors = {};
     if (!formData.firstName) formErrors.firstName = "First Name is required";
     if (!formData.lastName) formErrors.lastName = "Last Name is required";
     if (!formData.phoneNumber)
       formErrors.phoneNumber = "Phone Number is required";
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email))
       formErrors.email = "Email is invalid";
-
     setErrors(formErrors);
-    return Object.keys(formErrors).length === 0;
+    return !Object.keys(formErrors).length;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
+      let userImage = { fileId: formData.fileId };
+      if (isPhotoUpdated && formData.userImage) {
+        userImage.data = formData.userImage;
+        console.log("Updated user image with fileId and data.");
+      } else {
+        console.log("Using existing photo with fileId:", formData.fileId);
+      }
+      const updatedData = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        userImage,
+        phoneNumber: formData.phoneNumber,
+        address: {},
+      };
+
+      console.log("Submitting updated profile data:", updatedData); // Log the data being submitted
+
       try {
-        await axiosInstance.put(api.UPDATE_PROFILE.url, formData);
+        const response = await axiosInstance.put(
+          api.UPDATE_PROFILE.url,
+          updatedData
+        );
+        console.log("Profile updated successfully. Response:", response.data); // Log the response after update
         toast.success("Profile updated successfully!");
       } catch (error) {
+        console.error(
+          "Error updating profile:",
+          error.response?.data || error.message
+        );
         toast.error("Error updating profile.");
       }
+    } else {
+      console.log("Validation failed. Errors:", errors); // Log validation errors if any
     }
   };
 
@@ -107,9 +131,7 @@ function Profile() {
   return (
     <div className="profile-container">
       <div className="profile-form-section">
-        <div className="profile-info">
-          <h2 className="profile-header">Edit Your Information</h2>
-        </div>
+        <h2 className="profile-header">Edit Your Information</h2>
         <form onSubmit={handleSubmit}>
           <div className="profile-photo-section">
             <label htmlFor="profileImgUpload" className="profile-image-label">
@@ -134,7 +156,6 @@ function Profile() {
                 </div>
               )}
             </label>
-
             <input
               type="file"
               id="profileImgUpload"
@@ -152,7 +173,6 @@ function Profile() {
               </button>
             )}
           </div>
-
           <div className="profile-flex-container">
             <div className="profile-input-row">
               <div className="profile-input-group">
@@ -182,7 +202,6 @@ function Profile() {
                 )}
               </div>
             </div>
-
             <div className="profile-input-row">
               <div className="profile-input-group">
                 <label htmlFor="phoneNumber">Phone Number</label>
@@ -210,15 +229,15 @@ function Profile() {
               </div>
             </div>
           </div>
-
           <button type="submit" className="profile-submit-button">
             Update Profile
           </button>
         </form>
       </div>
       <img src={Regd_image} alt="Registration" className="registration-image" />
+      <ToastContainer />
     </div>
   );
-}
+};
 
 export default Profile;
