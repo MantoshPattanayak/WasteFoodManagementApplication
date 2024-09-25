@@ -33,7 +33,7 @@ function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
 let createOtp = async (req, res) => {
   try {
     let { encryptMobile: mobileNo } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     console.log("encrypted mobile number", mobileNo);
     const generatedOTP = generateRandomOTP();
     console.log("generated OTP", generatedOTP);
@@ -556,8 +556,8 @@ let updateUserProfile = async (req, res) => {
     
         if(Object.keys(userImage).length>0){
           // console.log('profilePicture?.data',profilePicture?.data)
-          if(userImage.fileId!=0 && userImage?.data){
-            console.log('inside image part')
+          if(userImage?.fileId!=0 && userImage?.data){
+            console.log('inside image part', userImage?.fileId)
             let findThePreviousFilePath = await fileAttachement.findOne({
               where:{
                 statusId:statusId,
@@ -586,17 +586,19 @@ let updateUserProfile = async (req, res) => {
               return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
             }
             imageUpdateVariable = 1;
+            console.log('inside image update')
+
         }
-        else if(!userImage.fileId && userImage?.data){
+        else if(userImage?.fileId==0 && userImage?.data){
           console.log('inside new image part')
           let insertionData = {
             id:userId,
             name:name
            }
           // create the data
-          let entityType = 'usermaster'
+          let entityType = 'users'
           let errors = [];
-          let subDir = "users"
+          let subDir = "userDir"
          
           let uploadSingleImage = await imageUpload(userImage.data,entityType,subDir,insertionData,userId,errors,1,transaction)
           console.log( uploadSingleImage,'165 line facility image')
@@ -609,6 +611,7 @@ let updateUserProfile = async (req, res) => {
           }
           imageUpdateVariable = 1;
   
+          console.log('inside image upload')
       }
         else if(userImage.fileId!=0){
           console.log('inside file')
