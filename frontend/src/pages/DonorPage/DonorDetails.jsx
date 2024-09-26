@@ -325,7 +325,9 @@ const DonorDetails = () => {
                             <label>Food Photo</label>
                             <input type="file"
                                 onChange={handleImageChange}
-                                accept="image/*" />
+                                accept="image/*"
+                                capture="environment"
+                            />
                         </span>
 
                         <div className="Address_form">
