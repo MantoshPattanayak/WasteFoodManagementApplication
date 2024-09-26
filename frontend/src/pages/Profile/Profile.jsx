@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Profile = () => {
   const [profileImg, setProfileImg] = useState(null);
+  const [profileImgChanged, setProfileImgChanged] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -41,6 +42,7 @@ const Profile = () => {
         setIsPhotoUpdated(true);
         console.log("Updated userImage:", reader.result); // Log updated image data
       };
+      
     } else {
       toast.error("Choose an image with size less than 500 KB.");
     }
@@ -49,7 +51,8 @@ const Profile = () => {
   const handleProfileImgRemove = () => {
     setProfileImg(null);
     setFormData((prev) => ({ ...prev, userImage: null }));
-    setIsPhotoUpdated(false);
+    // setIsPhotoUpdated(false);
+    setProfileImgChanged(true);
     console.log("Profile image removed."); // Log when image is removed
   };
 
@@ -88,13 +91,29 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      let userImage = { fileId: formData.fileId };
-      if (isPhotoUpdated && formData.userImage) {
-        userImage.data = formData.userImage;
-        console.log("Updated user image with fileId and data.");
-      } else {
-        console.log("Using existing photo with fileId:", formData.fileId);
+
+      let userImage = {};
+      
+      if(profileImgChanged && isPhotoUpdated){
+        console.log("here data", formData.userImage);
+        userImage = { fileId: formData.fileId, data: formData.userImage };
+        console.log("photo response 2:  ", formData.fileId);
       }
+      else if(profileImgChanged){
+        userImage = {fileId: formData.fileId};
+        console.log("photo response 3:  ", formData.fileId);
+      }
+       else if (isPhotoUpdated) {
+        console.log("here data", formData.userImage);
+        userImage = { fileId: 0, data: formData.userImage };
+        console.log("photo response 4:  ", formData.fileId);
+      }
+      else if(!isPhotoUpdated) {
+        userImage = {};
+        console.log("photo response 1:  ", formData.fileId);
+      }
+      
+ 
       const updatedData = {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
