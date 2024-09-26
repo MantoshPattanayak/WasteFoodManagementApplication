@@ -354,7 +354,7 @@ const DonateHistory = () => {
                                 </p>
                                 <p className="buttons">
                                     {
-                                        new Date(food.expirationdate) > new Date() && food.statusId == 1 && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)}>Close</button>
+                                        new Date(food.expirationdate) > new Date() && food.statusId == 1 && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)}>Mark as closed</button>
                                     }
                                     {/* {
                                         !(new Date(food.expirationdate) > new Date()) && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)} disabled>Close</button>

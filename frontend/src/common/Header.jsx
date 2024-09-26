@@ -99,7 +99,7 @@ const Header = () => {
                 </Link>
               )}
               {
-                user && <li className="header__nav-item profile-container">
+                user && <li className="header__nav-item header-profile-container">
                   <FontAwesomeIcon icon={faUser} className="icon_profile" />
                   <ul className="profile-submenu">
                     <li>

@@ -208,9 +208,9 @@
 
 
 
-.profile-container {
+.header-profile-container {
   position: relative; 
-
+  background-color: inherit;
 }
 
 .profile-submenu {
@@ -242,7 +242,7 @@
   background-color: #f0f0f0; 
 }
 
-.profile-container:hover .profile-submenu {
+.header-profile-container:hover .profile-submenu {
   display: block; 
 }
 
