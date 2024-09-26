@@ -12,8 +12,8 @@ const DonorDetails = withAuth(React.lazy(() => import('./pages/DonorPage/DonorDe
 const ReceivedHistoryPage = withAuth(React.lazy(() => import('./pages/ReceivedHistory/ReceivedHistoryPage')))
 const About = React.lazy(() => import('./pages/AboutPage/AboutPage'));
 const Registration = React.lazy(() => import('./pages/RegistrationForm/Registration'))
-const Profile = React.lazy(() => import('./pages/Profile/Profile'))
-const Fooddetails=React.lazy(()=>import('./pages/fooddetails/fooddetails'))
+const Profile = withAuth(React.lazy(() => import('./pages/Profile/Profile')))
+const Fooddetails = React.lazy(()=>import('./pages/fooddetails/fooddetails'))
 
 function App() {
 
