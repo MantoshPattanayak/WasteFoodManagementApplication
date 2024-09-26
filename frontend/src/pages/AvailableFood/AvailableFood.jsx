@@ -13,6 +13,7 @@ import { formatDateAsDDMMYYYYHHMMSS } from "../../utils/utilityFunction";
 import instance from "../../../env";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Footer from "../../common/footer";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -268,13 +269,13 @@ const AvailableFood = () => {
                             <img src={image_his_list} alt="Food Item" className="card-image" />
                             <div className="card-content">
                                 <p className="item_name">{food.foodName}</p>
-                                <p className="exp_date">Address - {food.address || "NA"}</p>
-                                <p className="exp_date">Expiration date - <p>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</p></p>
+                                <p className="exp_date">Address - {food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
+                                <p className="exp_date">Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
                                 <p className="exp_date">
                                     Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                     <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
                                 </p>
-                                <p
+                                {/* <p
                                     className="map-location"
                                     onClick={() =>
                                         window.open(
@@ -284,12 +285,13 @@ const AvailableFood = () => {
                                     }
                                 >
                                     <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
-                                </p>
+                                </p> */}
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
+            <Footer />
         </div>
     )
 }

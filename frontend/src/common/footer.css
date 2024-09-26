@@ -56,8 +56,9 @@ footer {
 .content_footer {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
-    gap: 320px;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 220px;
     padding: 20px 0;
     max-width: 1800px; 
     margin: 0 auto; 
@@ -67,7 +68,8 @@ footer {
 .footer-section {
     flex: 1 1 200px; 
     padding: 10px;
-    min-width: 150px; 
+    min-width: 150px;
+    text-align: center;
 }
 
 .footer-section h4 {
