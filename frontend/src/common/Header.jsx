@@ -36,7 +36,6 @@ const Header = () => {
         onClose: () => {
           setTimeout(() => {
             navigate('/');
-            removeLastHistoryEntry();
             sessionStorage.clear();
             localStorage.clear();
           }, 500);
