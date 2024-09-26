@@ -50,7 +50,7 @@ export function withAuth(Component) {
         const user = useSelector((state) => state.auth.user);
         console.log("is user", user ? true : false);
         if (!user) {
-            alert('Session expired!! Login again.')
+            // alert('Session expired!! Login again.')
             window.location.href = instance().baseName;
             // return null;
         }

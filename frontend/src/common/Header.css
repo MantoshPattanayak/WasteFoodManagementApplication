@@ -18,6 +18,10 @@
     align-items: center;
     width: 100%;
   }
+
+  .app_logo {
+    cursor: pointer;
+  }
   
   /* Logo styles */
   .header__logo {
