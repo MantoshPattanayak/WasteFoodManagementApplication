@@ -18,7 +18,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
+    "axios": "^1.7.7",
+=======
     "babel-loader": "^9.2.1",
+>>>>>>> 6cfff6f91a91c6040e193e50d922989682c2144a
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
