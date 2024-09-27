@@ -56,6 +56,13 @@ const api = {
      * req body - encryptMobile, encryptOtp
      */
   },
+  LOGIN_WITH_GOOGLE: {
+    url: baseURL + "/auth/loginWithOAuth",
+    method: "post",
+    /**
+     * googleTokenId, userType
+     */
+  },
   LOGOUT: {
     url: baseURL + "/auth/logout",
     method: "post",
