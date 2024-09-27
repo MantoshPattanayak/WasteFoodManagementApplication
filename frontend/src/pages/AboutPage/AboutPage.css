@@ -85,7 +85,77 @@
 .How_it_work p{
     text-align: center;
 }
+@media screen and (min-width: 769px) and (max-width: 1300px) {
+    .text_about{
+        font-size: 35px;
+        color: #ffff;
+    }
+    .content_text p{
+        color: #ffff;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    .text_about1{
+        font-size: 43px;
+        color: #ed7d0e;
+    }
+    .food-image{
+        height: 40vh;
+        width: auto;
+    
+    }
+    .content_text{
+        padding: 70px;
+       }
+     .button_donate_volunteer{
+        display: flex;
+        gap: 50px;
+        padding: 6px;
+    }
+    .donated_button{
+        padding: 8px;
+        width: auto;
+        color: #ffff;
+        font-size: 17px;
+        background-color: rgb(241, 98, 3);
+        border: 1px solid rgb(241, 98, 3);
+    }
 
+    /* mission section */
+.mission_child_food{
+    display: flex;
+    padding: 90px;
+    justify-content: space-around;
+}
+.text_mission{
+    text-align: center;
+    padding: 20px;
+    font-size: 55px;
+    color: #ed7d0e;
+    font-weight: 600;
+
+}
+.mission_content{
+    width: 600px;
+}
+.mission_content p{
+    font-size: 15px;
+}
+.mission_content h1{
+    color: rgb(1, 38, 63);
+    font-size: 25px;
+}
+.mission_image{
+    height: 40vh;
+    filter: brightness(85%);
+}
+/* how it's work */
+.How_it_work h1{
+    text-align: center;
+    font-size: 65px;
+    font-weight: 600;
+}
+}
 @media screen and (max-width: 768px) {
     .content_text {
         width: 100%;

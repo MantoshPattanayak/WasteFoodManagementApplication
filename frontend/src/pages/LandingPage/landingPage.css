@@ -3,7 +3,6 @@
 }
 
 .image_content_conatiner {
-
   height: 70vh;
   background-size: cover;
   background-repeat: no-repeat;
@@ -31,7 +30,6 @@
   font-size: 20px;
 }
 
-
 .Button_on_image {
   display: flex;
   justify-content: space-between;
@@ -39,10 +37,8 @@
   gap: 10px;
 }
 
-
-
-/* CSS */
-.button-9 {
+/* CSS for buttons */
+.button-9, .button-19 {
   appearance: button;
   backface-visibility: hidden;
   background-color: #040273;
@@ -71,74 +67,31 @@
   width: 25%;
 }
 
-.button-9:disabled {
-  cursor: default;
-}
-
-.button-9:hover {
+.button-9:hover, .button-19:hover {
   background-color: #020269;
 }
 
-.button-9:focus {
-  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
-}
-
-.button-19 {
-  appearance: button;
-  backface-visibility: hidden;
-  background-color: #040273;
-  border-radius: 6px;
-  border-width: 0;
-  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .1) 0 2px 5px 0, rgba(0, 0, 0, .07) 0 1px 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  font-family: -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif;
-  font-size: 100%;
-  height: 44px;
-  line-height: 1.15;
-  margin: 12px 0 0;
-  outline: none;
-  overflow: hidden;
-  padding: 0 25px;
-  position: relative;
-  text-align: center;
-  text-transform: none;
-  transform: translateZ(0);
-  transition: all .2s, box-shadow .08s ease-in;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  width: 25%;
-}
-
-.button-19:hover {
-  background-color: #020269;
-}
-
-.button-19:disabled {
+.button-9:disabled, .button-19:disabled {
   cursor: default;
 }
 
-.button-19:focus {
+.button-9:focus, .button-19:focus {
   box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
 }
 
-/* ads image set */
+/* Ads image set */
 .Ads_conatiner {
   display: flex;
   margin-top: 50px;
   justify-content: space-between;
   padding: 40px;
-
-
 }
 
 .Ads_image {
   height: 20vh;
 }
 
-/* what to do */
+/* What to do section */
 .what_to_do_text {
   max-width: 800px;
   padding: 120px;
@@ -202,9 +155,8 @@
   font-weight: 700;
 }
 
-
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 868px) {
   .what_to_do_text {
     padding: 20px;
     margin-top: 50px;
@@ -240,7 +192,6 @@
     font-size: 16px;
   }
 
-  /* ads image set */
   .Ads_conatiner {
     gap: 10px;
     width: 100%;
@@ -252,7 +203,7 @@
   }
 }
 
-@media screen and (max-width: 576px) {
+@media (max-width: 576px) {
   .image_text {
     max-width: 972px;
   }
@@ -269,15 +220,15 @@
   .Button_on_image button {
     font-size: 12px;
     width: 100%;
+    flex-direction: row;
   }
 }
 
-/* here ads css */
+/* Ads carousel styles */
 .ads-carousel {
   width: 100%; 
   overflow: hidden; 
-  position: relative;
-  
+  position: relative; 
 }
 
 .ads-track {
@@ -301,5 +252,58 @@
   }
   100% {
     transform: translateX(-50%); 
+  }
+}
+
+/* Additional media queries for laptop sizes */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .image_text h1 {
+    font-size: 70px;
+  }
+
+  .Button_on_image {
+    flex-direction: row;
+    margin-top: 60px;
+  }
+
+  .Button_on_image button {
+    width: 100%;
+  }
+
+  .Ads_conatiner {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .what_to_do {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .image_text h1 {
+    font-size: 80px;
+  }
+
+  .Button_on_image {
+    margin-top: 70px;
+  }
+
+  .what_to_do {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 30px;
+  }
+
+  .Ads_conatiner {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 1441px) {
+  .image_text h1 {
+    font-size: 90px;
   }
 }
