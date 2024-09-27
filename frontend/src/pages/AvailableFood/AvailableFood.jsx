@@ -221,6 +221,8 @@ const AvailableFood = () => {
                             )
                         }
                         <button className="button-4" role="button" onClick={getUserGeoLocation}><FontAwesomeIcon icon={faMapMarkerAlt} /> Find nearby</button>
+                    </div>
+                    <div className="Child_conatiner_doner_his1">
                         <button className={`button-4 ${foodTypeChoice ? 'filter-selected' : ''}`} role="button"
                             onClick={() => {
                                 setShowItemTypeOptions(prevState => !prevState);
@@ -257,9 +259,9 @@ const AvailableFood = () => {
                                 </div>
                             )
                         }
-                        <button className="button-4" role="button" onClick={(e) => {
-                            setTimeLimit(""); setFoodTypeChoice("");
-                        }}><FontAwesomeIcon icon={faTimes} /> Reset filters</button>
+                        <button className="button-4" role="button" onClick={(e) => { setTimeLimit(""); setFoodTypeChoice("");}}>
+                            <FontAwesomeIcon icon={faTimes} /> Reset filters
+                        </button>
                     </div>
                 </div>
 
