@@ -188,7 +188,7 @@ const AvailableFood = () => {
                                 setShowRecentOptions(prevState => !prevState);
                                 setShowItemTypeOptions(false);
                             }}
-                        // ref={recentRef}
+                      
                         >
                             <FontAwesomeIcon icon={faCalendar} /> Recent
                         </button>
