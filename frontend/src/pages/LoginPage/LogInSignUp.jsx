@@ -254,7 +254,7 @@ function LogInSignUp() {
             {/* Social Media Sign Up */}
             <div className="socialSignUp">
               <button className="googleSignUp" onClick={() => loginWithGoogle()}>Sign up with Google</button>
-              <button className="facebookSignUp">Sign up with Facebook</button>
+              {/* <button className="facebookSignUp">Sign up with Facebook</button> */}
             </div>
           </div>
         </div>
