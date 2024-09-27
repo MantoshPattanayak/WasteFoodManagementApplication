@@ -102,7 +102,7 @@ let addFoodDonationRequest = async (req, res) => {
             let imageFileUpload = imageUpload(foodItem.imageData, "foodDonation", subDir, insertionData, userId, errors, serialNumber, transaction);
             console.log("errors", errors);
             if (errors.length > 0) {
-                transaction.rollback();
+              await transaction.rollback();
                 return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
                     message: "Error while submitting data."
                 });
@@ -110,13 +110,13 @@ let addFoodDonationRequest = async (req, res) => {
         }
         console.log("insert into foodListingItems table end");
         serialNumber = 0;
-        transaction.commit();
+        await transaction.commit();
         return res.status(statusCode.CREATED.code).json({
             message: "New food donation has been posted."
         })
     }
     catch (error) {
-        transaction.rollback();
+       await transaction.rollback();
         logger.error(`An error occurred: ${error.message}`); // Log the error
 
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
