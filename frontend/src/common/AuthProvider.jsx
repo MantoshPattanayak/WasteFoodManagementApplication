@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
             if (!user) {
                 // const newTokenBoolean = await refresh(rtoken);
                 // console.log("newTokenBoolean", newTokenBoolean);
-                setIsAuthenticated(true);
+                setIsAuthenticated(false);
             }
             else {
                 setIsAuthenticated(true);
@@ -46,11 +46,12 @@ export function useAuth() {
 
 export function withAuth(Component) {
     return function AuthComponent(props) {
-        const { isAuthenticated } = useAuth();
-        console.log("withAuth", isAuthenticated);
-        if (!isAuthenticated) {
-            // window.location.href = instance().baseName;
-            alert('Session expired!! Login again.')
+        // const { isAuthenticated } = useAuth();
+        const user = useSelector((state) => state.auth.user);
+        console.log("is user", user ? true : false);
+        if (!user) {
+            // alert('Session expired!! Login again.')
+            window.location.href = instance().baseName;
             // return null;
         }
         return <Component {...props} />;

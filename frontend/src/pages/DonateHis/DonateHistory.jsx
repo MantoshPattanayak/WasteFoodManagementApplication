@@ -346,15 +346,15 @@ const DonateHistory = () => {
                             <img src={image_his_list} alt="Food Item" className="card-image" />
                             <div className="card-content">
                                 <p className="item_name">{food.foodName}</p>
-                                <p className="exp_date">Address - {food.address || "NA"}</p>
-                                <p className="exp_date">Expiration date - <span>{formatDateAsDDMMYYYYHHMMSS(food.expirationdate)}</span></p>
-                                <p className="exp_date">
+                                <p className="exp_date">Address - {food.address ? food.address.area + ', ' + food.address.townCity + ', ' + food.address.state : "NA"}</p>
+                                <p className="exp_date">Posted date - <span>{formatDateAsDDMMYYYYHHMMSS(food.createdon).split(" ")[0]}</span></p>
+                                {/* <p className="exp_date">
                                     Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                     <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
-                                </p>
+                                </p> */}
                                 <p className="buttons">
                                     {
-                                        new Date(food.expirationdate) > new Date() && food.statusId == 1 && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)}>Close</button>
+                                        new Date(food.expirationdate) > new Date() && food.statusId == 1 && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)}>Mark as closed</button>
                                     }
                                     {/* {
                                         !(new Date(food.expirationdate) > new Date()) && <button className="donation-details-button red" onClick={(e) => confirmDialogue(e, food.foodListingId)} disabled>Close</button>

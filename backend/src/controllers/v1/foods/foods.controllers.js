@@ -16,7 +16,7 @@ let addFoodDonationRequest = async (req, res) => {
         let userId = req.user?.userId || 1;
         let subDir = '/foodDonation';
         //check if any detail is missing
-        // console.log("check submitted details start");
+        console.log("check submitted details start", address);
         for (let foodItem of foodItemsArray) {
             if (foodItem.foodName == undefined || !foodItem.foodName) {
                 console.log("foodItem.foodName not provided");
@@ -52,7 +52,7 @@ let addFoodDonationRequest = async (req, res) => {
 
         //check if address details present correctly
         let addressDetails = ['building', 'area', 'landmark', 'pincode', 'townCity', 'state', 'country'];
-        // console.log("abcdedg", Object.keys(foodItemsArray[0].address));
+        console.log("abcdedg", Object.keys(foodItemsArray[0].address));
         for (let key of Object.keys(foodItemsArray[0].address)) {
             if (!addressDetails.includes(key) || (key != 'landmark' && !foodItemsArray[0].address[key])) {
                 return res.status(statusCode.BAD_REQUEST.code).json({
@@ -60,7 +60,7 @@ let addFoodDonationRequest = async (req, res) => {
                 });
             }
         }
-        // console.log("check submitted details end");
+        console.log("check submitted details end");
         // fetch entity types data
         // let entityTypesMasterData = await fetchMasterData('entityTypes');
         // console.log("entityTypesMasterData", entityTypesMasterData);
@@ -71,15 +71,15 @@ let addFoodDonationRequest = async (req, res) => {
         let insertFoodListing = await foodListings.create({
             userId: userId,
             statusId: 1,
-            address: address,
+            address: foodItemsArray[0].address,
             receiverId: receiverId || null,
             createdBy: userId
         }, { transaction, returning: true });
-        // console.log("insertFoodListing", insertFoodListing);
+        console.log("insertFoodListing", insertFoodListing);
 
         // insert into foodListingItems table
         let serialNumber = 0;
-        // console.log("insert into foodListingItems table start");
+        console.log("insert into foodListingItems table start");
         for (let foodItem of foodItemsArray) {
             serialNumber += 1;
             let insertFoodListingItem = await foodListingItems.create({
@@ -277,7 +277,8 @@ let viewFoodDonationList = async (req, res) => {
                 }
                 else {
                     return food.name?.toLowerCase().includes(givenReq) ||
-                        food.createdon?.toString().includes(givenReq);
+                        food.createdon?.toString().includes(givenReq) ||
+                        (food.address && JSON.stringify(food.address).includes(givenReq));
                 }
             })
         }
@@ -461,7 +462,7 @@ let donationHistory = async (req, res) => {
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare.users u on u."userId" = fl."createdBy"
             where u."userId" = ?
-            order by fli."expirationDate" desc
+            order by fl."createdOn" desc
         `;
         let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {
             replacements: [userId],

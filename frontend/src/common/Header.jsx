@@ -36,7 +36,6 @@ const Header = () => {
         onClose: () => {
           setTimeout(() => {
             navigate('/');
-            removeLastHistoryEntry();
             sessionStorage.clear();
             localStorage.clear();
           }, 500);
@@ -56,17 +55,11 @@ const Header = () => {
     }
   }
 
-  function removeLastHistoryEntry() {
-    window.history.back(); // Go back one step in history
-    window.history.pushState(null, '', window.location.href); // Replace the current URL with itself
-  };
-
   return (
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-
-          <img src={Logo} />
+          <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/DonorDetails') : navigate('/') }}/>
         </div>
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
           <ul className="header__nav-list">
@@ -99,7 +92,7 @@ const Header = () => {
                 </Link>
               )}
               {
-                user && <li className="header__nav-item profile-container">
+                user && <li className="header__nav-item header-profile-container">
                   <FontAwesomeIcon icon={faUser} className="icon_profile" />
                   <ul className="profile-submenu">
                     <li>
