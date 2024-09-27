@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start-redis": "redis-server",
-    "dev-frontend": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && npm run dev",
+    "dev-frontend": "cd frontend && npm run dev",
     "dev-backend": "nodemon backend/src/server.js",
     "build": "npm-run-all -s build-frontend-soulshare build-backend-soulshare",
-    "build-frontend-soulshare": "cd frontend && npx tailwindcss -i ./src/index.css -o ./dist/output.css && cd .. && npm install & npm install --prefix frontend & npm run build --prefix frontend",
+    "build-frontend-soulshare": "cd frontend && npm install & npm install --prefix frontend & npm run build --prefix frontend",
     "build-backend-soulshare": "npm install && webpack --config webpack.production.config.js --mode production",
     "start-backend-soulshare": "node ./dist/backend/main.js",
-    "start-frontend-soulshare": "cd frontend && npm run preview"
+    "start-frontend-soulshare": "cd frontend && npm run preview",
+    "start-soulshare": "npm-run-all -s start-backend-soulshare start-frontend-soulshare"
   },
   "keywords": [],
   "author": "",
