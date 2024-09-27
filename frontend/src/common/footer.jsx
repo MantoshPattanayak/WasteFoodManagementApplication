@@ -45,9 +45,15 @@ const Footer = () => {
                 <div className="footer-section">
                     <h4>TALK TO US</h4>
                     <ul>
-                        <li><FontAwesomeIcon icon={faEnvelope} /><a href=" soul@soulunileaders.com"> soul@soulunileaders.com</a></li>
-                        <li><FontAwesomeIcon icon={faPhone} /><a href=" +91 7077769335"> +91 7077769335</a></li>
-                        <li><FontAwesomeIcon icon={faLocationDot} /><p><b>Office Address:</b> E/42/D, Infocity Avenue, Chandaka Industrial Estate, Bhubaneswar, Odisha, India - 751024</p></li>
+                        <li>
+                            {/* <FontAwesomeIcon icon={faEnvelope} /> */}
+                            <b>Email:</b><a href=" soul@soulunileaders.com"> soul@soulunileaders.com</a></li>
+                        <li>
+                            {/* <FontAwesomeIcon icon={faPhone} /> */}
+                            <b>Phone:</b><a href=" +91 7077769335"> +91 7077769335</a></li>
+                        <li>
+                            {/* <FontAwesomeIcon icon={faLocationDot} /> */}
+                            <p><b>Address:</b> E/42/D, Infocity Avenue, Chandaka Industrial Estate, Bhubaneswar, Odisha, India - 751024</p></li>
                     </ul>
                 </div>
                 {/* <div className="footer-section">
