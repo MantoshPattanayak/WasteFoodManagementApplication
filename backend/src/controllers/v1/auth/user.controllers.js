@@ -16,7 +16,7 @@ let generateToken = require('../../../utils/generateToken');
 const imageUpload = require('../../../utils/imageUpload');
 const imageUpdate = require('../../../utils/imageUpdate')
 const logger = require('../../../logger/index.logger')
-
+const axios = require('axios')
 const file = db.files;
 const fileAttachement = db.fileAttachments;
 
@@ -413,10 +413,105 @@ let loginWithOTP = async (req, res) => {
 
 let loginWithOAuth = async (req, res) => {
   try {
+    let {googleTokenId, userType} = req.body
+    userType = 1;
+    let userAgent = req.headers['user-agent'];
 
+    // console.log('userAgent', userAgent)
+    let deviceInfo = parseUserAgent(userAgent)
+
+    let lastLoginTime = new Date();
+
+    if(googleTokenId){
+      // first we will verify the id token with google api
+      const response = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${googleTokenId}`)
+
+      // Destructure the information from the response
+
+      const {sub: googleId, name, email} = response.data;
+
+      // Check if the user already exist
+      let isUserExist = await users.findOne({
+        where: {
+          [Op.and]: [{ googleAccountId: googleId }, { statusId: statusId }]
+        }
+      })
+
+      if (!isUserExist) {
+         isUserExist = await users.create({
+          name: name,
+          email: email,
+          userType: userType,
+          lastLogin: lastLoginTime, // Example of setting a default value
+          statusId: 1, // Example of setting a default value
+          createdBy: 1,
+          createdOn:new Date(),
+          updatedOn: new Date(), // Set current timestamp for updatedOn
+        },
+          {
+            transaction
+          });
+      }
+
+      // console.log('2')
+      let tokenGenerationAndSessionStatus = await tokenAndSessionCreation(isUserExist, lastLoginTime, deviceInfo);
+
+      // console.log('all the data', tokenGenerationAndSessionStatus)
+
+      if (tokenGenerationAndSessionStatus?.error) {
+
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: tokenAndSessionCreation.error
+        })
+
+      }
+
+      // console.log('here upto it is coming')
+      let { accessToken, refreshToken, options, sessionId } = tokenGenerationAndSessionStatus
+
+
+      // Set the access token in an HTTP-only cookie named 'accessToken'
+      res.cookie('accessToken', accessToken, options);
+
+      // Set the refresh token in a separate HTTP-only cookie named 'refreshToken'
+      res.cookie('refreshToken', refreshToken, options)
+
+      // bearer is actually set in the first to tell that  this token is used for the authentication purposes
+
+      return res.status(statusCode.SUCCESS.code)
+        .header('Authorization', `Bearer ${accessToken}`)
+        .json({
+          message: "please render the donor landing page",
+          decideSignUpOrLogin: 1,
+          user: {
+            username: isUserExist,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            decideSignUpOrLogin: 1,
+            sid: sessionId
+          }
+        });
+
+
+    }
+    else{
+      return res.status(statusCode.BAD_REQUEST.code).json({
+        message:'Invalid Request'
+      })
+    }
   }
   catch (error) {
-    logger.error(`An error occurred: ${error.message}`); // Log the error
+    if(error.response){
+      logger.error(`An error occurred: ${error.message}`); // Log the error
+      return res.status(statusCode.UNAUTHORIZED.code).json({ message: 'Invalid or expired token' });
+
+    }
+    else{
+      logger.error(`An error occurred: ${error.message}`); // Log the error
+
+      return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: error.message });
+
+    }
 
   }
 }
@@ -735,7 +830,7 @@ let signUp = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     console.log('1')
-    let roleId = 4;
+    let roleId = 1;
     let statusId = 1;
     let { name, email, phoneNumber, longitude, latitude, address, userType, userImage } = req.body;
 
