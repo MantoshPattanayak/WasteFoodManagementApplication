@@ -9,10 +9,12 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../store/reducers/authReducer";
 import tokenService from "../../services/token.service";
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from "axios";
+
 function LogInSignUp() {
   const [userType, setUserType] = useState("Donor");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -30,7 +32,7 @@ function LogInSignUp() {
   const handlePhoneNumberChange = (event) => {
     let { value } = event.target;
     value = value.replace(/\D/g, ''); //remove any characters other than digits
-    if(value.length == 1 && value == 0) { // dont allow first character as 0
+    if (value.length == 1 && value == 0) { // dont allow first character as 0
       value = "";
     }
     value = value.replace(/^([1-9]{1}\d{9}).*/, '$1');  //regex to check if the number is valid: 10 digits and starts with 1-9
@@ -77,7 +79,7 @@ function LogInSignUp() {
       console.log("response of verify otp api", res.data);
       let checkOTP = (sessionStorage.getItem('check')) == encryptData(otp);
       console.log("checkOTP", checkOTP);
-      if(res.data.decideSignUpOrLogin) {
+      if (res.data.decideSignUpOrLogin) {
         dispatch(login(res.data.user));
         tokenService.setUser(res.data.user);
         toast.dismiss();
@@ -107,6 +109,57 @@ function LogInSignUp() {
     }
   };
 
+  // Function to handle Google OAuth login
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const { access_token } = tokenResponse;
+        console.log({ access_token });
+        // Fetch Google profile information
+        // const googleUser = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        //   headers: {
+        //     Authorization: `Bearer ${access_token}`,
+        //   },
+        // });
+        // console.error("googleuser.data", googleUser.data);
+        // Extract user information from Google response
+        // const { email, name, picture } = googleUser.data;
+
+        // Call your own API to verify if the user exists
+        const response = await axios.post(api.LOGIN_WITH_GOOGLE.url, { googleTokenId: access_token });
+        console.log("LOGIN_WITH_GOOGLE response", response.data);
+
+        if (response.data.decideSignUpOrLogin) {
+          tokenService.setUser(response.data.user);
+          dispatch(login(response.data.user));
+          toast.success('Login successful', {
+            autoClose: 1500,
+            onClose: () => {
+              setTimeout(() => {
+                navigate('/DonorDetails');
+              }, 500)
+            }
+          })
+        }
+        else {
+          toast.success('Please create profile.', {
+            autoClose: 1500,
+            onClose: () => {
+              setTimeout(() => {
+                navigate('/Registration');
+              }, 500)
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Error during Google login:', error);
+      }
+    },
+    onError: (error) => {
+      console.error('Login failed:', error);
+    },
+  });
+
   // Timer effect for OTP expiration countdown
   useEffect(() => {
     if (otpSent && timer > 0) {
@@ -123,90 +176,90 @@ function LogInSignUp() {
 
   return (
     <div className="logInSignUpContainer">
-    <div className="log_p">
-      <div className="headers_P">
-        <h1>Login / SignUp to Your Account</h1>
-        <p>
-          A simple act of sharing food can have a profound impact on someone's
-          life.
-        </p>
-        <div className="logInType">
-          <h3>Login/SignUp as a </h3>
-          <div className="radiobutton">
-            <div className="insideRadioButton">
-              <input
-                type="radio"
-                id="donor"
-                value="Donor"
-                checked={userType === "Donor"}
-                onChange={handleUserTypeChange}
-                className={userType === "Donor" ? "greenText" : ""}
-              />
-              <label
-                htmlFor="donor"
-                className={userType === "Donor" ? "greenText" : ""}
-              >
-                Donor
-              </label>
-            </div>
-            <div className="insideRadioButton">
-              <input
-                type="radio"
-                id="charity"
-                value="Charity"
-                checked={userType === "Charity"}
-                onChange={handleUserTypeChange}
-                className={userType === "charity" ? "greenText" : ""}
-              />
-              <label
-                htmlFor="charity"
-                className={userType === "Charity" ? "greenText" : ""}
-              >
-                Charity
-              </label>
+      <div className="log_p">
+        <div className="headers_P">
+          <h1>Login / SignUp to Your Account</h1>
+          <p>
+            A simple act of sharing food can have a profound impact on someone's
+            life.
+          </p>
+          <div className="logInType">
+            <h3>Login/SignUp as a </h3>
+            <div className="radiobutton">
+              <div className="insideRadioButton">
+                <input
+                  type="radio"
+                  id="donor"
+                  value="Donor"
+                  checked={userType === "Donor"}
+                  onChange={handleUserTypeChange}
+                  className={userType === "Donor" ? "greenText" : ""}
+                />
+                <label
+                  htmlFor="donor"
+                  className={userType === "Donor" ? "greenText" : ""}
+                >
+                  Donor
+                </label>
+              </div>
+              <div className="insideRadioButton">
+                <input
+                  type="radio"
+                  id="charity"
+                  value="Charity"
+                  checked={userType === "Charity"}
+                  onChange={handleUserTypeChange}
+                  className={userType === "charity" ? "greenText" : ""}
+                />
+                <label
+                  htmlFor="charity"
+                  className={userType === "Charity" ? "greenText" : ""}
+                >
+                  Charity
+                </label>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="inputFieldButton">
-          {/* Phone Number Input or OTP Input */}
-          {!otpSent ? (
-            <div className="phoneNumberSection">
-              <input
-                type="tel"
-                placeholder="Enter your phone number"
-                value={phoneNumber}
-                onChange={handlePhoneNumberChange}
-              />
-              <button className="button_verify_OTP" onClick={handleGetOtp}>
-                <p>Get OTP</p>
-                <FontAwesomeIcon icon={faArrowRight} />
-              </button>
-            </div>
-          ) : (
-            <div className="otpSection">
-              <input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={handleOtpChange}
-              />
-              <button className="button_verify_OTP" onClick={handleVerifyOtp}>
-                Verify OTP
-              </button>
-              <p>OTP expires in: {timer} seconds</p>
-            </div>
-          )}
+          <div className="inputFieldButton">
+            {/* Phone Number Input or OTP Input */}
+            {!otpSent ? (
+              <div className="phoneNumberSection">
+                <input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={phoneNumber}
+                  onChange={handlePhoneNumberChange}
+                />
+                <button className="button_verify_OTP" onClick={handleGetOtp}>
+                  <p>Get OTP</p>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </div>
+            ) : (
+              <div className="otpSection">
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={handleOtpChange}
+                />
+                <button className="button_verify_OTP" onClick={handleVerifyOtp}>
+                  Verify OTP
+                </button>
+                <p>OTP expires in: {timer} seconds</p>
+              </div>
+            )}
 
-          {/* Social Media Sign Up */}
-          <div className="socialSignUp">
-            <button className="googleSignUp">Sign up with Google</button>
-            <button className="facebookSignUp">Sign up with Facebook</button>
+            {/* Social Media Sign Up */}
+            <div className="socialSignUp">
+              <button className="googleSignUp" onClick={() => loginWithGoogle()}>Sign up with Google</button>
+              <button className="facebookSignUp">Sign up with Facebook</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <ToastContainer />
+      <ToastContainer />
     </div>
   );
 }

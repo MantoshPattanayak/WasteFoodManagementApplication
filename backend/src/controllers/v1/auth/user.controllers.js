@@ -80,18 +80,18 @@ let createOtp = async (req, res) => {
     //       code: encrypt(otp),
     //       expiryTime:expiryTime,
     //       verified: 0,
-          
+
     //     });
-     
+
     //   }
     // }
     // console.log("insertOTP", insertOtp);
     // if (insertOtp != null) {
     //   console.log(6)
-      return res.status(statusCode.SUCCESS.code).json({
-        message: "OTP sent successfully. OTP is valid for 1 minute.",
-        otp: otp,
-      });
+    return res.status(statusCode.SUCCESS.code).json({
+      message: "OTP sent successfully. OTP is valid for 1 minute.",
+      otp: otp,
+    });
     // }
     // else {
     //   console.log(7)
@@ -312,7 +312,7 @@ let loginWithOTP = async (req, res) => {
   try {
     console.log('loginwithotp', req.body)
     let statusId = 1;
-    
+
     let { encryptMobile: mobileNo, encryptOtp: otp } = req.body
 
     let userAgent = req.headers['user-agent'];
@@ -333,124 +333,27 @@ let loginWithOTP = async (req, res) => {
       // })
       // console.log('207 line', isOtpValid)
       // if (isOtpValid) {
-        // let updateTheVerifiedValue = await otpVerifications.update({ verified: 1 }
-        //   , {
-        //     where: {
-        //       id: isOtpValid.id || isOtpValid.dataValues.id
-        //     }
-        //   }
-        // )
-        // console.log(updateTheVerifiedValue, 'update the verified value')
-        let isUserExist = await users.findOne({
-          where: {
-            [Op.and]: [{ phoneNumber: decrypt(mobileNo) }, { statusId: statusId }]
-          }
-        })
-        console.log(isUserExist, 'check user 223 line')
-        // If the user does not exist then we have to send a message to the frontend so that the sign up page will get render
-        if (!isUserExist) {
-          return res.status(statusCode.SUCCESS.code).json({
-            message: "please render the sign up page",
-            decideSignUpOrLogin: 0,
-            user: {}
-          });
-        }
-
-        // console.log('2')
-        let tokenGenerationAndSessionStatus = await tokenAndSessionCreation(isUserExist, lastLoginTime, deviceInfo);
-
-        // console.log('all the data', tokenGenerationAndSessionStatus)
-
-        if (tokenGenerationAndSessionStatus?.error) {
-
-          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-            message: tokenAndSessionCreation.error
-          })
-
-        }
-
-        // console.log('here upto it is coming')
-        let { accessToken, refreshToken, options, sessionId } = tokenGenerationAndSessionStatus
-
-
-        // Set the access token in an HTTP-only cookie named 'accessToken'
-        res.cookie('accessToken', accessToken, options);
-
-        // Set the refresh token in a separate HTTP-only cookie named 'refreshToken'
-        res.cookie('refreshToken', refreshToken, options)
-
-        // bearer is actually set in the first to tell that  this token is used for the authentication purposes
-
-        return res.status(statusCode.SUCCESS.code)
-          .header('Authorization', `Bearer ${accessToken}`)
-          .json({
-            message: "please render the donor landing page",
-            decideSignUpOrLogin: 1,
-            user: {
-              username: isUserExist,
-              accessToken: accessToken,
-              refreshToken: refreshToken,
-              decideSignUpOrLogin: 1,
-              sid: sessionId
-            }
-          });
-      // }
-      // else {
-      //   return res.status(statusCode.BAD_REQUEST.code).json({
-      //     message: "Invalid Otp"
-      //   })
-      // }
-    }
-  }
-  catch (err) {
-    logger.error(`An error occurred: ${err.message}`); // Log the error
-
-    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-      message: err.message
-    })
-  }
-}
-
-let loginWithOAuth = async (req, res) => {
-  try {
-    let {googleTokenId, userType} = req.body
-    userType = 1;
-    let userAgent = req.headers['user-agent'];
-
-    // console.log('userAgent', userAgent)
-    let deviceInfo = parseUserAgent(userAgent)
-
-    let lastLoginTime = new Date();
-
-    if(googleTokenId){
-      // first we will verify the id token with google api
-      const response = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${googleTokenId}`)
-
-      // Destructure the information from the response
-
-      const {sub: googleId, name, email} = response.data;
-
-      // Check if the user already exist
+      // let updateTheVerifiedValue = await otpVerifications.update({ verified: 1 }
+      //   , {
+      //     where: {
+      //       id: isOtpValid.id || isOtpValid.dataValues.id
+      //     }
+      //   }
+      // )
+      // console.log(updateTheVerifiedValue, 'update the verified value')
       let isUserExist = await users.findOne({
         where: {
-          [Op.and]: [{ googleAccountId: googleId }, { statusId: statusId }]
+          [Op.and]: [{ phoneNumber: decrypt(mobileNo) }, { statusId: statusId }]
         }
       })
-
+      console.log(isUserExist, 'check user 223 line')
+      // If the user does not exist then we have to send a message to the frontend so that the sign up page will get render
       if (!isUserExist) {
-         isUserExist = await users.create({
-          name: name,
-          email: email,
-          userType: userType,
-          lastLogin: lastLoginTime, // Example of setting a default value
-          statusId: 1, // Example of setting a default value
-          createdBy: 1,
-          createdOn:new Date(),
-          updatedOn: new Date(), // Set current timestamp for updatedOn
-        },
-          {
-            transaction
-          });
+        return res.status(statusCode.SUCCESS.code).json({
+          message: "please render the sign up page",
+          decideSignUpOrLogin: 0,
+          user: {}
+        });
       }
 
       // console.log('2')
@@ -491,22 +394,127 @@ let loginWithOAuth = async (req, res) => {
             sid: sessionId
           }
         });
-
-
+      // }
+      // else {
+      //   return res.status(statusCode.BAD_REQUEST.code).json({
+      //     message: "Invalid Otp"
+      //   })
+      // }
     }
-    else{
+  }
+  catch (err) {
+    logger.error(`An error occurred: ${err.message}`); // Log the error
+
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: err.message
+    })
+  }
+}
+
+let loginWithOAuth = async (req, res) => {
+  try {
+    let { googleTokenId, userType } = req.body
+    userType = 1;
+    let userAgent = req.headers['user-agent'];
+    console.log("googleTokenId", googleTokenId);
+    // console.log('userAgent', userAgent)
+    let deviceInfo = parseUserAgent(userAgent)
+    let statusId = 1;
+    let lastLoginTime = new Date();
+
+    if (googleTokenId) {
+      console.log("01")
+      // first we will verify the id token with google api
+      // const response = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${googleTokenId}`)
+      // Fetch Google profile information
+      const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+          Authorization: `Bearer ${googleTokenId}`,
+        },
+      });
+
+      console.log("response", response);
+      // Destructure the information from the response
+
+      const { sub: googleId, name, email } = response.data;
+      console.log(1)
+      // Check if the user already exist
+      let isUserExist = await users.findOne({
+        where: {
+          [Op.and]: [{ googleAccountId: googleId }, { statusId: statusId }]
+        }
+      })
+      console.log(2)
+      if (!isUserExist) {
+        console.log(3)
+        isUserExist = await users.create({
+          name: name,
+          email: email,
+          userType: userType,
+          lastLogin: lastLoginTime, // Example of setting a default value
+          statusId: 1, // Example of setting a default value
+          createdBy: 1,
+          googleAccountId: googleId,
+          createdOn: new Date(),
+          updatedOn: new Date(), // Set current timestamp for updatedOn
+        });
+      }
+      console.log(4)
+      // console.log('2')
+      let tokenGenerationAndSessionStatus = await tokenAndSessionCreation(isUserExist, lastLoginTime, deviceInfo);
+      console.log(5)
+      // console.log('all the data', tokenGenerationAndSessionStatus)
+
+      if (tokenGenerationAndSessionStatus?.error) {
+        console.log(6)
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: tokenAndSessionCreation.error
+        })
+
+      }
+
+      // console.log('here upto it is coming')
+      let { accessToken, refreshToken, options, sessionId } = tokenGenerationAndSessionStatus
+      console.log(7)
+
+      // Set the access token in an HTTP-only cookie named 'accessToken'
+      res.cookie('accessToken', accessToken, options);
+      console.log(8)
+      // Set the refresh token in a separate HTTP-only cookie named 'refreshToken'
+      res.cookie('refreshToken', refreshToken, options)
+
+      // bearer is actually set in the first to tell that  this token is used for the authentication purposes
+      console.log(9)
+      return res.status(statusCode.SUCCESS.code)
+        .header('Authorization', `Bearer ${accessToken}`)
+        .json({
+          message: "please render the donor landing page",
+          decideSignUpOrLogin: 1,
+          user: {
+            username: isUserExist,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            decideSignUpOrLogin: 1,
+            sid: sessionId
+          }
+        });
+    }
+    else {
+      console.log(10)
       return res.status(statusCode.BAD_REQUEST.code).json({
-        message:'Invalid Request'
+        message: 'Invalid Request'
       })
     }
   }
   catch (error) {
-    if(error.response){
+    if (error.response) {
+      console.log(11)
       logger.error(`An error occurred: ${error.message}`); // Log the error
       return res.status(statusCode.UNAUTHORIZED.code).json({ message: 'Invalid or expired token' });
 
     }
-    else{
+    else {
+      console.log(12)
       logger.error(`An error occurred: ${error.message}`); // Log the error
 
       return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: error.message });
@@ -524,19 +532,19 @@ const viewUserProfile = async (req, res) => {
     let userId = req.user?.userId || 1;
 
     let publicRole = await users.findOne({
-      where:{
-        userId:userId
+      where: {
+        userId: userId
       }
     })
 
-    if(!publicRole){
+    if (!publicRole) {
       return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-        message:`Something went wrong`
+        message: `Something went wrong`
       })
     }
     let statusId = 1;
     let entityType = 'users'
- 
+
 
 
 
@@ -576,222 +584,225 @@ const viewUserProfile = async (req, res) => {
 };
 
 let updateUserProfile = async (req, res) => {
-    let transaction;
-    try {
-      console.log('232')
-      transaction = await sequelize.transaction();
-      console.log('req body', req.body, req.user.userId)
-      let statusId = 1;
-      let inActiveStatus= 2;
-      let userId = req.user.userId;
-      let updatedDt = new Date();
-      let createdDt = new Date();
-      console.log(userId,'userId',req.user.userId)
-      let {
-        name, 
-        email, 
-        phoneNumber, 
-         address,
-        userImage
-      } = req.body;
+  let transaction;
+  try {
+    console.log('232')
+    transaction = await sequelize.transaction();
+    console.log('req body', req.body, req.user.userId)
+    let statusId = 1;
+    let inActiveStatus = 2;
+    let userId = req.user.userId;
+    let updatedDt = new Date();
+    let createdDt = new Date();
+    console.log(userId, 'userId', req.user.userId)
+    let {
+      name,
+      email,
+      phoneNumber,
+      address,
+      userImage
+    } = req.body;
 
-  // console.log("Update Profile", req.body)
-      console.log("profile Update", req.body)
-      let imageUpdateVariable = 0;
-      let updatepublicUserCount;
-      let params = {};
-      let roleId =1;
-      
-   
-      let findPublicuserWithTheGivenId = await users.findOne({
-        where: {
-          userId: userId,
-        },
+    // console.log("Update Profile", req.body)
+    console.log("profile Update", req.body)
+    let imageUpdateVariable = 0;
+    let updatepublicUserCount;
+    let params = {};
+    let roleId = 1;
+
+
+    let findPublicuserWithTheGivenId = await users.findOne({
+      where: {
+        userId: userId,
+      },
+      transaction
+    });
+    console.log('2323')
+
+    if (findPublicuserWithTheGivenId.name != name && name) {
+      params.name = name;
+    }
+
+    if (findPublicuserWithTheGivenId.phoneNumber != phoneNumber && phoneNumber) {
+      const existingphoneNo = await users.findOne({
+        where: { phoneNumber: phoneNumber, statusId: statusId, userType: roleId },
+      });
+      if (existingphoneNo) {
+        await transaction.rollback();
+        return res
+          .status(statusCode.CONFLICT.code)
+          .json({ message: "User already exist same phoneNo" });
+      }
+      params.phoneNumber = phoneNumber;
+    }
+
+
+    if (findPublicuserWithTheGivenId.email != email && email) {
+
+      const existingemailId = await users.findOne({
+        where: { email: email, statusId: statusId, userType: roleId },
         transaction
       });
-      console.log('2323')
-
-      if (findPublicuserWithTheGivenId.name != name && name) {
-        params.name = name;
-      } 
-
-       if (findPublicuserWithTheGivenId.phoneNumber != phoneNumber && phoneNumber) {
-        const existingphoneNo = await users.findOne({
-          where: { phoneNumber: phoneNumber,statusId:statusId, userType:roleId },
+      if (existingemailId) {
+        await transaction.rollback();
+        return res.status(statusCode.CONFLICT.code).json({
+          message: "User already exist with given emailId",
         });
-        if (existingphoneNo) {
-          await transaction.rollback();
-          return res
-            .status(statusCode.CONFLICT.code)
-            .json({ message: "User already exist same phoneNo" });
-        } 
-        params.phoneNumber = phoneNumber;
-      } 
-
-   
-       if (findPublicuserWithTheGivenId.email != email && email) {
-        
-          const existingemailId = await users.findOne({
-            where: { email: email ,statusId:statusId, userType:roleId },
-            transaction
-          });
-          if (existingemailId) {
-            await transaction.rollback();
-            return res.status(statusCode.CONFLICT.code).json({
-              message: "User already exist with given emailId",
-            });
-          }
-        params.email = email;
       }
+      params.email = email;
+    }
 
-       if (address) {
-        
+    if (address) {
+
       params.address = address;
     }
-    
-        if(Object.keys(userImage).length>0){
-          // console.log('profilePicture?.data',profilePicture?.data)
-          if(userImage?.fileId!=0 && userImage?.data){
-            console.log('inside image part', userImage?.fileId)
-            let findThePreviousFilePath = await fileAttachement.findOne({
-              where:{
-                statusId:statusId,
-                fileId:userImage.fileId
-              },
-              transaction
-            })
-            let oldFilePath = findThePreviousFilePath?.url
-            console.log('old file path ', findThePreviousFilePath )
-            let errors=[];
-            let insertionData = {
-             id:userId,
-             name:name,
-             fileId:userImage.fileId
-            }
-               let subDir = "userDir"
-            //update the data
-            let updateSingleImage = await imageUpdate(userImage.data,subDir,insertionData,userId,errors,1,transaction,oldFilePath)
-            if(errors.length>0){
-  
-              await transaction.rollback();
-  
-              if(errors.some(error => error.includes("something went wrong"))){
-                return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({message:errors})
-              }
-              return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
-            }
-            imageUpdateVariable = 1;
-            console.log('inside image update')
 
-        }
-        else if(userImage?.fileId==0 && userImage?.data){
-          console.log('inside new image part')
-          let insertionData = {
-            id:userId,
-            name:name
-           }
-          // create the data
-          let entityType = 'users'
-          let errors = [];
-          let subDir = "userDir"
-         
-          let uploadSingleImage = await imageUpload(userImage.data,entityType,subDir,insertionData,userId,errors,1,transaction)
-          console.log( uploadSingleImage,'165 line facility image')
-          if(errors.length>0){
-            await transaction.rollback();
-            if(errors.some(error => error.includes("something went wrong"))){
-              return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({message:errors})
-            }
-            return res.status(statusCode.BAD_REQUEST.code).json({message:errors})
-          }
-          imageUpdateVariable = 1;
-  
-          console.log('inside image upload')
-      }
-        else if(userImage.fileId!=0){
-          console.log('inside file')
-          let inactiveTheFileId = await file.update({statusId:inActiveStatus},
-           { where:{
-              fileId:userImage.fileId
-            },
-          transaction}
-          )
-  
-          console.log('fileid', inactiveTheFileId)
-          let inActiveTheFileInFileAttachmentTable = await fileAttachement.update({
-            statusId:inActiveStatus
+    if (Object.keys(userImage).length > 0) {
+      // console.log('profilePicture?.data',profilePicture?.data)
+      if (userImage?.fileId != 0 && userImage?.data) {
+        console.log('inside image part', userImage?.fileId)
+        let findThePreviousFilePath = await fileAttachement.findOne({
+          where: {
+            statusId: statusId,
+            fileId: userImage.fileId
           },
-        {where:{
-          fileId:userImage.fileId
-        },
-        transaction
-      }
-      )
-      console.log('file update check',  inactiveTheFileId,'file attachemnt ' ,inActiveTheFileInFileAttachmentTable )
-
-      if(inactiveTheFileId.length == 0 || inActiveTheFileInFileAttachmentTable == 0){
-        await transaction.rollback();
-        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-          message:`Something went wrong`
+          transaction
         })
-      }
-      else{
-        imageUpdateVariable = 1;
-      }
-  
+        let oldFilePath = findThePreviousFilePath?.url
+        console.log('old file path ', findThePreviousFilePath)
+        let errors = [];
+        let insertionData = {
+          id: userId,
+          name: name,
+          fileId: userImage.fileId
         }
-        else{
+        let subDir = "userDir"
+        //update the data
+        let updateSingleImage = await imageUpdate(userImage.data, subDir, insertionData, userId, errors, 1, transaction, oldFilePath)
+        if (errors.length > 0) {
+
+          await transaction.rollback();
+
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+        }
+        imageUpdateVariable = 1;
+        console.log('inside image update')
+
+      }
+      else if (userImage?.fileId == 0 && userImage?.data) {
+        console.log('inside new image part')
+        let insertionData = {
+          id: userId,
+          name: name
+        }
+        // create the data
+        let entityType = 'users'
+        let errors = [];
+        let subDir = "userDir"
+
+        let uploadSingleImage = await imageUpload(userImage.data, entityType, subDir, insertionData, userId, errors, 1, transaction)
+        console.log(uploadSingleImage, '165 line facility image')
+        if (errors.length > 0) {
+          await transaction.rollback();
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+        }
+        imageUpdateVariable = 1;
+
+        console.log('inside image upload')
+      }
+      else if (userImage.fileId != 0) {
+        console.log('inside file')
+        let inactiveTheFileId = await file.update({ statusId: inActiveStatus },
+          {
+            where: {
+              fileId: userImage.fileId
+            },
+            transaction
+          }
+        )
+
+        console.log('fileid', inactiveTheFileId)
+        let inActiveTheFileInFileAttachmentTable = await fileAttachement.update({
+          statusId: inActiveStatus
+        },
+          {
+            where: {
+              fileId: userImage.fileId
+            },
+            transaction
+          }
+        )
+        console.log('file update check', inactiveTheFileId, 'file attachemnt ', inActiveTheFileInFileAttachmentTable)
+
+        if (inactiveTheFileId.length == 0 || inActiveTheFileInFileAttachmentTable == 0) {
           await transaction.rollback();
           return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-            message:`Something went wrong`
+            message: `Something went wrong`
           })
         }
-       
+        else {
+          imageUpdateVariable = 1;
+        }
+
       }
-      console.log('outside profile update part',params)
-  
-      if(Object.keys(params).length>0){
-        console.log('inside update part')
-  
-        params.updatedBy = userId;
-        params.updatedDt = updatedDt;
-        console.log('near 225 line')
-  
-        updatepublicUserCount=
-          await users.update(params, {
+      else {
+        await transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: `Something went wrong`
+        })
+      }
+
+    }
+    console.log('outside profile update part', params)
+
+    if (Object.keys(params).length > 0) {
+      console.log('inside update part')
+
+      params.updatedBy = userId;
+      params.updatedDt = updatedDt;
+      console.log('near 225 line')
+
+      updatepublicUserCount =
+        await users.update(params, {
           where: {
-            [Op.and]: [{userId: userId},{statusId:statusId}]
+            [Op.and]: [{ userId: userId }, { statusId: statusId }]
           },
           transaction
         });
-  
-      }
-      if (updatepublicUserCount >= 1 || imageUpdateVariable==1) {
-       
-        await transaction.commit();
-        console.log('data updated')
-        return res.status(statusCode.SUCCESS.code).json({
-          message: "Updated Successfully",
-        });
-      } else {
-        await transaction.rollback();
-        return res.status(statusCode.BAD_REQUEST.code).json({
-          message: "Data not Updated ",
-        });
-      }
-      
-      
-      
-    } catch (error) {
-      if(transaction) await transaction.rollback();
-      logger.error(`An error occurred: ${error.message}`); // Log the error
-  
-      res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-        message: "Internal Server Error",
-        error: error.message,
+
+    }
+    if (updatepublicUserCount >= 1 || imageUpdateVariable == 1) {
+
+      await transaction.commit();
+      console.log('data updated')
+      return res.status(statusCode.SUCCESS.code).json({
+        message: "Updated Successfully",
+      });
+    } else {
+      await transaction.rollback();
+      return res.status(statusCode.BAD_REQUEST.code).json({
+        message: "Data not Updated ",
       });
     }
- 
+
+
+
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    logger.error(`An error occurred: ${error.message}`); // Log the error
+
+    res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+
 }
 
 
@@ -838,9 +849,9 @@ let signUp = async (req, res) => {
     // let updatedOn = new Date();
 
     //check if address details present correctly
-    let addressDetails = [ 'building', 'area', 'landmark', 'pincode', 'townCity', 'state' ];
+    let addressDetails = ['building', 'area', 'landmark', 'pincode', 'townCity', 'state'];
     if (address != null || typeof address != 'undefined') {
-      for(let key of Object.keys(address)) {
+      for (let key of Object.keys(address)) {
         if (!addressDetails.includes(key) || (key != 'landmark' && !address[key])) {
           return res.status(statusCode.BAD_REQUEST.code).json({
             message: `please provide all required data to set up the profile`
@@ -848,7 +859,7 @@ let signUp = async (req, res) => {
         }
       }
     }
-    
+
     if (!name && !phoneNumber && !longitude && !latitude && !userType) {
       console.log(2)
       await transaction.rollback();
@@ -895,7 +906,7 @@ let signUp = async (req, res) => {
       {
         transaction
       });
-      console.log(8)
+    console.log(8)
 
     if (!newUser) {
       console.log(9)
