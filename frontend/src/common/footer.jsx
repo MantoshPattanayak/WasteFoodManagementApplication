@@ -1,9 +1,11 @@
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./footer.css"
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
+import { faEnvelope, faLocationDot, faPhone } from "@fortawesome/free-solid-svg-icons";
 
 const Footer = () => {
     const user = useSelector((state) => state.auth.user);
@@ -33,25 +35,28 @@ const Footer = () => {
                 <div className="footer-section">
                     <h4>Navigation</h4>
                     <ul>
-                        <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>
-                        <li><a href="tel:+6623991145">+66 2399 1145</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="https://facebook.com">Facebook</a></li>
-                        <li><a href="https://linkedin.com">LinkedIn</a></li>
+                        <li><Link to={'/DonorDetails'}>Donate now</Link></li>
+                        <li><Link to={'/AvailableFood'}>Explore Donations</Link></li>
+                        <li><Link to={'/About'}>About</Link></li>
+                        <li><Link to={'#'}>Contact us</Link></li>
                     </ul>
                 </div>
                 {/* 2nd */}
                 <div className="footer-section">
                     <h4>TALK TO US</h4>
                     <ul>
-                        <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>
-                        <li><a href="tel:+6623991145">+66 2399 1145</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="https://facebook.com">Facebook</a></li>
-                        <li><a href="https://linkedin.com">LinkedIn</a></li>
+                        <li>
+                            {/* <FontAwesomeIcon icon={faEnvelope} /> */}
+                            <b>Email:</b><a href=" soul@soulunileaders.com"> soul@soulunileaders.com</a></li>
+                        <li>
+                            {/* <FontAwesomeIcon icon={faPhone} /> */}
+                            <b>Phone:</b><a href=" +91 7077769335"> +91 7077769335</a></li>
+                        <li>
+                            {/* <FontAwesomeIcon icon={faLocationDot} /> */}
+                            <p><b>Address:</b> E/42/D, Infocity Avenue, Chandaka Industrial Estate, Bhubaneswar, Odisha, India - 751024</p></li>
                     </ul>
                 </div>
-                <div className="footer-section">
+                {/* <div className="footer-section">
                     <h4>TALK TO US</h4>
                     <ul>
                         <li><a href="mailto:support@ercom.com">support@ercom.com</a></li>
@@ -70,7 +75,7 @@ const Footer = () => {
                         <li><a href="https://facebook.com">Facebook</a></li>
                         <li><a href="https://linkedin.com">LinkedIn</a></li>
                     </ul>
-                </div>
+                </div> */}
 
             </div>
             <span className="copy_right">

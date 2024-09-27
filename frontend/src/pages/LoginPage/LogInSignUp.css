@@ -158,6 +158,6 @@
     margin-top: 50px;
   }
   .logInSignUpContainer {
-    height: 100%;
+    height: 100vh;
   }
 }
