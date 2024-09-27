@@ -169,8 +169,14 @@ function Registration() {
       try {
         let res = await axiosInstance.post(api.SIGNUP.url, modifiedData);
         console.log("response of sign up API", res.data);
-        tokenService.setUser(res.data?.user);
-        navigate("/DonorLandingPage");
+        toast.success("Profile created successfully. Kindly login.", {
+          autoClose: 1500,
+          onClose: () => {
+            setTimeout(() => {
+              navigate("/Login");
+            }, 500);
+          }
+        });
       } catch (error) {
         console.error("error of sign up api", error);
       }
@@ -194,6 +200,7 @@ function Registration() {
 
   return (
     <div className="registrationContainer">
+      <ToastContainer />
       <div className="formSection">
         <div className="info">
           <div className="leftInfo">Input your information</div>

@@ -14,6 +14,7 @@ import instance from "../../../env";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../common/footer";
+import axios from "axios";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -30,11 +31,13 @@ const AvailableFood = () => {
     const [userPosition, setUserPosition] = useState({
         latitude: '', longitude: ''
     })
+    const [pincode, setPincode] = useState('');
+    // const [townCity, setTownCity] = useState('');
     const recentRef = useRef();
     const itemTypeRef = useRef();
 
     // API to fetch list of available food donations
-    async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user) {
+    async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq) {
         try {
             let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url, {
                 page_size: recordsCount,
@@ -47,7 +50,17 @@ const AvailableFood = () => {
                 givenReq
             });
             console.log("Response of fetchAvailableFood API", res.data.foodDonationData);
-            setFoodDonationList(res.data.foodDonationData);
+            if(pincode && pincode.length == 6) {
+                let donationList = res.data.foodDonationData;
+                donationList = donationList.filter((data) => {
+                    return JSON.stringify(data.address).toLowerCase().includes(Array.from(townCityList)[0].toLowerCase())
+                });
+                console.log("donation list filtered by pincode", donationList);
+                setFoodDonationList(donationList);
+            }
+            else {
+                setFoodDonationList(res.data.foodDonationData);
+            }
         }
         catch (error) {
             console.error('Error while fetching available food', error);
@@ -69,69 +82,69 @@ const AvailableFood = () => {
         }
     }
 
-    function getUserGeoLocation() {
-        console.log("getUserGeoLocation");
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setUserPosition({ latitude, longitude });
-                    return;
-                },
-                (error) => {
-                    console.log("error", error);
-                    let response;
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            console.error("User denied the request for Geolocation.");
-                            response = {
-                                success: 0,
-                                error:
-                                    "Location access denied. Please enable location services to use this feature.",
-                            };
-                            // alert('Location access denied. Please enable location services to use this feature.');
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            console.error("Location information is unavailable.");
-                            response = {
-                                success: 0,
-                                error:
-                                    "Location information is currently unavailable. Please try again later.",
-                            };
-                            // alert('Location information is currently unavailable. Please try again later.');
-                            break;
-                        case error.TIMEOUT:
-                            console.error("The request to get user location timed out.");
-                            response = {
-                                success: 0,
-                                error:
-                                    "Request to access location timed out. Please try again.",
-                            };
-                            // alert('Request to access location timed out. Please try again.');
-                            break;
-                        default:
-                            console.error("An unknown error occurred.");
-                            response = {
-                                success: 0,
-                                error:
-                                    "An unknown error occurred while accessing your location.",
-                            };
-                        // alert('An unknown error occurred while accessing your location.');
-                    }
-                    alert(response.error);
-                    return;
-                }
-            );
-        } else {
-            console.error("Geolocation is not supported by this browser");
-            let response = {
-                success: 0,
-                error: "Geolocation is not supported by this browser",
-            };
-            toast.error(response.error);
-        }
-        return;
-    }
+    // function getUserGeoLocation() {
+    //     console.log("getUserGeoLocation");
+    //     if (navigator.geolocation) {
+    //         navigator.geolocation.getCurrentPosition(
+    //             (position) => {
+    //                 const { latitude, longitude } = position.coords;
+    //                 setUserPosition({ latitude, longitude });
+    //                 return;
+    //             },
+    //             (error) => {
+    //                 console.log("error", error);
+    //                 let response;
+    //                 switch (error.code) {
+    //                     case error.PERMISSION_DENIED:
+    //                         console.error("User denied the request for Geolocation.");
+    //                         response = {
+    //                             success: 0,
+    //                             error:
+    //                                 "Location access denied. Please enable location services to use this feature.",
+    //                         };
+    //                         // alert('Location access denied. Please enable location services to use this feature.');
+    //                         break;
+    //                     case error.POSITION_UNAVAILABLE:
+    //                         console.error("Location information is unavailable.");
+    //                         response = {
+    //                             success: 0,
+    //                             error:
+    //                                 "Location information is currently unavailable. Please try again later.",
+    //                         };
+    //                         // alert('Location information is currently unavailable. Please try again later.');
+    //                         break;
+    //                     case error.TIMEOUT:
+    //                         console.error("The request to get user location timed out.");
+    //                         response = {
+    //                             success: 0,
+    //                             error:
+    //                                 "Request to access location timed out. Please try again.",
+    //                         };
+    //                         // alert('Request to access location timed out. Please try again.');
+    //                         break;
+    //                     default:
+    //                         console.error("An unknown error occurred.");
+    //                         response = {
+    //                             success: 0,
+    //                             error:
+    //                                 "An unknown error occurred while accessing your location.",
+    //                         };
+    //                     // alert('An unknown error occurred while accessing your location.');
+    //                 }
+    //                 alert(response.error);
+    //                 return;
+    //             }
+    //         );
+    //     } else {
+    //         console.error("Geolocation is not supported by this browser");
+    //         let response = {
+    //             success: 0,
+    //             error: "Geolocation is not supported by this browser",
+    //         };
+    //         toast.error(response.error);
+    //     }
+    //     return;
+    // }
 
     function debounce(fn) {
         let timeoutId;
@@ -139,6 +152,31 @@ const AvailableFood = () => {
             timeoutId = setTimeout(() => fn(...args), 1000);
         }
     }
+
+    // async function fetchPincodeDetails(pincode) {
+    //     try {
+    //         console.log("pincode", pincode);
+    //         if (pincode && pincode.length == 6) {
+    //             let response = await axios.get(api.SEARCH_PLACE_BY_PINCODE.url + `${pincode}`);
+    //             console.log("Response from pincode suggestion", response.data);
+    //             let townCityList = new Set(response.data[0].PostOffice.map((data) => { return data.Division || data.District }));
+    //             console.log("townCity", Array.from(townCityList)[0]);
+    //             // setGivenReq(Array.from(townCityList)[0]);
+    //             let donationList = Object.assign(foodDonationList);
+    //             donationList = donationList.filter((data) => {
+    //                 return JSON.stringify(data.address).toLowerCase().includes(Array.from(townCityList)[0].toLowerCase())
+    //             });
+    //             console.log("donation list filtered by pincode", donationList);
+    //             setFoodDonationList(donationList);
+    //         }
+    //         else {
+    //             console.error("pincode less than 6.");
+    //         }
+    //     }
+    //     catch (error) {
+    //         console.error("Error at fetchPincodeDetails API", error);
+    //     }
+    // }
 
     let debouncedFetchAvailableFood = useCallback(debounce(fetchAvailableFood), []);
 
@@ -170,9 +208,9 @@ const AvailableFood = () => {
     }, []);
 
     useEffect(() => {
-        console.log({ timeLimit, foodTypeChoice });
-        debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition);
-    }, [timeLimit, foodTypeChoice, userPosition, debouncedFetchAvailableFood]);
+        console.log({ timeLimit, foodTypeChoice, givenReq });
+        debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition, givenReq);
+    }, [timeLimit, foodTypeChoice, userPosition, givenReq]);
 
     return (
         <div className='Mian_conatiner_doner_his'>
@@ -189,7 +227,7 @@ const AvailableFood = () => {
                                 setShowRecentOptions(prevState => !prevState);
                                 setShowItemTypeOptions(false);
                             }}
-                      
+
                         >
                             <FontAwesomeIcon icon={faCalendar} /> Recent
                         </button>
@@ -220,7 +258,10 @@ const AvailableFood = () => {
                                 </div>
                             )
                         }
-                        <button className="button-4" role="button" onClick={getUserGeoLocation}><FontAwesomeIcon icon={faMapMarkerAlt} /> Find nearby</button>
+                        {/* <button className="button-4" role="button" onClick={getUserGeoLocation}>
+                            <FontAwesomeIcon icon={faMapMarkerAlt} /> Find nearby
+                        </button> */}
+                        <input name="givenReq" value={givenReq} className="pincode_text" type="text" maxLength={6} placeholder="Search by pincode" onChange={ (e) => {setGivenReq(e.target.value.replace(/\D/g, '')); }} />
                     </div>
                     <div className="Child_conatiner_doner_his1">
                         <button className={`button-4 ${foodTypeChoice ? 'filter-selected' : ''}`} role="button"
@@ -259,7 +300,7 @@ const AvailableFood = () => {
                                 </div>
                             )
                         }
-                        <button className="button-4" role="button" onClick={(e) => { setTimeLimit(""); setFoodTypeChoice("");}}>
+                        <button className="button-4" role="button" onClick={(e) => { setTimeLimit(""); setFoodTypeChoice(""); setGivenReq(""); }}>
                             <FontAwesomeIcon icon={faTimes} /> Reset filters
                         </button>
                     </div>
