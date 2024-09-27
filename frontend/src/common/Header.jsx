@@ -32,7 +32,7 @@ const Header = () => {
       console.log("response of log out API", res);
       dispatch(logout());
       toast.success("Logged out successfully!", {
-        autoClose: 1000,
+        autoClose: 1500,
         onClose: () => {
           setTimeout(() => {
             navigate('/');
