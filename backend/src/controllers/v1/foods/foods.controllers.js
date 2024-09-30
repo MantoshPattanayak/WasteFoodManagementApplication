@@ -10,8 +10,9 @@ let foodCategories = db.foodCategories
 const logger = require('../../../logger/index.logger')
 
 let addFoodDonationRequest = async (req, res) => {
-    let transaction = await sequelize.transaction();
+    let transaction;
     try {
+        transaction =  await sequelize.transaction();
         let { foodItemsArray, receiverId, address } = req.body;
         let userId = req.user?.userId || 1;
         let subDir = '/foodDonation';
@@ -99,7 +100,8 @@ let addFoodDonationRequest = async (req, res) => {
             }
             // insert into food image file
             let errors = [];
-            let imageFileUpload = imageUpload(foodItem.imageData, "foodDonation", subDir, insertionData, userId, errors, serialNumber, transaction);
+            // console.log('transaction inside food donation', transaction)
+            let imageFileUpload = await imageUpload(foodItem.imageData, "foodDonation", subDir, insertionData, userId, errors, serialNumber, transaction);
             console.log("errors", errors);
             if (errors.length > 0) {
               await transaction.rollback();
