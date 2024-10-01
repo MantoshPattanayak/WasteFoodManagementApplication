@@ -430,12 +430,14 @@ let viewFoodPickupById = async (req, res) => {
 let donationHistory = async (req, res) => {
     try {
         let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq } = req.body;
+        let statusId = 1
         let limit = page_size || 50;
         let page = page_number || 1;
         let offset = (page - 1) * limit;
         let isDate = validateAndConvertDate(givenReq).isValid;
         console.log("isDate", isDate);
         let { userId } = req.user || req.body;
+        let entityType = "foodDonation"
         console.log("userId", userId);
         if (givenReq) {
             if (isDate) {
@@ -460,6 +462,7 @@ let donationHistory = async (req, res) => {
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
                 ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType, fl."createdBy", fl."foodListingId", fl."statusId"
+                 , fli."foodListingItemId"
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare.users u on u."userId" = fl."createdBy"
@@ -470,6 +473,27 @@ let donationHistory = async (req, res) => {
             replacements: [userId],
             type: Sequelize.QueryTypes.SELECT,
         });
+        if(fetchFoodDonationListData.length > 0){
+            for(let i of fetchFoodDonationListData){
+                let findTheImageUrl = await sequelize.query(` select f."fileId", fl."url"  from soulshare."foodListingItems" u 
+                    inner join soulshare.files f on u."foodListingItemId" = f."entityId" 
+                    inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  where f."entityType" = ? and u."statusId" = ?  and u."foodListingItemId" = ? and fl."statusId" = ? and f."statusId" = ?`,
+                      {
+                        type: QueryTypes.SELECT,
+                        replacements: [entityType, statusId, i.foodListingItemId, statusId, statusId]
+                      })
+                    console.log('findtheimageurl', findTheImageUrl)
+                    if (findTheImageUrl.length > 0) {
+                      i.url = findTheImageUrl[0].url;
+                      i.fileId = findTheImageUrl[0].fileId;
+                    }
+                    else{
+                        i.url = null;
+                        i.fileId = null;
+                    }
+            }
+           
+        }
         console.log("fetchFoodDonationListData", fetchFoodDonationListData);
         let foodDonationData = fetchFoodDonationListData;
         /*
