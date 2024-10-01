@@ -35,7 +35,7 @@ const Header = () => {
         autoClose: 1500,
         onClose: () => {
           setTimeout(() => {
-            navigate('/');
+            navigate("/");
             sessionStorage.clear();
             localStorage.clear();
           }, 500);
