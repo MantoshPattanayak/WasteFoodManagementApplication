@@ -78,7 +78,7 @@ let imageUpload = async (imageData, entityType, subDir, insertionData, userId, e
         uploadFilePath = `${imageFileDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
 
         fs.writeFileSync(uploadFilePath, uploadImageFileBuffer);
-        uploadFilePath2 = `/${subDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
+        uploadFilePath2 = `${subDir}/${insertionData.id}${insertionData.name}_${serialNumber || null}.${fileExtension}`;
         console.log(uploadFilePath2, "upload file path2 43")
         let fileName = `${insertionData.id}${insertionData.name}.${fileExtension}`;
         // let fileType = mime ? mime.split("/")[0] : 'unknown';
