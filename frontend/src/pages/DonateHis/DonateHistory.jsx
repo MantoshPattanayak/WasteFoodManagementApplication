@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import tokenService from "../../services/token.service";
 import { useNavigate } from "react-router-dom";
 
+
 const DonateHistory = () => {
     const [recordsCount, setRecordsCount] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
@@ -343,7 +344,7 @@ const DonateHistory = () => {
                 <div className="cards-grid">
                     {foodDonationList?.map((food, index) => (
                         <div key={index} className="card">
-                            <img src={image_his_list} alt="Food Item" className="card-image" />
+                            <img  src={`${instance().baseURL}/static${food.url}`} alt="Food Item" className="card-image" />
                             <div className="card-content">
                                 <p className="item_name">{food.foodName}</p>
                                 <p className="exp_date">Address - {food.address ? food.address.area + ', ' + food.address.townCity + ', ' + food.address.state : "NA"}</p>
