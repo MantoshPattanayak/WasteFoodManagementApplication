@@ -57,10 +57,12 @@
 
 .inputFieldButton {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   width: 63vw;
   margin-top: 100px;
+  gap: 50px;
 }
 
 .phoneNumberSection,
