@@ -35,7 +35,7 @@ const Header = () => {
         autoClose: 1500,
         onClose: () => {
           setTimeout(() => {
-            navigate('/');
+            navigate("/");
             sessionStorage.clear();
             localStorage.clear();
           }, 500);
@@ -59,7 +59,7 @@ const Header = () => {
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/DonorDetails') : navigate('/') }}/>
+          <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/') : navigate('/') }}/>
         </div>
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
           <ul className="header__nav-list">
