@@ -49,10 +49,13 @@ app.use((req,res,next)=>{
 
 
 //-------------------------------------------define router-----------------------------------------------------//
-app.use("/auth", authRoutes);
-app.use("/food", foodsRoutes);
-app.use("/notification", notificationRoutes);
-app.use("/activity", activityRoutes);
+// app.use("/share",(req,res,next)=>{
+//   next()
+// })
+app.use("/sshare/auth", authRoutes);
+app.use("/sshare/food", foodsRoutes);
+app.use("/sshare/notification", notificationRoutes);
+app.use("/sshare/activity", activityRoutes);
 //-------------------------------------------------------------------------------------------------------------//
 
 app.use((err, req, res, next)=>{
