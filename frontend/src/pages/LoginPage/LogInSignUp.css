@@ -98,6 +98,17 @@
   color: #898889;
   font-weight: 600;
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  /* height: 15vh; */
+  gap: 10px;
+}
+.socialLogo{
+  height: auto;
+    width: 34px;
+}
+.googleSignUp div{
+  font-size: 20px;
 }
 
 .googleSignUp,
