@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/soul_share.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faRightFromBracket, faSearch, faUser } from "@fortawesome/free-solid-svg-icons";
 import { logout } from "../store/reducers/authReducer";
 import axiosInstance from "../services/axios";
 import api from "../utils/apiList";
@@ -16,6 +16,8 @@ const Header = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [givenReq, setGivenReq] = useState('');
+  const [itemCategory, setItemCategory] = useState('');
 
   useEffect(() => {
     // console.log("user", user);
@@ -55,12 +57,41 @@ const Header = () => {
     }
   }
 
+  function handleSearch(e) {
+    let searchLink = '/AvailableFood';
+    if ((givenReq && itemCategory) || givenReq) {
+      givenReq ? searchLink += `?s=${givenReq}` : '';
+      itemCategory ? searchLink += `?category=${itemCategory}` : '';
+      givenReq && itemCategory ? searchLink += `?s=${givenReq}&category=${itemCategory}` : '';
+      navigate(searchLink);
+    }
+    else {
+      return;
+    }
+  }
+
   return (
     <header className="header">
       <div className="header__container">
         <div className="header__logo">
-          <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/') : navigate('/') }}/>
+          <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/') : navigate('/') }} />
         </div>
+        {
+          !user &&
+          <div className="header_search_bar">
+            <div className="search_categories">
+              <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
+                <option value={""}>Select categories</option>
+                <option value={"Food"}>Food</option>
+                <option value={"Clothes"}>Clothes</option>
+              </select>
+            </div>
+            <div className="search_field">
+              <input type="text" value={givenReq} onChange={(e) => setGivenReq(e.target.value)} />
+              <button onClick={handleSearch}><FontAwesomeIcon icon={faSearch} /></button>
+            </div>
+          </div>
+        }
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
           <ul className="header__nav-list">
             <li className="header__nav-item">
@@ -68,12 +99,12 @@ const Header = () => {
             </li>
             <li className="header__nav-item">
               {/* {!user && ( */}
-                <Link
-                  to={user ? "/DonorDetails" : ""}
-                  onClick={handleNavigation}
-                >
-                  Donate Now
-                </Link>
+              <Link
+                to={user ? "/DonorDetails" : ""}
+                onClick={handleNavigation}
+              >
+                Donate Now
+              </Link>
               {/* )} */}
             </li>
 
@@ -108,7 +139,7 @@ const Header = () => {
                 </li>
               }
             </li>
-            
+
           </ul>
         </nav>
         <div className="header__hamburger" onClick={toggleSidebar}>
@@ -125,10 +156,26 @@ const Header = () => {
             onClick={toggleSidebar}
           ></span>
         </div>
+        {
+          !user &&
+          <div className="header_search_bar_mobile">
+            <div className="search_categories">
+              <select>
+                <option value={""}>Select categories</option>
+                <option value={"Food"}>Food</option>
+                <option value={"Clothes"}>Clothes</option>
+              </select>
+            </div>
+            <div className="search_field">
+              <input type="text" value={givenReq} onChange={(e) => setGivenReq(e.target.value)} />
+              <button onClick={handleSearch}><FontAwesomeIcon icon={faSearch} /></button>
+            </div>
+          </div>
+        }
       </div>
       <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <button className="sidebar__close" onClick={toggleSidebar}>
-          <FontAwesomeIcon icon={faClose} size="sm"/>
+          <FontAwesomeIcon icon={faClose} size="sm" />
         </button>
         <ul className="sidebar__list">
           <li className="sidebar__item">
@@ -136,9 +183,9 @@ const Header = () => {
           </li>
           <li className="sidebar__item">
             {/* {!user && ( */}
-              <Link to={user ? "/DonorDetails" : ""} onClick={handleNavigation}>
-                Donate Now
-              </Link>
+            <Link to={user ? "/DonorDetails" : ""} onClick={handleNavigation}>
+              Donate Now
+            </Link>
             {/* )} */}
           </li>
 
