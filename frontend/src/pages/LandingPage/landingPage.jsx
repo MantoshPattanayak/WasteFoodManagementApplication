@@ -78,11 +78,11 @@ const LandingPage = () => {
         ), url(${images[currentIndex]})`,
             }}>
                 <span className="image_text">
-                    <h1>Imagine a world <br>
-                    </br>without HUNGER</h1>
-                    <p>Eliminate hunger by donating food, funds, or resources to local food banks and charities.
-                        Your contributions  help provide meals to those in need, creating a stronger,
-                        healthier community.</p>
+                    <h1>Donate What You Can, <br>
+                    </br>Help Where It Counts</h1>
+                    <p>
+                        Your unused items have the power to make a difference. Every contribution counts, bringing communities together and making a lasting impact.
+                    </p>
                     <span className="Button_on_image">
                         <button className="button-19" role="button" onClick={(e) => handleNavigation(e)}>Donate Now</button>
                         <button className="button-9" role="button" onClick={() => navigate('/AvailableFood')}>Explore donations</button>
@@ -118,11 +118,7 @@ const LandingPage = () => {
                 <div className="what_to_do_text">
                     <h1>What We Do ?</h1>
                     <p>
-                        We have built a compassionate community where individuals come together to donate food, and
-                        volunteers actively participate in rescuing and distributing it to those in need. Our mission is to
-                        ensure that no one goes without a proper meal by delivering food directly to charities and people
-                        who cannot afford even one daily meal. Together, we're committed to fighting hunger
-                        and nourishing those who need it most.
+                    We have created a compassionate community where individuals unite to donate various essential items, and dedicated volunteers actively work to collect and distribute these donations to those in need. Our mission is to ensure that no one is deprived of basic necessities by delivering resources directly to charities and individuals who struggle to access them. Together, we are committed to making a difference and uplifting those who require support the most.
                     </p>
                 </div>
                 <div className="what_to_do_explain">
