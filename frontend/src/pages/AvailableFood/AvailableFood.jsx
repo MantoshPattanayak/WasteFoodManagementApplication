@@ -1,10 +1,16 @@
-import "./AvailableFood.css"
+import "./AvailableFood.css";
 import Header from "../../common/Header";
-import image_his_list from "../../assets/food_donation_home.jpeg"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBagShopping, faCalendar, faCheck, faMapLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import image_his_list from "../../assets/food_donation_home.jpeg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faBagShopping,
+    faCalendar,
+    faCheck,
+    faMapLocationDot,
+    faPhone,
+} from "@fortawesome/free-solid-svg-icons";
+import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
@@ -15,6 +21,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../common/footer";
 import axios from "axios";
+// import slider
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -50,7 +57,7 @@ const AvailableFood = () => {
                 givenReq
             });
             console.log("Response of fetchAvailableFood API", res.data.foodDonationData);
-            if(pincode && pincode.length == 6) {
+            if (pincode && pincode.length == 6) {
                 let donationList = res.data.foodDonationData;
                 donationList = donationList.filter((data) => {
                     return JSON.stringify(data.address).toLowerCase().includes(Array.from(townCityList)[0].toLowerCase())
@@ -211,111 +218,45 @@ const AvailableFood = () => {
         console.log({ timeLimit, foodTypeChoice, givenReq });
         debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition, givenReq);
     }, [timeLimit, foodTypeChoice, userPosition, givenReq]);
-
     return (
-        <div className='Mian_conatiner_doner_his'>
-            <Header />
-            <ToastContainer />
-            <div className="child_conatiner_donor_details">
-                <span className='text_his'>
-                    <h1 className="Avil_text">Available Donations</h1>
-                </span>
-                <div className="parent-container">
-                    <div className="Child_conatiner_doner_his1">
-                        <button className={`button-4 ${timeLimit ? 'filter-selected' : ''}`} role="button"
-                            onClick={() => {
-                                setShowRecentOptions(prevState => !prevState);
-                                setShowItemTypeOptions(false);
-                            }}
+        <div className="main_container">
+            <Header /> {/* Your header component */}
 
-                        >
-                            <FontAwesomeIcon icon={faCalendar} /> Recent
-                        </button>
-                        {
-                            showRecentOptions && (
-                                <div ref={recentRef} className="dropdown-options-1">
-                                    <ul>
-                                        {
-                                            filterOptions.timeRange?.map((time, index) => {
-                                                if (timeLimit == time.time) {
-                                                    return (
-                                                        <li key={index} onClick={(e) => setTimeLimit(time.time)} className="selected">
-                                                            <FontAwesomeIcon icon={faCheck} /> &nbsp;
-                                                            {time.time}
-                                                        </li>
-                                                    )
-                                                }
-                                                else {
-                                                    return (
-                                                        <li key={index} onClick={(e) => setTimeLimit(time.time)}>
-                                                            {time.time}
-                                                        </li>
-                                                    )
-                                                }
-                                            })
-                                        }
-                                    </ul>
-                                </div>
-                            )
-                        }
-                        {/* <button className="button-4" role="button" onClick={getUserGeoLocation}>
-                            <FontAwesomeIcon icon={faMapMarkerAlt} /> Find nearby
-                        </button> */}
-                        <input name="givenReq" value={givenReq} className="pincode_text" type="text" maxLength={6} placeholder="Search by pincode" onChange={ (e) => {setGivenReq(e.target.value.replace(/\D/g, '')); }} />
-                    </div>
-                    <div className="Child_conatiner_doner_his1">
-                        <button className={`button-4 ${foodTypeChoice ? 'filter-selected' : ''}`} role="button"
-                            onClick={() => {
-                                setShowItemTypeOptions(prevState => !prevState);
-                                setShowRecentOptions(false);
-                            }}
-                        // ref={itemTypeRef}
-                        >
-                            <FontAwesomeIcon icon={faBagShopping} /> Item type
-                        </button>
-                        {
-                            showItemTypeOptions && (
-                                <div ref={itemTypeRef} className="dropdown-options-2">
-                                    <ul>
-                                        {
-                                            filterOptions.foodType?.map((foodType, index) => {
-                                                if (foodTypeChoice == foodType.foodCategoryId) {
-                                                    return (
-                                                        <li key={index} onClick={(e) => setFoodTypeChoice(foodType.foodCategoryId)} className="selected">
-                                                            <FontAwesomeIcon icon={faCheck} /> &nbsp;
-                                                            {foodType.foodCategoryName}
-                                                        </li>
-                                                    )
-                                                }
-                                                else {
-                                                    return (
-                                                        <li key={index} onClick={(e) => setFoodTypeChoice(foodType.foodCategoryId)}>
-                                                            {foodType.foodCategoryName}
-                                                        </li>
-                                                    )
-                                                }
-                                            })
-                                        }
-                                    </ul>
-                                </div>
-                            )
-                        }
-                        <button className="button-4" role="button" onClick={(e) => { setTimeLimit(""); setFoodTypeChoice(""); setGivenReq(""); }}>
-                            <FontAwesomeIcon icon={faTimes} /> Reset filters
-                        </button>
-                    </div>
+            <div className="content_wrapper">
+                {/* Left Sidebar Filter */}
+                <div className="filter_sidebar">
+
+                    <ul className="filter_menu">
+                        <li>Home</li>
+                        <li>Services</li>
+                        <li>Food</li>
+                        <li>Clothes</li>
+                        <li>Distance</li>
+                        <li>Rent House</li>
+                        <li>Mobiles & Tablets</li>
+                        <li>Sports & Hobbies</li>
+                        <li>Kids & Toys</li>
+                        <li>Education</li>
+                        <li>Commercial Real Estate</li>
+                        <li>Pets & Pet Care</li>
+                        <li>Home & Lifestyle</li>
+                        
+                    </ul>
                 </div>
 
-                <div className="cards-grid">
+                {/* Right Side Grid Content */}
+                <div className="grid_content_area">
+                    {/* Multiple Grid Items */}
                     {foodDonationList?.map((food, index) => (
-                        <div key={index} className="card">
-                            <img src={image_his_list} alt="Food Item" className="card-image" />
-                            <div className="card-content">
-                                <p className="item_name">{food.foodName}</p>
-                                <p className="exp_date">Address - {food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
-                                <p className="exp_date">Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
+                        <div className="item_grid" key={index}>
+                            {/* Image placeholder */}
+                            <img className="item_image" src={`${instance().baseURL}/static${food.url}`} ></img>
+                            <div className="item_content">
+                                <h2 className="item_title">{food.foodName}</h2>
+                                <p>{food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
+                                <p>Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
                                 <p className="exp_date">
-                                    Contact - <FontAwesomeIcon icon={faPhone} /> &nbsp;
+                                    <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                     <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
                                 </p>
                                 {/* <p
@@ -334,8 +275,8 @@ const AvailableFood = () => {
                     ))}
                 </div>
             </div>
-            <Footer />
         </div>
-    )
-}
+
+    );
+};
 export default AvailableFood;
