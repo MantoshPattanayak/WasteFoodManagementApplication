@@ -7,13 +7,14 @@ const fetchMasterData = require("../../../utils/fetchMasterData");
 const { formatDateToDDMMYYYYHHMMSSMS, calculateDistance, validateAndConvertDate } = require("../../../utils/commonFunctions");
 const timeZone = process.env.TIMEZONE;
 let foodCategories = db.foodCategories
+let categoryTable = db.categories
 const logger = require('../../../logger/index.logger')
 
 let addFoodDonationRequest = async (req, res) => {
     let transaction;
     try {
         transaction =  await sequelize.transaction();
-        let { foodItemsArray, receiverId, address } = req.body;
+        let { foodItemsArray, receiverId, address, categoryId } = req.body;
         let userId = req.user?.userId || 1;
         let subDir = '/foodDonation';
         //check if any detail is missing
@@ -49,6 +50,7 @@ let addFoodDonationRequest = async (req, res) => {
                     message: "Please provide all data."
                 });
             }
+            
         }
 
         //check if address details present correctly
@@ -74,6 +76,7 @@ let addFoodDonationRequest = async (req, res) => {
             statusId: 1,
             address: foodItemsArray[0].address,
             receiverId: receiverId || null,
+            categoryId: categoryId,
             createdBy: userId
         }, { transaction, returning: true });
         console.log("insertFoodListing", insertFoodListing);
@@ -165,7 +168,7 @@ let initialData = async (req, res) => {
 
 let viewFoodDonationList = async (req, res) => {
     try {
-        let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq } = req.body;
+        let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq, categoryId } = req.body;
         let limit = page_size || 50;
         let page = page_number || 1;
         let offset = (page - 1) * limit;
@@ -194,7 +197,7 @@ let viewFoodDonationList = async (req, res) => {
                 u.latitude, u.longitude, fli."foodName", TO_CHAR(
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as expirationDate, u."phoneNumber", fl."address", fli."foodCategory" as foodType
+                ) as expirationDate, u."phoneNumber", fl."categoryId", fl."address", fli."foodCategory" as foodType
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
@@ -269,7 +272,12 @@ let viewFoodDonationList = async (req, res) => {
                 return food.foodtype == foodType;
             })
         }
-
+        if (categoryId) {     // filter records according to food type selected
+            console.log("foodType filter");
+            foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
+                return food.categoryId == categoryId;
+            })
+        }
         if (givenReq) {
             foodDonationData = foodDonationData.filter((food, index, foodDonationData) => {
                 console.log("givenReq", givenReq, isDate);
@@ -584,6 +592,33 @@ let donationHistory = async (req, res) => {
         })
     }
 }
+let initialDataForCategories = async (req, res)=>{
+    try {
+        console.log('1')
+        let statusId = 1;
+        let findAllCategories = await categoryTable.findAll({
+            where:{
+                statusId: statusId
+            }
+        })
+        
+        if(findAllCategories.length > 0){
+            return res.status(statusCode.SUCCESS.code).json({
+                message:"Category Data",
+                categoryData: findAllCategories
+            })
+        }
+        else{
+            return res.status(statusCode.BAD_REQUEST.code).json({
+                message:"No Data"
+            })
+        }
+    } catch (err) {
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message:err.message
+        })
+    }
+}
 
 module.exports = {
     addFoodDonationRequest,
@@ -594,5 +629,6 @@ module.exports = {
     closeFoodDonation,
     viewFoodPickupList,
     viewFoodPickupById,
-    donationHistory
+    donationHistory,
+    initialDataForCategories
 }

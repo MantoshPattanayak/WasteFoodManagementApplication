@@ -57,7 +57,7 @@ db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
 db1.categories = require('./categories.models')(sequelize, DataTypes)
 console.log('all details 2')
 
-db1.foodCategories.sync({
+db1.foodListings.sync({
   alter: false,
 });
 

@@ -13,7 +13,7 @@ export default defineConfig({
   preview: {
     port: 5173
   },
-  base: '/sshare',
+  base: '/',
   build: {
     minify: 'terser',
     terserOptions: {

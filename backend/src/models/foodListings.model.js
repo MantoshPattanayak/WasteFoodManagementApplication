@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
             //     key: "userId"
             // }
         },
+        categoryId:{
+            type:DataTypes.INTEGER
+        },
         address: {
             type: DataTypes.JSON,
         },
