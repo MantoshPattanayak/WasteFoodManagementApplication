@@ -23,7 +23,7 @@ function App() {
       <Provider store={persistor}>
         <GoogleOAuthProvider clientId={clientId}>
           <AuthProvider>
-            <Router basename='/sshare'>
+            <Router basename='/'>
               <div>
                 <Suspense fallback={<div>Loading...</div>}>
                   <Routes>
