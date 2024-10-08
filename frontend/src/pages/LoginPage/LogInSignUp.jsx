@@ -62,7 +62,9 @@ function LogInSignUp() {
       sessionStorage.setItem('check', encryptData(res.data.otp));
       setOtpSent(true);
       setTimer(60);
-      toast.success(res.data.message);
+      toast.success(res.data.message, {
+        autoClose: 700
+      });
     }
     catch (error) {
       console.error('otp generation failed!', error);
@@ -85,18 +87,18 @@ function LogInSignUp() {
         tokenService.setUser(res.data.user);
         toast.dismiss();
         toast.success("Login successful!", {
-          autoClose: 1000,
+          autoClose: 500,
           onClose: () => {
             setTimeout(() => {
               navigate('/DonorDetails');
-            }, 500);
+            }, 100);
           }
         })
       }
       else {
         toast.dismiss();
         toast.success("Please create your profile.", {
-          autoClose: 1000,
+          autoClose: 800,
           onClose: () => {
             setTimeout(() => {
               navigate('/Registration');
@@ -181,8 +183,7 @@ function LogInSignUp() {
         <div className="headers_P">
           <h1>Login / SignUp to Your Account</h1>
           <p>
-            A simple act of sharing food can have a profound impact on someone's
-            life.
+            A simple act of donating can have a profound impact on someone's life.
           </p>
           <div className="logInType">
             <h3>Login/SignUp as a </h3>

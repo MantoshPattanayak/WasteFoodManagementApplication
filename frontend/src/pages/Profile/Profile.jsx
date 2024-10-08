@@ -21,6 +21,7 @@ const Profile = () => {
     email: "",
     fileId: "",
     userImage: null,
+    userType: ''
   });
   const [errors, setErrors] = useState({});
   const [isPhotoUpdated, setIsPhotoUpdated] = useState(false);
@@ -62,7 +63,7 @@ const Profile = () => {
     try {
       const { data } = await axiosInstance.get(api.VIEW_PROFILE.url);
       console.log("Response of profile data: ", data);
-      const { name, phoneNumber, email, url, fileId } = data.public_user[0];
+      const { name, phoneNumber, email, url, fileId, roleName } = data.public_user[0];
       const [firstName, lastName] = name.split(" ");
       setFormData({
         firstName,
@@ -70,9 +71,10 @@ const Profile = () => {
         phoneNumber,
         email,
         fileId,
-        userImage: url ? `${instance().baseURL}${url}` : null,
+        userImage: url ? `${instance().baseURL}/static/${url}` : null,
+        userType: roleName
       });
-      setProfileImg(url ? `${instance().baseURL}${url}` : null);
+      setProfileImg(url ? `${instance().baseURL}/static/${url}` : null);
     } catch (error) {
       toast.error("Error fetching profile data.");
     }
@@ -246,6 +248,19 @@ const Profile = () => {
                     id="email"
                     name="email"
                     value={formData.email}
+                    onChange={handleInputChange}
+                    readOnly
+                  />
+                </div>
+              </div>
+              <div className="profile-input-row">
+                <div className="profile-input-group">
+                  <label htmlFor="email">Access type</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.userType}
                     onChange={handleInputChange}
                     readOnly
                   />
