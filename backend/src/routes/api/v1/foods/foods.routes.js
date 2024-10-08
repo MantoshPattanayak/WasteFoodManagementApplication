@@ -23,7 +23,6 @@ router.get("/viewFoodPickupById/:id", authenticateToken, foodsController.viewFoo
 router.post('/donationHistory', authenticateToken, foodsController.donationHistory);
 
 
-router.get('/initialDataForCategories', authenticateToken, foodsController.initialDataForCategories);
 
 
 
