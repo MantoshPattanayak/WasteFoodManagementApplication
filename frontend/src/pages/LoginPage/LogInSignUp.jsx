@@ -14,6 +14,7 @@ import { login } from "../../store/reducers/authReducer";
 import tokenService from "../../services/token.service";
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from "axios";
+import googleIcon from "../../assets/google_icon.png";
 
 function LogInSignUp() {
   const [userType, setUserType] = useState("Donor");
@@ -253,7 +254,10 @@ function LogInSignUp() {
 
             {/* Social Media Sign Up */}
             <div className="socialSignUp">
-              <button className="googleSignUp" onClick={() => loginWithGoogle()}>Sign up with Google</button>
+              <button className="googleSignUp" onClick={() => loginWithGoogle()}>
+                <img className="socialLogo" src={googleIcon} alt="" />
+                <div>Sign up with Google</div>
+              </button>
               {/* <button className="facebookSignUp">Sign up with Facebook</button> */}
             </div>
           </div>
