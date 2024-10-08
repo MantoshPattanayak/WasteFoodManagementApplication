@@ -133,6 +133,8 @@ let addFoodDonationRequest = async (req, res) => {
 let initialData = async (req, res) => {
     try {
         console.log('232')
+        let statusId = 1;
+
         let timeRange = [{ time: 'Today' }, { time: 'Yesterday' }];
         let distanceRange = [
             { 0: 1 },
@@ -152,9 +154,19 @@ let initialData = async (req, res) => {
             }
         });
 
+        
+        let findAllCategories = await categoryTable.findAll({
+            where:{
+                statusId: statusId
+            }
+        })
+        
+     
+
         return res.status(statusCode.SUCCESS.code).json({
             message: 'food donation list filter dropdown data',
-            timeRange, distanceRange, foodType, unitsData
+            timeRange, distanceRange, foodType, unitsData,
+            findAllCategories
         })
     }
     catch (error) {
@@ -592,33 +604,7 @@ let donationHistory = async (req, res) => {
         })
     }
 }
-let initialDataForCategories = async (req, res)=>{
-    try {
-        console.log('1')
-        let statusId = 1;
-        let findAllCategories = await categoryTable.findAll({
-            where:{
-                statusId: statusId
-            }
-        })
-        
-        if(findAllCategories.length > 0){
-            return res.status(statusCode.SUCCESS.code).json({
-                message:"Category Data",
-                categoryData: findAllCategories
-            })
-        }
-        else{
-            return res.status(statusCode.BAD_REQUEST.code).json({
-                message:"No Data"
-            })
-        }
-    } catch (err) {
-        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
-            message:err.message
-        })
-    }
-}
+
 
 module.exports = {
     addFoodDonationRequest,
@@ -630,5 +616,5 @@ module.exports = {
     viewFoodPickupList,
     viewFoodPickupById,
     donationHistory,
-    initialDataForCategories
+    
 }
