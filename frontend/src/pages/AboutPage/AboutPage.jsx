@@ -30,9 +30,11 @@ const About = () => {
             <ToastContainer />
             <div className="child_about_main_container">
                 <div className="content_text">
-                    <h1 className="text_about">Imagine a world <br></br>
-                        <h2 className="text_about1"> without  Hunger</h2> </h1>
-                    <p><p>Food wastement contributes to hunger worldwide.Reducing food waste not only  <br></br>helps alleviate hunger but also conserves resources and reduces environmental impact.</p>
+                    <h1 className="text_about">From Your Hands to <br /> Those in Need
+                        {/* <h2 className="text_about1"> without  Hunger</h2>  */}
+                    </h1>
+                    <p>
+                        Whether it's donating essential items, clothing, or food, your support directly reaches those in need.
                     </p>
                     <span className="button_donate_volunteer">
                         <button className="donated_button" onClick={handleNavigation}>Donate Now</button>
@@ -51,9 +53,18 @@ const About = () => {
                     </div>
                     <div className="mission_content">
                         <h1>Mission</h1>
-                        <p>At SOUL Share, we believe in creating a sustainable world where no food goes to waste, and everyone has access to nutritious meals. Our mission is simple: to bridge the gap between food surplus and food scarcity by connecting donors who have excess food with volunteers who are eager to help distribute it to those in need.</p>
+                        <p>
+                            Our initiative is built on the belief that everyone has something valuable to give, and through collective generosity, 
+                            we can make a lasting impact. By bridging communities, we connect those who are able to donate with individuals in need, 
+                            fostering unity and compassion. Our mission is to fight inequality by ensuring that essential items reach the most vulnerable, 
+                            helping to reduce disparity. With every donation, we create lasting change and a brighter future for those facing hardships. 
+                            Your contributions provide not only material support but also hope and dignity to those who need it most.
+                        </p>
                         <h1>Belief</h1>
-                        <p>Our core belief is that food is far too valuable to waste, and that technology can transform the way we use food.</p>
+                        <p>
+                            Our belief is rooted in the idea that when we lift others, we elevate society as a whole. 
+                            By providing essential goods to those in need, we strive to create a world where generosity bridges gaps and restores hope.
+                        </p>
                     </div>
 
                 </div>

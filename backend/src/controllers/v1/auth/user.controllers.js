@@ -548,7 +548,10 @@ const viewUserProfile = async (req, res) => {
 
 
 
-    let showpublic_user = await sequelize.query(`select u.* from soulshare.users u where u."statusId" = ? and u."userType" =? and u."userId" = ?
+    let showpublic_user = await sequelize.query(`
+      select u.*, r."roleName"  from soulshare.users u
+      inner join soulshare.roles r on r."roleId" = u."userType"
+      where u."statusId" = ? and u."userType" =? and u."userId" = ?
    `, {
       type: QueryTypes.SELECT,
       replacements: [statusId, publicRole.userType, userId]
@@ -556,7 +559,8 @@ const viewUserProfile = async (req, res) => {
 
     let findTheImageUrl = await sequelize.query(` select f."fileId", fl."url"  from soulshare.users u 
     inner join soulshare.files f on u."userId" = f."entityId" 
-    inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  where f."entityType" = ? and u."statusId" = ? and u."userType" =? and u."userId" = ? and fl."statusId" = ? and f."statusId" = ?`,
+    inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  
+    where f."entityType" = ? and u."statusId" = ? and u."userType" =? and u."userId" = ? and fl."statusId" = ? and f."statusId" = ?`,
       {
         type: QueryTypes.SELECT,
         replacements: [entityType, statusId, publicRole.userType, userId, statusId, statusId]

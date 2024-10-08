@@ -33,7 +33,7 @@ app.use(
     limit: "20mb"
   })
 );
-app.use('/static', express.static(uploadDir));
+app.use('/sshare/static', express.static(uploadDir));
 
 app.use(cookieParser());
 // app.use(requestLogger);
