@@ -25,7 +25,7 @@ const Footer = () => {
         <footer>
             {/* <ToastContainer /> */}
             <span className="text_overcom">
-                <h1>Overcome Ignorance and <br></br>Fight for Equality</h1>
+                <h1>Transforming Generosity into Action</h1>
             </span>
             <div className="footer_button_vol_do">
                 <button className="volunteer_button">VOLUNTEER</button>
