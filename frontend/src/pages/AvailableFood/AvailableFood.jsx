@@ -22,6 +22,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../common/footer";
 import axios from "axios";
 // import slider
+import ShimmerUi from "../../common/ShimmerUi";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -35,6 +36,7 @@ const AvailableFood = () => {
     const user = useSelector((state) => state.auth.user);
     const [showRecentOptions, setShowRecentOptions] = useState(false);
     const [showItemTypeOptions, setShowItemTypeOptions] = useState(false);
+    const [isLoding, setisLoding]=useState(false)
     const [userPosition, setUserPosition] = useState({
         latitude: '', longitude: ''
     })
@@ -46,6 +48,7 @@ const AvailableFood = () => {
     // API to fetch list of available food donations
     async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq) {
         try {
+            setisLoding(true)
             let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url, {
                 page_size: recordsCount,
                 page_number: pageNumber,
@@ -64,13 +67,17 @@ const AvailableFood = () => {
                 });
                 console.log("donation list filtered by pincode", donationList);
                 setFoodDonationList(donationList);
+             
             }
             else {
                 setFoodDonationList(res.data.foodDonationData);
             }
+            setisLoding(false);
         }
+        
         catch (error) {
             console.error('Error while fetching available food', error);
+            setisLoding(false)
         }
     }
     // API to fetch filter dropdown data
@@ -245,34 +252,40 @@ const AvailableFood = () => {
                 </div>
 
                 {/* Right Side Grid Content */}
+
                 <div className="grid_content_area">
-                    {/* Multiple Grid Items */}
-                    {foodDonationList?.map((food, index) => (
-                        <div className="item_grid" key={index}>
-                            {/* Image placeholder */}
-                            <img className="item_image" src={`${instance().baseURL}/static${food.url}`} ></img>
-                            <div className="item_content">
-                                <h2 className="item_title">{food.foodName}</h2>
-                                <p>{food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
-                                <p>Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
-                                <p className="exp_date">
-                                    <FontAwesomeIcon icon={faPhone} /> &nbsp;
-                                    <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
-                                </p>
-                                {/* <p
-                                    className="map-location"
-                                    onClick={() =>
-                                        window.open(
-                                            instance().GOOGLE_MAPS_BASE_URL +
-                                            `&destination=${food.latitude},${food.longitude}`
-                                        )
-                                    }
-                                >
-                                    <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
-                                </p> */}
+                    {isLoding ? (
+                        <ShimmerUi/>
+                    ):(
+                        foodDonationList?.map((food, index) => (
+                            <div className="item_grid" key={index}>
+                                {/* Image placeholder */}
+                                <img className="item_image" src={`${instance().baseURL}/static${food.url}`} ></img>
+                                <div className="item_content">
+                                    <h2 className="item_title">{food.foodName}</h2>
+                                    <p>{food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
+                                    <p>Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
+                                    <p className="exp_date">
+                                        <FontAwesomeIcon icon={faPhone} /> &nbsp;
+                                        <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
+                                    </p>
+                                    {/* <p
+                                        className="map-location"
+                                        onClick={() =>
+                                            window.open(
+                                                instance().GOOGLE_MAPS_BASE_URL +
+                                                `&destination=${food.latitude},${food.longitude}`
+                                            )
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
+                                    </p> */}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
+                    {/* Multiple Grid Items */}
+                   
                 </div>
             </div>
         </div>
