@@ -180,7 +180,7 @@ let initialData = async (req, res) => {
 
 let viewFoodDonationList = async (req, res) => {
     try {
-        let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq, categoryId } = req.body;
+        let { page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq, categoryId, randomKey } = req.body;
         let limit = page_size || 50;
         let page = page_number || 1;
         let offset = (page - 1) * limit;

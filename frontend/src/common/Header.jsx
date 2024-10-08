@@ -10,6 +10,7 @@ import axiosInstance from "../services/axios";
 import api from "../utils/apiList";
 import { toast } from "react-toastify";
 import profile_image from "../assets/profile.png";
+import axios from "axios";
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -18,10 +19,6 @@ const Header = () => {
   const navigate = useNavigate();
   const [givenReq, setGivenReq] = useState('');
   const [itemCategory, setItemCategory] = useState('');
-
-  useEffect(() => {
-    // console.log("user", user);
-  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -69,6 +66,55 @@ const Header = () => {
       return;
     }
   }
+
+  useEffect(() => {
+    // Request notification permission
+    if ('Notification' in window && navigator.serviceWorker) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+        } else {
+          console.log('Notification permission denied.');
+        }
+      });
+    }
+
+    // Fetch notifications on mount and set interval for updates
+    fetchNotifications();
+    const intervalId = setInterval(() => {
+      console.log("Fetching notifications again...");
+      fetchNotifications();
+    }, 10000);  // Fetch every 10 seconds
+
+    // Cleanup interval on unmount
+    return () => {
+      console.log("Clearing notification interval...");
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const fetchNotifications = async () => {
+    console.log('Fetching notifications...');
+    try {
+      const response = await axios.post(`http://localhost:8000/sshare/food/viewFoodDonationList?t=${Date.now()}`, {
+          randomKey: Math.random()
+      });
+      const data = response.data;
+      console.log('Fetched Notifications:', data);
+
+      // Ensure data.message exists before sending it
+      if (data.message && navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'NOTIFICATIONS',
+          data: data.message, // Assuming data.message is a string or similar
+        });
+      } else {
+        console.error('Service worker controller is not available or data.message is undefined.');
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
 
   return (
     <header className="header">
