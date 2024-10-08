@@ -13,7 +13,7 @@ const logger = require('../../../logger/index.logger')
 let addFoodDonationRequest = async (req, res) => {
     let transaction;
     try {
-        transaction =  await sequelize.transaction();
+        transaction = await sequelize.transaction();
         let { foodItemsArray, receiverId, address, categoryId } = req.body;
         let userId = req.user?.userId || 1;
         let subDir = '/foodDonation';
@@ -50,7 +50,7 @@ let addFoodDonationRequest = async (req, res) => {
                     message: "Please provide all data."
                 });
             }
-            
+
         }
 
         //check if address details present correctly
@@ -107,7 +107,7 @@ let addFoodDonationRequest = async (req, res) => {
             let imageFileUpload = await imageUpload(foodItem.imageData, "foodDonation", subDir, insertionData, userId, errors, serialNumber, transaction);
             console.log("errors", errors);
             if (errors.length > 0) {
-              await transaction.rollback();
+                await transaction.rollback();
                 return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
                     message: "Error while submitting data."
                 });
@@ -121,7 +121,7 @@ let addFoodDonationRequest = async (req, res) => {
         })
     }
     catch (error) {
-       await transaction.rollback();
+        await transaction.rollback();
         logger.error(`An error occurred: ${error.message}`); // Log the error
 
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
@@ -154,14 +154,14 @@ let initialData = async (req, res) => {
             }
         });
 
-        
+
         let findAllCategories = await categoryTable.findAll({
-            where:{
+            where: {
                 statusId: statusId
             }
         })
-        
-     
+
+
 
         return res.status(statusCode.SUCCESS.code).json({
             message: 'food donation list filter dropdown data',
@@ -186,7 +186,9 @@ let viewFoodDonationList = async (req, res) => {
         let offset = (page - 1) * limit;
         let currDate = new Date();
         let isDate = validateAndConvertDate(givenReq).isValid;
-        console.log("isDate", isDate);
+        let entityType = "foodDonation"
+        let statusId = 1;
+        // console.log("isDate", isDate);
         if (givenReq) {
             if (isDate) {
                 givenReq = validateAndConvertDate(givenReq).data;
@@ -198,7 +200,7 @@ let viewFoodDonationList = async (req, res) => {
         else {
             givenReq = null;
         }
-        console.log({ page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq });
+        // console.log({ page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq });
         let foodDonationListQuery = `
             select
                 u."userId", u."name", u."phoneNumber",
@@ -209,7 +211,7 @@ let viewFoodDonationList = async (req, res) => {
                 u.latitude, u.longitude, fli."foodName", TO_CHAR(
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as expirationDate, u."phoneNumber", fl."categoryId", fl."address", fli."foodCategory" as foodType
+                ) as expirationDate, u."phoneNumber", fl."categoryId", fl."address", fli."foodCategory" as foodType, fli."foodListingItemId"
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
@@ -217,13 +219,13 @@ let viewFoodDonationList = async (req, res) => {
             where sm."statusCode" = 'ACTIVE' and fli."expirationDate" >= :currDate
             order by fli."expirationDate" desc
         `;
-        console.log('foodDonationListQuery', foodDonationListQuery)
+        // console.log('foodDonationListQuery', foodDonationListQuery)
 
         let fetchFoodDonationListData = await sequelize.query(foodDonationListQuery, {
             type: Sequelize.QueryTypes.SELECT,
-            replacements:{currDate:currDate}
+            replacements: { currDate: currDate }
         });
-        console.log("fetchFoodDonationListData", fetchFoodDonationListData);
+        // console.log("fetchFoodDonationListData", fetchFoodDonationListData);
         let foodDonationData = fetchFoodDonationListData;
         if (timeLimit) {   //if timelimit provided, then filter records accordingly
             console.log("timeLimit filter");
@@ -305,6 +307,31 @@ let viewFoodDonationList = async (req, res) => {
             })
         }
         console.log("foodDonationData", foodDonationData);
+        if (foodDonationData.length > 0) {
+            for (let i of foodDonationData) {
+                console.log(i);
+                let findTheImageUrl = await sequelize.query(`
+                    select f."fileId", fl."url"  from soulshare."foodListingItems" u 
+                    inner join soulshare.files f on u."foodListingItemId" = f."entityId" 
+                    inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  
+                    where f."entityType" = ? and u."statusId" = ?  and u."foodListingItemId" = ? 
+                    and fl."statusId" = ? and f."statusId" = ?`,
+                    {
+                        type: QueryTypes.SELECT,
+                        replacements: [entityType, statusId, i.foodListingItemId, statusId, statusId]
+                    })
+                console.log('findtheimageurl', findTheImageUrl)
+                if (findTheImageUrl.length > 0) {
+                    i.url = findTheImageUrl[0].url;
+                    i.fileId = findTheImageUrl[0].fileId;
+                }
+                else {
+                    i.url = null;
+                    i.fileId = null;
+                }
+            }
+
+        }
         foodDonationData = foodDonationData.slice(offset, offset + limit);
         res.status(statusCode.SUCCESS.code).json({
             message: "view food donation list",
@@ -493,26 +520,26 @@ let donationHistory = async (req, res) => {
             replacements: [userId],
             type: Sequelize.QueryTypes.SELECT,
         });
-        if(fetchFoodDonationListData.length > 0){
-            for(let i of fetchFoodDonationListData){
+        if (fetchFoodDonationListData.length > 0) {
+            for (let i of fetchFoodDonationListData) {
                 let findTheImageUrl = await sequelize.query(` select f."fileId", fl."url"  from soulshare."foodListingItems" u 
                     inner join soulshare.files f on u."foodListingItemId" = f."entityId" 
                     inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  where f."entityType" = ? and u."statusId" = ?  and u."foodListingItemId" = ? and fl."statusId" = ? and f."statusId" = ?`,
-                      {
+                    {
                         type: QueryTypes.SELECT,
                         replacements: [entityType, statusId, i.foodListingItemId, statusId, statusId]
-                      })
-                    console.log('findtheimageurl', findTheImageUrl)
-                    if (findTheImageUrl.length > 0) {
-                      i.url = findTheImageUrl[0].url;
-                      i.fileId = findTheImageUrl[0].fileId;
-                    }
-                    else{
-                        i.url = null;
-                        i.fileId = null;
-                    }
+                    })
+                console.log('findtheimageurl', findTheImageUrl)
+                if (findTheImageUrl.length > 0) {
+                    i.url = findTheImageUrl[0].url;
+                    i.fileId = findTheImageUrl[0].fileId;
+                }
+                else {
+                    i.url = null;
+                    i.fileId = null;
+                }
             }
-           
+
         }
         console.log("fetchFoodDonationListData", fetchFoodDonationListData);
         let foodDonationData = fetchFoodDonationListData;
@@ -598,7 +625,7 @@ let donationHistory = async (req, res) => {
             foodDonationData
         });
     }
-    catch(error) {
+    catch (error) {
         return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
             message: error.message
         })
@@ -616,5 +643,5 @@ module.exports = {
     viewFoodPickupList,
     viewFoodPickupById,
     donationHistory,
-    
+
 }
