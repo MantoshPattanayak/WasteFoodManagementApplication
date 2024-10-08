@@ -9,6 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../common/footer";
 import { useNavigate } from "react-router-dom";
+import instance from "../../../env";
 
 const DonorDetails = () => {
     // Initialize state ---------
@@ -204,9 +205,7 @@ const DonorDetails = () => {
 
         if (!value.foodName) {
             err.foodName = "Please enter food name";
-        } else if (!checkSpecialChar.test(value.foodName)) {
-            err.foodName = "Please enter valid food name  (no special characters)"
-        }
+        } 
         if (!value.foodCategory) {
             err.foodCategory = "Please select a food category"
         }
