@@ -80,10 +80,10 @@ const Header = () => {
     }
 
     // Fetch notifications on mount and set interval for updates
-    fetchNotifications();
+    // fetchNotifications();
     const intervalId = setInterval(() => {
       console.log("Fetching notifications again...");
-      fetchNotifications();
+      // fetchNotifications();
     }, 60000);  // Fetch every 10 seconds
 
     // Cleanup interval on unmount
