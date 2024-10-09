@@ -178,7 +178,8 @@ const DonorDetails = () => {
                         unit: DonorData.unit,
                         expirationDate: DonorData.expirationDate,
                         imageData: DonorData.imageData,
-                        address: DonorData.address
+                        address: DonorData.address,
+                        categoryId: DonorData.categoryId
                     }
                 ]
             });
