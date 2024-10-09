@@ -24,6 +24,7 @@ import Footer from "../../common/footer";
 import axios from "axios";
 // import slider
 import ShimmerUi from "../../common/ShimmerUi";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -31,7 +32,6 @@ const AvailableFood = () => {
     const [timeLimit, setTimeLimit] = useState("");
     const [distanceRange, setDistanceRange] = useState("");
     const [foodTypeChoice, setFoodTypeChoice] = useState('');
-    const [givenReq, setGivenReq] = useState('');
     const [foodDonationList, setFoodDonationList] = useState([]);
     const [filterOptions, setFilterOptions] = useState({});
     const user = useSelector((state) => state.auth.user);
@@ -42,15 +42,20 @@ const AvailableFood = () => {
         latitude: '', longitude: ''
     })
     const [pincode, setPincode] = useState('');
-    const [category, setCategory] = useState("");
+    const location = useLocation();
+    let searchTerm = new URLSearchParams(location.search).get('s') || '';
+    let categoryId = new URLSearchParams(location.search).get('category') || '';
+    const [category, setCategory] = useState(categoryId);
+    const [givenReq, setGivenReq] = useState(searchTerm);
     // const [townCity, setTownCity] = useState('');
     const recentRef = useRef();
     const itemTypeRef = useRef();
+    const navigate = useNavigate();
 
     // API to fetch list of available food donations
     async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq, categoryId) {
         try {
-            setisLoding(true)
+            setisLoding(true);
             let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url, {
                 page_size: recordsCount,
                 page_number: pageNumber,
@@ -59,26 +64,62 @@ const AvailableFood = () => {
                 userLongitude: user?.longitude || 85.7380521,
                 distanceRange,
                 foodType: foodTypeChoice,
-                categoryId,
-                givenReq
+                categoryId: categoryId,
+                givenReq: givenReq
             });
-            console.log("Response of fetchAvailableFood API", res.data.foodDonationData);
-            if (pincode && pincode.length == 6) {
-                let donationList = res.data.foodDonationData;
-                donationList = donationList.filter((data) => {
-                    return JSON.stringify(data.address).toLowerCase().includes(Array.from(townCityList)[0].toLowerCase())
-                });
-                console.log("donation list filtered by pincode", donationList);
-                setFoodDonationList(donationList);
-
+            console.log("Response of fetchAvailableFood API", res.data.foodDonationData, new Date().toISOString());
+            // if (pincode && pincode.length == 6) {
+            //     let donationList = res.data.foodDonationData;
+            //     donationList = donationList.filter((data) => {
+            //         return JSON.stringify(data.address).toLowerCase().includes(Array.from(townCityList)[0].toLowerCase())
+            //     });
+            //     // console.log("donation list filtered by pincode", donationList);
+            //     setFoodDonationList(donationList); 
+            // }
+            // else {
+            //     setFoodDonationList(res.data.foodDonationData);
+            // }
+            if (res.data?.foodDonationData.length > 0) {
+                if (categoryId && givenReq) {
+                    setFoodDonationList(
+                        res.data.foodDonationData.filter((item) => {
+                            // console.log(item.foodName, item.address);
+                            return item.categoryId == categoryId &&
+                                (item?.foodName?.includes(givenReq) ||
+                                    JSON.stringify(item.address)?.includes(givenReq));
+                        })
+                    );
+                }
+                else if (categoryId) {
+                    setFoodDonationList(
+                        res.data.foodDonationData.filter((item) => {
+                            // console.log(item.foodName, item.address);
+                            return item.categoryId == categoryId;
+                        })
+                    );
+                }
+                else if (givenReq) {
+                    setFoodDonationList(
+                        res.data.foodDonationData.filter((item) => {
+                            // console.log(item.foodName, item.address);
+                            return item?.foodName?.includes(givenReq) ||
+                                JSON.stringify(item.address)?.includes(givenReq);
+                        })
+                    );
+                }
+                else {
+                    setFoodDonationList(res.data.foodDonationData);
+                }
             }
             else {
-                setFoodDonationList(res.data.foodDonationData);
+                setFoodDonationList([]);
             }
+
             setisLoding(false);
         }
 
         catch (error) {
+            setFoodDonationList([]);
             console.error('Error while fetching available food', error);
             setisLoding(false)
         }
@@ -87,7 +128,7 @@ const AvailableFood = () => {
     async function fetchFilterDropdown() {
         try {
             let res = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
-            console.log("Response of fetchFilterDropdown API", res.data);
+            // console.log("Response of fetchFilterDropdown API", res.data);
             setFilterOptions({
                 timeRange: res.data.timeRange,
                 distanceRange: res.data.distanceRange,
@@ -226,9 +267,10 @@ const AvailableFood = () => {
     }, []);
 
     useEffect(() => {
-        console.log({ timeLimit, foodTypeChoice, givenReq });
+        // console.log({ timeLimit, foodTypeChoice, givenReq });
         debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition, givenReq, category);
     }, [timeLimit, foodTypeChoice, userPosition, givenReq, category]);
+
     return (
         <div className="main_container">
             <Header /> {/* Your header component */}
@@ -237,19 +279,19 @@ const AvailableFood = () => {
                 {/* Left Sidebar Filter */}
                 <div className="filter_sidebar">
                     <ul className="filter_menu">
-                        <li onClick={(e) => setCategory("")}>Clear All &nbsp; &nbsp;<FontAwesomeIcon icon={faTrash} /></li>
+                        <li style={{display: "flex", justifyContent: "space-between", alignItems: "center"}} onClick={(e) => { setCategory(""); navigate("/AvailableFood"); navigate(0); }}>Clear All &nbsp; &nbsp;<FontAwesomeIcon icon={faTrash} /></li>
                         {
                             filterOptions?.category?.length > 0 && filterOptions?.category.map((item, index) => {
                                 if (category && category == item.categoryId) {
                                     return (
-                                        <li className="selected" onClick={(e) => setCategory(item.categoryId)}>
+                                        <li key={index} className="selected" onClick={(e) => setCategory(item.categoryId)}>
                                             {item.description}
                                         </li>
                                     )
                                 }
                                 else {
                                     return (
-                                        <li onClick={(e) => setCategory(item.categoryId)}>
+                                        <li key={index} onClick={(e) => setCategory(item.categoryId)}>
                                             {item.description}
                                         </li>
                                     )
@@ -296,7 +338,7 @@ const AvailableFood = () => {
 
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </div>
 
     );
