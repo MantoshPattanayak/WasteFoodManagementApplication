@@ -18,6 +18,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [givenReq, setGivenReq] = useState('');
+  const [categoryList, setCategoryList] = useState([]);
   const [itemCategory, setItemCategory] = useState('');
 
   const toggleSidebar = () => {
@@ -45,6 +46,17 @@ const Header = () => {
     }
   }
 
+  async function fetchCategoryList() {
+    try {
+      let response = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
+      console.log("fetchCategoryList", response.data);
+      setCategoryList(response.data.findAllCategories);
+    }
+    catch (error) {
+      console.log("Error at fetchCategoryList", error);
+    }
+  }
+
   function handleNavigation(e) {
     // console.log("handle navigation");
     if (user) {
@@ -56,18 +68,23 @@ const Header = () => {
 
   function handleSearch(e) {
     let searchLink = '/AvailableFood';
-    if ((givenReq && itemCategory) || givenReq) {
-      givenReq ? searchLink += `?s=${givenReq}` : '';
-      itemCategory ? searchLink += `?category=${itemCategory}` : '';
-      givenReq && itemCategory ? searchLink += `?s=${givenReq}&category=${itemCategory}` : '';
-      navigate(searchLink);
+    if (givenReq && !itemCategory) {
+      searchLink += `?s=${givenReq}`;
+    }
+    else if (itemCategory && !givenReq) {
+      searchLink += `?category=${itemCategory}`;
+    }
+    else if (givenReq && itemCategory) {
+      searchLink += `?s=${givenReq}&category=${itemCategory}`
     }
     else {
       return;
     }
+    navigate(searchLink);
   }
 
   useEffect(() => {
+    fetchCategoryList();
     // Request notification permission
     if ('Notification' in window && navigator.serviceWorker) {
       Notification.requestPermission().then((permission) => {
@@ -81,40 +98,40 @@ const Header = () => {
 
     // Fetch notifications on mount and set interval for updates
     // fetchNotifications();
-    const intervalId = setInterval(() => {
-      console.log("Fetching notifications again...");
-      // fetchNotifications();
-    }, 60000);  // Fetch every 10 seconds
+    // const intervalId = setInterval(() => {
+    //   console.log("Fetching notifications again...");
+    //   // fetchNotifications();
+    // }, 60000);  // Fetch every 10 seconds
 
     // Cleanup interval on unmount
     return () => {
       console.log("Clearing notification interval...");
-      clearInterval(intervalId);
+      // clearInterval(intervalId);
     };
   }, []);
 
-  const fetchNotifications = async () => {
-    console.log('Fetching notifications...');
-    try {
-      const response = await axios.post(api.VIEW_FOOD_DONATION_LIST.url + `?t=${Date.now()}`, {
-          randomKey: Math.random()
-      });
-      const data = response.data;
-      console.log('Fetched Notifications:', data);
+  // const fetchNotifications = async () => {
+  //   console.log('Fetching notifications...');
+  //   try {
+  //     const response = await axios.post(api.VIEW_FOOD_DONATION_LIST.url + `?t=${Date.now()}`, {
+  //       randomKey: Math.random()
+  //     });
+  //     const data = response.data;
+  //     console.log('Fetched Notifications:', data);
 
-      // Ensure data.message exists before sending it
-      if (data.message && navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'NOTIFICATIONS',
-          data: data.message, // Assuming data.message is a string or similar
-        });
-      } else {
-        console.error('Service worker controller is not available or data.message is undefined.');
-      }
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    }
-  };
+  //     // Ensure data.message exists before sending it
+  //     if (data.message && navigator.serviceWorker && navigator.serviceWorker.controller) {
+  //       navigator.serviceWorker.controller.postMessage({
+  //         type: 'NOTIFICATIONS',
+  //         data: data.message, // Assuming data.message is a string or similar
+  //       });
+  //     } else {
+  //       console.error('Service worker controller is not available or data.message is undefined.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching notifications:', error);
+  //   }
+  // };
 
   return (
     <header className="header">
@@ -123,13 +140,18 @@ const Header = () => {
           <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/') : navigate('/') }} />
         </div>
         {
-          !user &&
+          // !user &&
           <div className="header_search_bar">
             <div className="search_categories">
               <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
                 <option value={""}>Select categories</option>
-                <option value={"Food"}>Food</option>
-                <option value={"Clothes"}>Clothes</option>
+                {
+                  categoryList?.length > 0 && categoryList.map((item, index) => {
+                    return (
+                      <option key={index} value={item.categoryId}>{item.description}</option>
+                    )
+                  })
+                }
               </select>
             </div>
             <div className="search_field">
@@ -203,7 +225,7 @@ const Header = () => {
           ></span>
         </div>
         {
-          !user &&
+          // !user &&
           <div className="header_search_bar_mobile">
             <div className="search_categories">
               <select>
