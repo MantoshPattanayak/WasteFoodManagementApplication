@@ -84,7 +84,7 @@ const Header = () => {
     const intervalId = setInterval(() => {
       console.log("Fetching notifications again...");
       fetchNotifications();
-    }, 10000);  // Fetch every 10 seconds
+    }, 60000);  // Fetch every 10 seconds
 
     // Cleanup interval on unmount
     return () => {
@@ -96,7 +96,7 @@ const Header = () => {
   const fetchNotifications = async () => {
     console.log('Fetching notifications...');
     try {
-      const response = await axios.post(`http://localhost:8000/sshare/food/viewFoodDonationList?t=${Date.now()}`, {
+      const response = await axios.post(api.VIEW_FOOD_DONATION_LIST.url + `?t=${Date.now()}`, {
           randomKey: Math.random()
       });
       const data = response.data;
