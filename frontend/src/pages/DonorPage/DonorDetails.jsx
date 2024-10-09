@@ -31,8 +31,10 @@ const DonorDetails = () => {
             townCity: "",
             state: "",
             country: ""
-        }
+        },
+        categoryId: ""
     });
+    const [categoryList, setCategoryList] = useState([]);
     const navigate = useNavigate();
 
     // Function to handle input changes
@@ -45,6 +47,7 @@ const DonorDetails = () => {
         setshowError(prevState => ({
             ...prevState, [name]: ''
         }))
+        console.log("DonorData", DonorData);
     };
     // Function to handle address input changes
     const handleAddressChange = (e) => {
@@ -85,6 +88,7 @@ const DonorDetails = () => {
             let res = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
             setDonorType(res.data.foodType);
             setgetUnit(res.data.unitsData);
+            setCategoryList(res.data.findAllCategories);
             console.log("Response of initial data", res);
         } catch (err) {
             console.log("Error getting initial data GetDonorType", err);
@@ -149,7 +153,7 @@ const DonorDetails = () => {
         if (DonorData.address.pincode && DonorData.address.pincode.length == 6) {
             debouncedFetchPincodeDetails(DonorData.address.pincode)
         }
-    }, [DonorData.address.pincode, debouncedFetchPincodeDetails]);
+    }, [DonorData.address.pincode, debouncedFetchPincodeDetails, DonorData.categoryId]);
 
     useEffect(() => {
         GetDonorType();
@@ -253,7 +257,7 @@ const DonorDetails = () => {
                     <h1>Donation Details</h1>
                     <form className="form_conatiner_form" onSubmit={PostDonorData}>
                         <span className="input_text_conatiner">
-                            <label>Food Name</label>
+                            <label>Item Name</label>
                             <input
                                 type="text"
                                 name="foodName"
@@ -264,7 +268,24 @@ const DonorDetails = () => {
                             {showError.foodName && <span className="error_msg">{showError.foodName} </span>}
                         </span>
                         <span className="input_text_conatiner1">
-                            <label htmlFor="foodType">Food Type*</label>
+                            <label htmlFor="foodType">Category*</label>
+                            <select
+                                id="categoryId"
+                                name="categoryId"
+                                value={DonorData.categoryId}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select Item Category</option>
+                                {categoryList?.length > 0 && categoryList.map((item, index) => (
+                                    <option key={index} value={item.categoryId}>
+                                        {item.description}
+                                    </option>
+                                ))}
+                            </select>
+                            {showError.foodCategory && <span className="error_msg">{showError.foodCategory} </span>}
+                        </span>
+                        <span className="input_text_conatiner1">
+                            <label htmlFor="foodType">Sub Category*</label>
                             <select
                                 id="foodType"
                                 name="foodCategory"
@@ -272,17 +293,21 @@ const DonorDetails = () => {
                                 onChange={handleChange}
                             >
                                 <option value="">Select Food Category</option>
-                                {DonorType?.length > 0 && DonorType.map((item, index) => (
-                                    <option key={index} value={item.foodCategoryId}>
-                                        {item.foodCategoryName}
-                                    </option>
-                                ))}
+                                {DonorType?.length > 0 && DonorType.map((item, index) => {
+                                    if(parseInt(DonorData.categoryId) == parseInt(item.categoryId)) {
+                                        return (
+                                            <option key={index} value={item.foodCategoryId}>
+                                                {item.foodCategoryName}
+                                            </option>
+                                        );
+                                    } 
+                                })}
                             </select>
                             {showError.foodCategory && <span className="error_msg">{showError.foodCategory} </span>}
                         </span>
 
                         <span className="input_text_conatiner">
-                            <label>Food Quantity</label>
+                            <label>Select Quantity*</label>
                             <input
                                 type="text"
                                 name="quantity"
@@ -293,7 +318,7 @@ const DonorDetails = () => {
                             {showError.quantity && <span className="error_msg">{showError.quantity} </span>}
                         </span>
                         <span className="input_text_conatiner1">
-                            <label htmlFor="foodType">Select the Unit</label>
+                            <label htmlFor="foodType">Select Unit*</label>
                             <select
                                 id="foodType"
                                 name="unit"
@@ -310,7 +335,7 @@ const DonorDetails = () => {
                             {showError.unit && <span className="error_msg"> {showError.unit}</span>}
                         </span>
                         <span className="input_text_conatiner">
-                            <label>Food Expiry Date</label>
+                            <label>Expiry Date*</label>
                             <input
                                 type="date"
                                 name="expirationDate"
@@ -321,7 +346,7 @@ const DonorDetails = () => {
                             {showError.expirationDate && <span className="error_msg"> {showError.expirationDate}</span>}
                         </span>
                         <span className="input_text_conatiner">
-                            <label>Food Photo</label>
+                            <label>Item Photo</label>
                             <input type="file"
                                 onChange={handleImageChange}
                                 accept="image/*"

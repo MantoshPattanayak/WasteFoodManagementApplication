@@ -42,6 +42,12 @@
   background-color: #e0e0e0;
   color: rgb(5, 141, 169);
 }
+
+.filter_menu > .selected {
+  background-color: #e0e0e0;
+  color: rgb(5, 141, 169);
+}
+
 .filter_menu li:hover::before {
   content: ''; 
   position: absolute;
