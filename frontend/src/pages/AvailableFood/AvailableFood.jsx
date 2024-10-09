@@ -296,6 +296,7 @@ const AvailableFood = () => {
 
                 </div>
             </div>
+            <Footer/>
         </div>
 
     );
