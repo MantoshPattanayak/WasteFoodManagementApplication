@@ -326,8 +326,8 @@ let viewFoodDonationList = async (req, res) => {
                     })
                 console.log('findtheimageurl', findTheImageUrl)
                 if (findTheImageUrl.length > 0) {
-                    i.url = findTheImageUrl[0].url;
-                    i.fileId = findTheImageUrl[0].fileId;
+                    i.url = encodeURI(findTheImageUrl[0].url);
+                    i.fileId = encodeURI(findTheImageUrl[0].fileId);
                 }
                 else {
                     i.url = null;
@@ -397,8 +397,8 @@ let viewFoodDonationById = async (req, res) => {
                         })
                     console.log('findtheimageurl', findTheImageUrl)
                     if (findTheImageUrl.length > 0) {
-                        fetchFoodListingDetails[0].url = findTheImageUrl[0].url;
-                        fetchFoodListingDetails[0].fileId = findTheImageUrl[0].fileId;
+                        fetchFoodListingDetails[0].url = encodeURI(findTheImageUrl[0].url);
+                        fetchFoodListingDetails[0].fileId = encodeURI(findTheImageUrl[0].fileId);
                     }
                     else {
                         fetchFoodListingDetails[0].url = null;
