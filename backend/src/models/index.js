@@ -55,9 +55,11 @@ db1.authSessions = require('./authSessions.model')(sequelize, DataTypes)
 db1.device = require('./device.model')(sequelize, DataTypes)
 db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
 db1.categories = require('./categories.models')(sequelize, DataTypes)
+db1.contactDonor = require('./contactdonor.models')(sequelize, DataTypes)
+
 console.log('all details 2')
 
-db1.foodListings.sync({
+db1.contactDonor.sync({
   alter: false,
 });
 

@@ -22,6 +22,8 @@ router.get("/viewFoodPickupById/:id", authenticateToken, foodsController.viewFoo
 
 router.post('/donationHistory', authenticateToken, foodsController.donationHistory);
 
+router.post('/contactDonor', foodsController.contactDonor);
+
 
 
 

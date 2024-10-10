@@ -8,7 +8,10 @@ const { formatDateToDDMMYYYYHHMMSSMS, calculateDistance, validateAndConvertDate 
 const timeZone = process.env.TIMEZONE;
 let foodCategories = db.foodCategories
 let categoryTable = db.categories
+let contactDonorTable = db.contactDonor
 const logger = require('../../../logger/index.logger')
+const sendEmail = require('../../../utils/generateEmail')
+
 
 let addFoodDonationRequest = async (req, res) => {
     let transaction;
@@ -203,7 +206,7 @@ let viewFoodDonationList = async (req, res) => {
         // console.log({ page_size, page_number, timeLimit, userLatitude, userLongitude, distanceRange, foodType, givenReq });
         let foodDonationListQuery = `
             select
-                u."userId", u."name", u."phoneNumber",
+                u."userId", u."name", u."phoneNumber",u."email",
                 TO_CHAR(
                     fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
@@ -211,7 +214,8 @@ let viewFoodDonationList = async (req, res) => {
                 u.latitude, u.longitude, fli."foodName", TO_CHAR(
                     fli."expirationDate"  AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as expirationDate, u."phoneNumber", fl."categoryId", fl."address", fli."foodCategory" as foodType, fli."foodListingItemId"
+                ) as expirationDate, u."phoneNumber", fl."categoryId", fl."address", fli."foodCategory" as foodType, fli."foodListingItemId",
+                 fl."foodListingId"
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."statusMasters" sm on fl."statusId" = sm."statusId" and sm."parentStatusCode" = 'RECORD_STATUS'
@@ -356,7 +360,7 @@ let viewFoodDonationById = async (req, res) => {
                 CASE
                     when fli."expirationDate" is null then null
                     else TO_CHAR(fli."expirationDate"AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS')
-                    end as expirationDate, fli."statusId", sm.description, u."userId", u."name", u."phoneNumber",
+                    end as expirationDate, fli."statusId", sm.description, u."userId", u."name", u."phoneNumber", u."email",
                 TO_CHAR(
                     fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
@@ -632,6 +636,81 @@ let donationHistory = async (req, res) => {
     }
 }
 
+let contactDonor = async (req,res)=>{
+    let transaction;
+    try {
+        transaction = await sequelize.transaction();
+        let {name, mobileNo, userType, emailId} = req.body;
+        let statusId = 1;
+        if(!name || !mobileNo || !userType || !emailId){
+            return res.send(statusCode.BAD_REQUEST.code).json({
+                message:`Invalid Request`
+            })
+        }
+        let findTheDataIfExist = await contactDonorTable.findOne({
+            where:{
+                mobileNo:mobileNo,
+                userType:userType
+            },
+            transaction
+        })
+        if(!findTheDataIfExist){
+            let insertToContactTable = await contactDonorTable.create({
+              name:name,
+              userType:userType,
+              mobileNo:mobileNo,
+              createdOn:new Date(),
+              updatedOn: new Date(),
+              statusId:statusId
+            },
+        transaction)
+            if(!insertToContactTable){
+                await transaction.rollback();
+                return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+                    message:'Something went wrong'
+                })
+            }
+
+        }
+  
+  
+       let message = `
+                    <p>I hope this message finds you well!</p>
+                    <p>Below are the details of the consumer who has recently engaged with your business:</p>
+                    <h3>Contact Details:</h3>
+                    <p>Name: ${name}</p>
+                    <p>Mobile No: ${mobileNo}</p>
+                    `;
+  
+  
+        try {
+          await sendEmail({
+            email: `${emailId}`,
+            subject: "Consumer Details",
+            html: message
+          }
+          )
+          await transaction.commit();
+          return res
+            .status(statusCode.SUCCESS.code)
+            .json({ message: "Mail successfully sent to donor" });
+        }
+        catch (err) {
+            console.log('not working')
+            await transaction.rollback();
+            logger.error(`An error occurred: ${err.message}`); // Log the error
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: "Something went wrong" })
+        }
+      
+
+    } catch (err) {
+        if(transaction) await transaction.rollback();
+        logger.error(`An error occurred: ${err.message}`); // Log the error
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: err.message
+        })
+    }
+}
 
 module.exports = {
     addFoodDonationRequest,
@@ -643,5 +722,5 @@ module.exports = {
     viewFoodPickupList,
     viewFoodPickupById,
     donationHistory,
-
+    contactDonor
 }
