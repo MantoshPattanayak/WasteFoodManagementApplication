@@ -17,6 +17,8 @@ import Landing_image3 from "../../assets/Save_food_image_3.jpg"
 import { useSelector } from "react-redux"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
+import googlePlayStore from "../../assets/google-play.svg";
+import appleStore from "../../assets/apple.svg";
 
 const LandingPage = () => {
     const navigate = useNavigate()
@@ -50,7 +52,7 @@ const LandingPage = () => {
     }
     // Ads Auto slide / swap  image ------
 
-    const image_Ads = [ads_image, Landing_image2, ads_image,Landing_image2 ];
+    const image_Ads = [ads_image, Landing_image2, ads_image, Landing_image2];
     // handle Mouse Hovor
     // Function to pause the animation
     const handleMouseOver = () => {
@@ -118,7 +120,7 @@ const LandingPage = () => {
                 <div className="what_to_do_text">
                     <h1>What We Do ?</h1>
                     <p>
-                    We have created a compassionate community where individuals unite to donate various essential items, and dedicated volunteers actively work to collect and distribute these donations to those in need. Our mission is to ensure that no one is deprived of basic necessities by delivering resources directly to charities and individuals who struggle to access them. Together, we are committed to making a difference and uplifting those who require support the most.
+                        We have created a compassionate community where individuals unite to donate various essential items, and dedicated volunteers actively work to collect and distribute these donations to those in need. Our mission is to ensure that no one is deprived of basic necessities by delivering resources directly to charities and individuals who struggle to access them. Together, we are committed to making a difference and uplifting those who require support the most.
                     </p>
                 </div>
                 <div className="what_to_do_explain">
@@ -147,6 +149,18 @@ const LandingPage = () => {
                                 <h2 className="b_donor">Join    <FontAwesomeIcon icon={faArrowRight} /></h2>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div className="mobile-app-link">
+                    <div>DOWNLOAD THE APP</div>
+                    <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
+                        <a className="icon-app-link">
+                            <img src={googlePlayStore} />
+                        </a>
+                        <a className="icon-app-link">
+                            <img src={appleStore} />
+                        </a>
                     </div>
                 </div>
             </div>
