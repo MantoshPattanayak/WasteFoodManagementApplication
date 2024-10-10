@@ -51,7 +51,12 @@ const AvailableFood = () => {
     const recentRef = useRef();
     const itemTypeRef = useRef();
     const navigate = useNavigate();
-
+    const [showContactForm, setShowContactForm] = useState(false);
+    const [contactFormData, setContactFormData] = useState({
+        name: "",
+        mobile: "",
+        userType: "",
+    })
     // API to fetch list of available food donations
     async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq, categoryId) {
         try {
@@ -237,6 +242,15 @@ const AvailableFood = () => {
     //     }
     // }
 
+    async function contactDonor(e, id) {
+        try {
+            let res = await axiosInstance.post();
+        }
+        catch (error) {
+            console.error("Error at contactDonor", error);
+        }
+    }
+
     let debouncedFetchAvailableFood = useCallback(debounce(fetchAvailableFood), []);
 
     useEffect(() => {
@@ -319,6 +333,7 @@ const AvailableFood = () => {
                                         <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                         <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
                                     </p>
+                                    <p style={{display: 'flex', justifyContent: "flex-end"}}><button className="donation-contact-button" onClick={(e) => setShowContactForm(true)}>Contact</button></p>
                                     {/* <p
                                         className="map-location"
                                         onClick={() =>
@@ -335,8 +350,16 @@ const AvailableFood = () => {
                         ))
                     )}
                     {/* Multiple Grid Items */}
-
                 </div>
+                {
+                    showContactForm &&
+                    <form className="donation-contact-form">
+                        <div className="donation-contact-form-row">
+                            <label>Name*</label>
+                            <input type="text" value={contactFormData.name} placeholder="Enter your name"/>
+                        </div>
+                    </form>
+                }
             </div>
             <Footer />
         </div>
