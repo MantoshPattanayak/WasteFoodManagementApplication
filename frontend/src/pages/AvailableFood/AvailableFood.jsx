@@ -25,6 +25,8 @@ import axios from "axios";
 // import slider
 import ShimmerUi from "../../common/ShimmerUi";
 import { useLocation, useNavigate } from "react-router-dom";
+import { encryptData } from "../../utils/encryption";
+import { Link } from "react-router-dom";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -276,6 +278,16 @@ const AvailableFood = () => {
         debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition, givenReq, category);
     }, [timeLimit, foodTypeChoice, userPosition, givenReq, category]);
 
+
+  // here Function to encryptDataid (Pass the Id)----------------------------------------------
+  function encryptDataId(id) {
+    let res = encryptData(id);
+    return res;
+}
+
+
+// useNavigate
+
     return (
         <div className="main_container">
             <Header /> {/* Your header component */}
@@ -312,15 +324,21 @@ const AvailableFood = () => {
                     {isLoding ? (
                         <ShimmerUi />
                     ) : (
+                        
                         foodDonationList?.map((food, index) => (
-                            <div className="item_grid" key={index}>
+                         
+                              <div className="item_grid"   key={index}
+                              onClick={()=>navigate(`/AvailableFoodDetails?foodListingId=${encryptDataId(food.foodListingId)}`
+                             
+                              )}
+                              >
                                 {/* Image placeholder */}
                                 <img className="item_image" src={`${instance().baseURL}/static${food.url}`} ></img>
                                 <div className="item_content">
                                     <h2 className="item_title">{food.foodName}</h2>
-                                    <p>{food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
-                                    <p>Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
-                                    <p className="exp_date">
+                                    <p className="text">{food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
+                                    <p className="text">Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
+                                    {/* <p className="exp_date">
                                         <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                         <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
                                     </p>
@@ -335,8 +353,12 @@ const AvailableFood = () => {
                                     >
                                         <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
                                     </p> */}
+                                 
+                                
                                 </div>
-                            </div>
+                              </div>
+                          
+                          
                         ))
                     )}
                     {/* Multiple Grid Items */}

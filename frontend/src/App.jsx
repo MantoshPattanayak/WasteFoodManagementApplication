@@ -15,6 +15,7 @@ const About = React.lazy(() => import('./pages/AboutPage/AboutPage'));
 const Registration = React.lazy(() => import('./pages/RegistrationForm/Registration'))
 const Profile = withAuth(React.lazy(() => import('./pages/Profile/Profile')))
 const Fooddetails = React.lazy(() => import('./pages/fooddetails/fooddetails'))
+const AvailableFoodDetails=React.lazy(()=>import('./pages/AvailableFood/AvailableFoodDetails'))
 const clientId = '285807180215-an40t7r1rau490tt3f82knnnascdal3l.apps.googleusercontent.com';
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
                     <Route path="/Registration" element={<Registration />} />
                     <Route path="/Profile" element={<Profile />} />
                     <Route path="/Fooddetails" element={<Fooddetails />} />
+                    <Route path="/AvailableFoodDetails" element={<AvailableFoodDetails />} />
                   </Routes>
                 </Suspense>
               </div>
