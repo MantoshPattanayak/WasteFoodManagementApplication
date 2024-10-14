@@ -91,7 +91,6 @@ const Header = () => {
   function handleDisplayAppLink(e) {
     e.preventDefault();
     setDisplayAppLink(true);
-    appDisplayContainer.current.style.display = 'block'; // Show the popup
     return;
   }
 
