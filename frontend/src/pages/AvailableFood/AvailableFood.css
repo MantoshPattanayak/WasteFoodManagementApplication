@@ -99,6 +99,13 @@
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
+  color: black;
+
+}
+.text{
+  color: black;
+
+  
 }
 
 .item_description {
@@ -140,6 +147,7 @@
 
   .item_grid {
     padding: 10px; /* Reduce padding for mobile */
+   
   }
 
   .item_image {
