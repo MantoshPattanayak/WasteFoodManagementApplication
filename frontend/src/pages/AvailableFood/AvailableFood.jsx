@@ -51,7 +51,6 @@ const AvailableFood = () => {
     const recentRef = useRef();
     const itemTypeRef = useRef();
     const navigate = useNavigate();
-    const [showContactForm, setShowContactForm] = useState(false);
     const [contactFormData, setContactFormData] = useState({
         name: "",
         mobile: "",
@@ -70,7 +69,7 @@ const AvailableFood = () => {
                 distanceRange,
                 foodType: foodTypeChoice,
                 categoryId: categoryId,
-                givenReq: givenReq
+                // givenReq: givenReq
             });
             console.log("Response of fetchAvailableFood API", res.data.foodDonationData, new Date().toISOString());
             // if (pincode && pincode.length == 6) {
@@ -90,7 +89,7 @@ const AvailableFood = () => {
                         res.data.foodDonationData.filter((item) => {
                             // console.log(item.foodName, item.address);
                             return item.categoryId == categoryId &&
-                                (item?.foodName?.includes(givenReq) ||
+                                (item?.foodName?.toLowerCase().includes(givenReq.toLowerCase()) ||
                                     JSON.stringify(item.address)?.includes(givenReq));
                         })
                     );
@@ -242,14 +241,6 @@ const AvailableFood = () => {
     //     }
     // }
 
-    async function contactDonor(e, id) {
-        try {
-            let res = await axiosInstance.post();
-        }
-        catch (error) {
-            console.error("Error at contactDonor", error);
-        }
-    }
 
     let debouncedFetchAvailableFood = useCallback(debounce(fetchAvailableFood), []);
 
@@ -333,7 +324,6 @@ const AvailableFood = () => {
                                         <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                         <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
                                     </p>
-                                    <p style={{display: 'flex', justifyContent: "flex-end"}}><button className="donation-contact-button" onClick={(e) => setShowContactForm(true)}>Contact</button></p>
                                     {/* <p
                                         className="map-location"
                                         onClick={() =>
@@ -351,15 +341,6 @@ const AvailableFood = () => {
                     )}
                     {/* Multiple Grid Items */}
                 </div>
-                {
-                    showContactForm &&
-                    <form className="donation-contact-form">
-                        <div className="donation-contact-form-row">
-                            <label>Name*</label>
-                            <input type="text" value={contactFormData.name} placeholder="Enter your name"/>
-                        </div>
-                    </form>
-                }
             </div>
             <Footer />
         </div>

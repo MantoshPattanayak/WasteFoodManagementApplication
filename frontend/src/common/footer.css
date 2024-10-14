@@ -2,7 +2,8 @@ footer {
     background-color: #0A122A;
     color: white;
     font-size: 14px;
-    padding: 20px 10px; /* Adjust padding for more flexibility */
+    padding: 20px 10px;
+    /* Adjust padding for more flexibility */
 }
 
 .text_overcom {
@@ -23,7 +24,8 @@ footer {
     justify-content: center;
     gap: 20px;
     padding: 20px;
-    flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+    flex-wrap: wrap;
+    /* Allows buttons to wrap on smaller screens */
 }
 
 .volunteer_button,
@@ -60,13 +62,13 @@ footer {
     align-items: flex-start;
     gap: 220px;
     padding: 20px 0;
-    max-width: 1800px; 
-    margin: 0 auto; 
-    box-sizing: border-box; 
+    max-width: 1800px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .footer-section {
-    flex: 1 1 200px; 
+    flex: 1 1 200px;
     padding: 10px;
     min-width: 150px;
     text-align: center;
@@ -126,7 +128,8 @@ footer {
 
     .volunteer_button,
     .donate_button {
-        width: 45%; /* Adjust button size on smaller screens */
+        width: 45%;
+        /* Adjust button size on smaller screens */
         font-size: 14px;
     }
 
@@ -137,17 +140,20 @@ footer {
     }
 
     .footer-section {
-        flex: 1 1 100%; /* Each section takes full width on mobile */
-        text-align: center; /* Center text for better readability */
+        flex: 1 1 100%;
+        /* Each section takes full width on mobile */
+        text-align: center;
+        /* Center text for better readability */
     }
 
     .copy_right h1 {
         font-size: 12px;
     }
 }
+
 @media (max-width: 768px) {
     .content_footer {
-        padding: 10px; 
+        padding: 10px;
         max-width: 90%;
         gap: 20px;
     }
@@ -155,13 +161,14 @@ footer {
 
 @media (max-width: 480px) {
     .content_footer {
-        padding: 5px; 
-        max-width: 95%; 
+        padding: 5px;
+        max-width: 95%;
         gap: 20px;
     }
 }
 
 @media (max-width: 480px) {
+
     .volunteer_button,
     .donate_button {
         width: 80%;

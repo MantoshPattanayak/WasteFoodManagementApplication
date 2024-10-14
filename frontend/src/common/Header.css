@@ -63,6 +63,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  align-items: center;
 }
 
 .header__nav-item {
@@ -305,6 +306,75 @@
   display: none;
 }
 
+.overlay-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+  z-index: 999; /* Keep it below the popup */
+}
+
+.header-mobile-app-link {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  border-radius: 15px;
+  background-color: #e2eaf5;
+  width: max-content;
+  height: 50%;
+  padding: 10px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header-mobile-app-link > div:nth-child(1) {
+  height: 10%;
+  border-bottom: 1px solid gray;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header-mobile-app-link > div:nth-child(1) > svg {
+  cursor: pointer;
+}
+
+.header-mobile-app-link > div:nth-child(2) {
+  height: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-mobile-app-link > div:nth-child(3) {
+  height: 60%;
+}
+
+.app-icons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  height: 20%;
+  border-top: 1px solid gray;
+}
+
+.app-icons img {
+  margin: 15px 5px;
+  width: 40px;
+}
+
+.app-icons img:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
 @media screen and (max-width: 540px) {
   .header__container {
     display: grid;
@@ -369,5 +439,19 @@
   }
   .header__hamburger {
     align-items: flex-end;
+  }
+
+  .header-mobile-app-link {
+    width: 70vw;
+    padding: 5px;
+  }
+
+  .header-mobile-app-link > div:nth-child(2) > h5 {
+    font-size: 14px;
+  }
+
+  .app-icons img {
+    margin: 10px 5px;
+    width: 30px;
   }
 }
