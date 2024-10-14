@@ -326,8 +326,8 @@ let viewFoodDonationList = async (req, res) => {
                     })
                 console.log('findtheimageurl', findTheImageUrl)
                 if (findTheImageUrl.length > 0) {
-                    i.url = findTheImageUrl[0].url;
-                    i.fileId = findTheImageUrl[0].fileId;
+                    i.url = encodeURI(findTheImageUrl[0].url);
+                    i.fileId = encodeURI(findTheImageUrl[0].fileId);
                 }
                 else {
                     i.url = null;
@@ -354,6 +354,8 @@ let viewFoodDonationList = async (req, res) => {
 let viewFoodDonationById = async (req, res) => {
     try {
         let foodListingId = req.params.id;
+        let entityType = "foodDonation"
+        let statusId = 1;
         let foodDonationListQuery = `
             select
                 fl."foodListingId", fli."foodListingItemId", fli."foodName", fli."foodCategory", fc."foodCategoryName", fli.quantity, fli.unit, u2."unitName",
@@ -364,7 +366,7 @@ let viewFoodDonationById = async (req, res) => {
                 TO_CHAR(
                     fl."createdOn" AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC',
                     'YYYY-MM-DD"T"HH24:MI:SS.MS'
-                ) as createdOn, u.latitude, u.longitude
+                ) as createdOn, u.latitude, u.longitude, fl.address
             from soulshare."foodListings" fl
             inner join soulshare."foodListingItems" fli on fl."foodListingId" = fli."foodListingId"
             inner join soulshare."foodCategories" fc on fli."foodCategory" = fc."foodCategoryId"
@@ -381,6 +383,30 @@ let viewFoodDonationById = async (req, res) => {
         });
 
         if (fetchFoodListingDetails.length > 0) {
+            
+              
+                    let findTheImageUrl = await sequelize.query(`
+                        select f."fileId", fl."url"  from soulshare."foodListingItems" u 
+                        inner join soulshare.files f on u."foodListingItemId" = f."entityId" 
+                        inner join soulshare."fileAttachments" fl on fl."fileId" = f."fileId"  
+                        where f."entityType" = ? and u."statusId" = ?  and u."foodListingItemId" = ? 
+                        and fl."statusId" = ? and f."statusId" = ?`,
+                        {
+                            type: QueryTypes.SELECT,
+                            replacements: [entityType, statusId, fetchFoodListingDetails[0].foodListingItemId, statusId, statusId]
+                        })
+                    console.log('findtheimageurl', findTheImageUrl)
+                    if (findTheImageUrl.length > 0) {
+                        fetchFoodListingDetails[0].url = encodeURI(findTheImageUrl[0].url);
+                        fetchFoodListingDetails[0].fileId = encodeURI(findTheImageUrl[0].fileId);
+                    }
+                    else {
+                        fetchFoodListingDetails[0].url = null;
+                        fetchFoodListingDetails[0].fileId = null;
+                    }
+                
+    
+            
             return res.status(statusCode.SUCCESS.code).json({
                 message: "Food donation details",
                 fetchFoodListingDetails
