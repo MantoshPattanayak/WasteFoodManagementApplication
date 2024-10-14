@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Header.css"; // Import the CSS file for styling
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/soul_share.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,6 +11,8 @@ import api from "../utils/apiList";
 import { toast } from "react-toastify";
 import profile_image from "../assets/profile.png";
 import axios from "axios";
+import googlePlayStore from "../assets/google-play.svg";
+import appleStore from "../assets/apple.svg";
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -20,6 +22,9 @@ const Header = () => {
   const [givenReq, setGivenReq] = useState('');
   const [categoryList, setCategoryList] = useState([]);
   const [itemCategory, setItemCategory] = useState('');
+  const [displayAppLink, setDisplayAppLink] = useState(false);
+  let location = useLocation();
+  const appDisplayContainer = useRef()
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -83,6 +88,12 @@ const Header = () => {
     navigate(searchLink);
   }
 
+  function handleDisplayAppLink(e) {
+    e.preventDefault();
+    setDisplayAppLink(true);
+    return;
+  }
+
   useEffect(() => {
     fetchCategoryList();
     // Request notification permission
@@ -95,7 +106,6 @@ const Header = () => {
         }
       });
     }
-
     // Fetch notifications on mount and set interval for updates
     // fetchNotifications();
     // const intervalId = setInterval(() => {
@@ -162,6 +172,11 @@ const Header = () => {
         }
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
           <ul className="header__nav-list">
+            {location.pathname != '/' && <li className="header__nav-item" style={{ padding: "5px", borderRadius: "6px", backgroundColor: "Background" }}>
+              <Link onClick={handleDisplayAppLink}>
+                Get the App
+              </Link>
+            </li>}
             <li className="header__nav-item">
               {!user && <Link to={user ? "/DonorLandingPage" : "/"}>Home</Link>}
             </li>
@@ -207,7 +222,6 @@ const Header = () => {
                 </li>
               }
             </li>
-
           </ul>
         </nav>
         <div className="header__hamburger" onClick={toggleSidebar}>
@@ -246,6 +260,14 @@ const Header = () => {
           <FontAwesomeIcon icon={faClose} size="sm" />
         </button>
         <ul className="sidebar__list">
+          {
+            location.pathname != '/' &&
+            <li className="sidebar__item">
+              <Link onClick={(e) => { setSidebarOpen(false); handleDisplayAppLink(e); }}>
+                Get the App
+              </Link>
+            </li>
+          }
           <li className="sidebar__item">
             {!user && <Link to={user ? "/DonorLandingPage" : "/"}>Home</Link>}
           </li>
@@ -281,6 +303,21 @@ const Header = () => {
           </li>
         </ul>
       </div>
+      {
+        displayAppLink &&
+        <>
+          <div className="overlay-container" />
+          <div ref={appDisplayContainer} className="header-mobile-app-link">
+            <div onClick={(e) => { setDisplayAppLink(false); appDisplayContainer.current.style.display = 'none'; }}><FontAwesomeIcon icon={faClose} size="xl" /></div>
+            <div><h5>Your Small Act, Their Big Change. Donate via App!🥰</h5></div>
+            <div className="app-photo-display"></div>
+            <div className="app-icons">
+              <a><img src={googlePlayStore} /></a>
+              <a><img src={appleStore} /></a>
+            </div>
+          </div>
+        </>
+      }
     </header>
   );
 };
