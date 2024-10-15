@@ -55,7 +55,11 @@ self.addEventListener('message', (event) => {
         // Display notification
         self.registration.showNotification('New Notification', {
             body: notificationData,
-            icon: 'icon.png', // Specify your icon path here
+            tag: `notification-${event.data.id}`,
+            data: { url: event.data.url },  // Extra data can be passed here
+            actions: [
+                { action: 'open', title: 'Open App' }
+            ]
         });
     }
 });

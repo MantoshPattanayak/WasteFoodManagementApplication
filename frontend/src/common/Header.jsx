@@ -110,12 +110,12 @@ const Header = () => {
     // fetchNotifications();
     // const intervalId = setInterval(() => {
     //   console.log("Fetching notifications again...");
-    //   // fetchNotifications();
-    // }, 60000);  // Fetch every 10 seconds
+    //   fetchNotifications();
+    // }, 10000);  // Fetch every 10 seconds
 
     // Cleanup interval on unmount
     return () => {
-      console.log("Clearing notification interval...");
+      // console.log("Clearing notification interval...");
       // clearInterval(intervalId);
     };
   }, []);
@@ -133,7 +133,9 @@ const Header = () => {
   //     if (data.message && navigator.serviceWorker && navigator.serviceWorker.controller) {
   //       navigator.serviceWorker.controller.postMessage({
   //         type: 'NOTIFICATIONS',
-  //         data: data.message, // Assuming data.message is a string or similar
+  //         id: Date.now(),
+  //         url: '',
+  //         data: data?.message, // Assuming data.message is a string or similar
   //       });
   //     } else {
   //       console.error('Service worker controller is not available or data.message is undefined.');

@@ -68,6 +68,8 @@
 
 .header__nav-item {
   margin: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .header__nav-item a {
