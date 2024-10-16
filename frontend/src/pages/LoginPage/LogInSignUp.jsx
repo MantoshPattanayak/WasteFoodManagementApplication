@@ -22,11 +22,28 @@ function LogInSignUp() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(60);
+  const [userTypeList, setUserTypeList] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // asunc func to fetch user types
+  async function fetchInitialUserData() {
+    try {
+      let res = await axiosInstance.get(api.USER_INITIALDATA.url);
+      console.log("Response at fetchInitialUserData", res.data.roles);
+      setUserTypeList(res.data.roles);  // maintain user types list after api call
+      setUserType(res.data.roles[0].roleId);  // default set first user type from the list
+    }
+    catch (error) {
+      console.error("Error at fetchInitialUserData", error);
+    }
+  }
+
   // Handles the radio button change for user type
-  const handleUserTypeChange = (event) => {
-    setUserType(event.target.value);
+  const handleUserTypeChange = (event, roleId) => {
+    event.preventDefault();
+    console.log("handleUserTypeChange", roleId);
+    setUserType(roleId);
   };
 
   // Handles the phone number input change
@@ -101,7 +118,7 @@ function LogInSignUp() {
           autoClose: 800,
           onClose: () => {
             setTimeout(() => {
-              navigate('/Registration');
+              navigate(`/Registration?userType=${encryptData(userType)}`);
             }, 500);
           }
         })
@@ -149,7 +166,7 @@ function LogInSignUp() {
             autoClose: 1500,
             onClose: () => {
               setTimeout(() => {
-                navigate('/Registration');
+                navigate(`/Registration?userType=${encryptData(userType)}`);
               }, 500)
             }
           })
@@ -175,7 +192,12 @@ function LogInSignUp() {
       setOtpSent(false);
       setOtp("");
     }
-  }, [otpSent, timer]);
+  }, [otpSent, timer, userType]);
+
+  useEffect(() => {
+    fetchInitialUserData();
+  }, []);
+
 
   return (
     <div className="logInSignUpContainer">
@@ -188,23 +210,49 @@ function LogInSignUp() {
           <div className="logInType">
             <h3>Login/SignUp as a </h3>
             <div className="radiobutton">
-              <div className="insideRadioButton">
-                <input
-                  type="radio"
-                  id="donor"
-                  value="Donor"
-                  checked={userType === "Donor"}
-                  onChange={handleUserTypeChange}
-                  className={userType === "Donor" ? "greenText" : ""}
-                />
-                <label
-                  htmlFor="donor"
-                  className={userType === "Donor" ? "greenText" : ""}
-                >
-                  Donor
-                </label>
-              </div>
-              <div className="insideRadioButton">
+              {
+                userTypeList?.length > 0 && userTypeList?.map((user, index) => {
+                  if(userType == user.roleId){
+                    return (
+                      <div key={index} className="insideRadioButton">
+                        <input
+                          type="radio"
+                          id="donor"
+                          checked={userType == user.roleId}
+                          onChange={(e) => handleUserTypeChange(e, user.roleId)}
+                          className={userType == user.roleId ? "greenText" : ""}
+                        />
+                        <label
+                          htmlFor="donor"
+                          className={userType == user.roleId ? "greenText" : ""}
+                        >
+                          {user.roleName}
+                        </label>
+                      </div>
+                    )
+                  }
+                  else {
+                    return (
+                      <div key={index} className="insideRadioButton">
+                        <input
+                          type="radio"
+                          id="donor"
+                          checked={userType == user.roleId}
+                          onChange={(e) => handleUserTypeChange(e, user.roleId)}
+                          // className={userType == user.roleId ? "greenText" : ""}
+                        />
+                        <label
+                          htmlFor="donor"
+                          // className={userType == user.roleId ? "greenText" : ""}
+                        >
+                          {user.roleName}
+                        </label>
+                      </div>
+                    )
+                  }
+                })
+              }
+              {/* <div className="insideRadioButton">
                 <input
                   type="radio"
                   id="charity"
@@ -219,7 +267,7 @@ function LogInSignUp() {
                 >
                   Charity
                 </label>
-              </div>
+              </div> */}
             </div>
           </div>
 

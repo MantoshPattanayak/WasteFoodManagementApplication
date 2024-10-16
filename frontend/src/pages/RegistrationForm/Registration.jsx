@@ -10,8 +10,12 @@ import api from "../../utils/apiList";
 import { useLocation, useNavigate } from "react-router-dom";
 import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { decryptData } from "../../utils/encryption";
 
 function Registration() {
+  const location = useLocation();
+  const userRole = decryptData(new URLSearchParams(location.search).get('userType'));
+  console.log("userRole", userRole);
   const [profileImg, setProfileImg] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,13 +27,12 @@ function Registration() {
       longitude: "",
     },
     landmark: "",
-    userType: "",
+    userType: userRole || "",
     userImage: "",
     termsAccepted: false,
   });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const location = useLocation();
   const [userTypeList, setUserTypeList] = useState([]);
 
   function getUserGeoLocation() {
@@ -360,7 +363,7 @@ function Registration() {
                     key={index}
                     type="button"
                     className={
-                      formData.userType === userType.roleId ? "selected" : ""
+                      formData.userType == userType.roleId ? "selected" : ""
                     }
                     onClick={() =>
                       setFormData({ ...formData, userType: userType.roleId })

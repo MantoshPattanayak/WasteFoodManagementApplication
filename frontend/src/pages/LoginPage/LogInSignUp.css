@@ -7,7 +7,7 @@
   background-image: url(../../assets/login_bg.jpg);
   color: white; /* Optional: Change text color for better readability */
   padding: 20px;
-  border-radius: 8px; /* Optional: Styling for a better look */
+  /* border-radius: 8px; Optional: Styling for a better look */
   width: 100%; /* Adjust as needed */
   height: 100vh; /* Adjust as needed */
 }
@@ -52,7 +52,7 @@
 .greenText {
   color: #00ff00;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .inputFieldButton {
