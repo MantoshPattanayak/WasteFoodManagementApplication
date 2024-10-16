@@ -108,6 +108,13 @@ const api = {
     //     address:{}
     //     }
   },
+  REQUEST_CONTACT: {
+    url: baseURL + "/food/contactDonor",
+    method: "post",
+    /**
+     * name, mobileNo, userType, emailId
+     */
+  }
 };
 
 export default api;

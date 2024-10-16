@@ -174,7 +174,7 @@ const Header = () => {
         }
         <nav className={`header__nav ${isSidebarOpen ? "open" : ""}`}>
           <ul className="header__nav-list">
-            {location.pathname != '/' && <li className="header__nav-item" style={{ padding: "5px", borderRadius: "6px", backgroundColor: "Background" }}>
+            {location.pathname != '/' && <li className="header__nav-item">
               <Link onClick={handleDisplayAppLink}>
                 Get the App
               </Link>
