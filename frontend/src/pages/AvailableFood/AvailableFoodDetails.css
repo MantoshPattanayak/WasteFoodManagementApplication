@@ -164,6 +164,42 @@ label{
     display: flex;
     justify-content: space-between;
 }
+/* drop down */
+
+.custom_dropdown {
+    width: 100%;
+    padding: 12px 16px; 
+    margin: 10px 0; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    background-color: #f9f9f9; 
+    color: #333;
+    box-sizing: border-box; 
+    appearance: none; 
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"><path fill="none" stroke="%23333" stroke-width="2" d="M2 7 L12 17 22 7"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+}
+
+.custom_dropdown:focus {
+    border-color: #007bff; 
+    outline: none;
+}
+
+
+.custom_dropdown:hover {
+    border-color: #007bff;
+}
+
+
+.custom_dropdown option {
+    padding: 10px; 
+    background-color: white;
+    color: #333;
+}
+
 /* Responsive popup on smaller screens */
 @media (max-width: 768px) {
     .popup-content {
@@ -226,7 +262,7 @@ label{
     flex-wrap: wrap; 
     gap: 20px; 
 }
-.card {
+.item_card{
     background-color: #fff; 
     border-radius: 8px; 
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
@@ -236,9 +272,14 @@ label{
     height: 30vh;
     padding: 8px;
 }
-.card p{
+.item_card p{
     font-size: 18px;
     font-weight: 600;
+}
+
+.product-image{
+    height: 15vh;
+    width: 28vh;
 }
 
 

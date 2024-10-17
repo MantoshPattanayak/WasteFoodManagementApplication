@@ -3,36 +3,113 @@ import Header from "../../common/Header";
 import { useState, useEffect } from "react";
 import axiosInstance from "../../services/axios";
 import { decryptData } from "../../utils/encryption";
-import { Link, useLocation,useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../utils/apiList";
-
+import instance from "../../../env";
+import { formatDateAsDDMMYYYYHHMMSS } from "../../utils/utilityFunction";
+// toast -------------
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const AvailableFoodDetails = () => {
     const [isPopupOpen, setisPopupOpen] = useState(false)
     // get data of itemByid
-    const[getDataById, setgetDataById]=useState([])
-    const foodListingId=decryptData(new URLSearchParams(location.search).get("foodListingId"))
- 
+    const [getDataById, setgetDataById] = useState([])
+    const foodListingId = decryptData(new URLSearchParams(location.search).get("foodListingId"))
+    // filter data
+    const [FilteredDonationData, setFilteredDonationData] = useState([])
+    // get initail data in drop down ---------
+    const[initailData, setinitailData]=useState([])
+    // Contact Us ----
+    const [contactUs, setcontactUs] = useState({
+        name: '',
+        mobileNo: '',
+        userType: '',
+        emailId: ''
+    })
+
     //get data --------------
-    async function GetitemDataById(foodListingId){
+    async function GetitemDataById(foodListingId) {
         console.log("decypt food list id", foodListingId);
-        try{
-            let res= await axiosInstance.get(`${api.VIEW_FOOD_DONATION_BY_ID.url}/${foodListingId}` )
-            setgetDataById(res.data.fetchFoodListingDetails[0])
+        try {
+            let res = await axiosInstance.get(`${api.VIEW_FOOD_DONATION_BY_ID.url}/${foodListingId}`)
+            const data=res.data.fetchFoodListingDetails[0]
+            setgetDataById(data)
             console.log("here Response of GetitemDataById", res.data.fetchFoodListingDetails[0]);
-        }catch(err){
+            const categoryId = data.categoryId;
+            GetDataByList(categoryId)
+          console.log("Extracted categoryId:", categoryId);
+        } catch (err) {
             console.log("Error : Response of GetItemDataById", err);
         }
     }
-//   useEffect for Update the data
-useEffect(()=>{
-    GetitemDataById(foodListingId)
-}, [])
+    // ByList Api ------------
+    async function GetDataByList(categoryId) {
+        console.log("categoryId", categoryId);
+        try {
+       
+            let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url)
 
+            const filterData = res.data.foodDonationData.filter((item) => item.categoryId === categoryId);
+            setFilteredDonationData(filterData);
+            console.log("here Response of get data By List ", res);
 
+        } catch (err) {
+            console.log("throw error of GetDataByList", err);
+        }
+    }
+    //handle Submit ---
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setcontactUs(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+   // handle drop down data
+   const handleDropDownChange=(e)=>{
+    // set roleid to userTypeid
+    setcontactUs(prevState => ({
+        ...prevState,
+        userType: e.target.value // Set selected roleId to userType
+      })); 
+   }
 
+    // call Api for Post the Contact us data --------------------
+    async function PostData(e) {
+        e.preventDefault()
+        try {
+            let res = await axiosInstance.post(api.REQUEST_CONTACT.url, {
+                name: contactUs.name,
+                emailId: contactUs.emailId,
+                mobileNo: contactUs.mobileNo,
+                userType:contactUs.userType
 
+            });
+            toast.success("Thank you for reaching out! Our team will get back to you shortly.");
+            console.log("Response of Post Conact us Data", res);
 
+        } catch (err) {
+            toast.error("Oops! Something went wrong. Please try again.");
+            console.log("here Error handler", err);
+        }
+    }
+    // const get the initail data ------------------------
+    async function GetInitailData() {
+        try {
+            let res = await axiosInstance.get(api.USER_INITIALDATA.url)
+            setinitailData(res.data.roles)
+            console.log("Resoponse of get intailData", res);
 
+        } catch (err) {
+            console.log("Error Response of Get Intail Data", err)
+        }
+    }
+    //   useEffect for Update the data
+    useEffect(() => {
+        GetInitailData()
+        GetitemDataById(foodListingId);
+        GetDataByList()
+    }, [])
 
     // handle Popup(Open)
     const handleOpenPopup = () => {
@@ -44,22 +121,29 @@ useEffect(()=>{
     }
 
     // encrypt the id
+    //List [1, 2, 3, [1, 2, 3, [3, 4, 5 ,6 [6, 7], [1, 2, 3]], [1, 3, 4]]]
+    
   
+
+
+
+
+
     return (
         <div className="main_container_item_details">
             <Header />
+            <ToastContainer/>
             <div class="product-container">
                 <div class="image-section">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRE0b7vFLR-jNx8hjihbU4MOfYxiE9qAGYCg&s"></img>
+                    <img src={`${instance().baseURL}/static${getDataById.url}`} ></img>
                 </div>
                 <div class="details-section">
                     <h2>{getDataById.foodName}</h2>
                     <ul class="product-details">
-                        <li><strong>Max Cutting Width (mm):</strong> 250 mm</li>
-                        <li><strong>Product Description:</strong> Cameo 4 + Skin Cutting Software</li>
-                        <li><strong>Configuration:</strong> 12 inch</li>
-                        <li><strong>RAM:</strong> 4 GB RAM</li>
-                        <li><strong>Packaging Type:</strong> Packet</li>
+                        <li> <strong>{getDataById.foodCategoryName}</strong>  </li>
+                        <li><strong>Quantity:</strong>{getDataById.quantity}  {getDataById.unitName}</li>
+                        <li><strong>Expirationdate: </strong> {formatDateAsDDMMYYYYHHMMSS(getDataById.expirationdate)}</li>
+
                     </ul>
                     <p class="description">Skin Cutting software with CAMEO 4 Cutting Plotter model, you can cut up to 12-inch width, and in roll format skins...</p>
                     <button class="button-9" onClick={handleOpenPopup}>Contact</button>
@@ -67,48 +151,61 @@ useEffect(()=>{
 
             </div>
             <div className="product-container1">
-                <p className="p_tag_similar">Find Similar More Products:</p>
-                <div className="product_card_item">
-                    <div className="card">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRE0b7vFLR-jNx8hjihbU4MOfYxiE9qAGYCg&s"
-                            alt="Product Image"
-                            className="product-image"
-                        />
-                        <p className="product-name">Cameo 4 Cutting Plotter</p>
-                        <p1>Bhubaneswar, Odisha</p1>
-                        <p1>Expiration date - 26-10-2024</p1>
+                <p className="p_tag_similar">Find Similar More Donation:</p>
 
-                    </div>
-
+                <div className="product_card_item" >
+                    {FilteredDonationData.map((item, index) => (
+                        <div className="item_card" key={index}>
+                            <img src={`${instance().baseURL}/static${item.url}`} alt="Product Image" className="product-image" />
+                            <p className="product-name">{item.foodName}</p>
+                            <p1>{item.address.townCity}</p1>
+                            <p1>Expiration Date:{formatDateAsDDMMYYYYHHMMSS(item.expirationdate)}</p1>
+                        </div>
+                    ))}
                 </div>
             </div>
-
-
-
-
-
-
             {/* Popup component */}
             {isPopupOpen && (
-                <div className="popup-overlay">
-                    <div className="popup-content">
-                        <h3>Contact Us</h3>
-                        <p>Feel free to reach out for more information .</p>
-                        <label>Name</label>
-                        <input type="text" placeholder="Your Name" />
-                        <label>Email_Id</label>
-                        <input type="email" placeholder="Your Email" />
-                        <label>Mobile Number</label>
-                        <input type="text" placeholder="Your Phone Number" />
-                        <div className="button_close_submit">
-                            <button className="button-9" role="button" >Submit</button>
-                            <button class="button-42" role="button" onClick={handleClosePopup}>Close</button>
+                <form onSubmit={PostData}>
+                    <div className="popup-overlay">
+                        <div className="popup-content">
+                            <h3>Contact Us</h3>
+                            <p>Feel free to reach out for more information .</p>
+                            <label>Name</label>
+                            <input type="text" name="name" id="name"
+                                value={contactUs.name}
+                                onChange={handleChange}
+                                placeholder="Your Name" />
+                            <label>Email_Id</label>
+                            <input type="email" name="emailId" id="emailId"
+                                value={contactUs.emailId}
+                                onChange={handleChange}
+                                placeholder="Your Email" />
+                            <label>Mobile Number</label>
+                            <input type="text" name="mobileNo" id="mobileNo"
+                                value={contactUs.mobileNo}
+                                onChange={handleChange}
+                                placeholder="Your Phone Number" />
+                              
+                                              
+                                <select className="custom_dropdown"
+                                name="userType"
+                                value={contactUs.userType}
+                                 onChange={handleDropDownChange} >
+                                    {initailData.map((item)=>(
+                                        <option key={item.roleId} value={item.roleId}>{item.roleName}</option>  
+                                    ))}
+                                </select>
+                          
 
+                            <div className="button_close_submit">
+                                <button className="button-9" role="button">Submit</button>
+                                <button class="button-42" role="button" onClick={handleClosePopup}>Close</button>
+                            </div>
                         </div>
-
                     </div>
-                </div>
+                </form>
+
             )}
         </div>
     )
