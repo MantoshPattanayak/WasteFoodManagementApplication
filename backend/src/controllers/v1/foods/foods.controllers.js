@@ -668,9 +668,10 @@ let contactDonor = async (req,res)=>{
     try {
         transaction = await sequelize.transaction();
         let {name, mobileNo, userType, emailId} = req.body;
+     
         let statusId = 1;
         if(!name || !mobileNo || !userType || !emailId){
-            return res.send(statusCode.BAD_REQUEST.code).json({
+            return res.status(statusCode.BAD_REQUEST.code).json({
                 message:`Invalid Request`
             })
         }
