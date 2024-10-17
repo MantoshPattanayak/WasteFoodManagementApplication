@@ -56,10 +56,11 @@ db1.device = require('./device.model')(sequelize, DataTypes)
 db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
 db1.categories = require('./categories.models')(sequelize, DataTypes)
 db1.contactDonor = require('./contactdonor.models')(sequelize, DataTypes)
+db1.contactRequest = require('./contactRequest.models')(sequelize, DataTypes)
 
 console.log('all details 2')
 
-db1.contactDonor.sync({
+db1.contactRequest.sync({
   alter: false,
 });
 
