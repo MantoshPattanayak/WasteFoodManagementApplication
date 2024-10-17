@@ -114,6 +114,13 @@ const api = {
     /**
      * name, mobileNo, userType, emailId
      */
+  },
+  CONTACT_US: {
+    url: baseURL + "/activity/contact-us",
+    method: "post",
+    /**
+     * firstName, lastName, email, phoneNumber, message
+     */
   }
 };
 
