@@ -128,24 +128,24 @@ const LandingPage = () => {
                         <div className="image_text_ads">
                             <div className="each_image_ads">
                                 <img className="image_logo" src={what_to_do_1st_image} alt="Rescue Food"></img>
-                                <p className="text_color">We rescue fresh leftover food from individuals, restaurants, grocery stores, caterers, and events.</p>
+                                <p className="text_color">We rescue fresh leftover food from individuals, restaurants, grocery stores, caterers, and events as well as other goods such as clothes, electronics, etc.</p>
                                 <h2 className="b_donor">Be a Donor    <FontAwesomeIcon icon={faArrowRight} /></h2>
                             </div>
                             <div className="each_image_ads">
                                 <img className="image_logo" src={Bike_ride_drivery_body} alt="Bike Ride"></img>
-                                <p className="text_color">Volunteers can join our team to help by collecting food donations directly from donors, ensuring it reaches those in need.</p>
+                                <p className="text_color">Volunteers can join our team to help by collecting donations directly from donors, ensuring it reaches those in need.</p>
                                 <h2 className="b_donor">Be a Volunteer    <FontAwesomeIcon icon={faArrowRight} /></h2>
                             </div>
                         </div>
                         <div className="image_text_ads">
                             <div className="each_image_ads">
                                 <img className="image_logo" src={dis} alt="Distribution"></img>
-                                <p className="text_color">We donate rescued food directly to people or through charities, and facilitate communication between donors and volunteers.</p>
+                                <p className="text_color">We donate essentials directly to people or through charities, and facilitate communication between donors and volunteers.</p>
                                 <h2 className="b_donor">Register Charity   <FontAwesomeIcon icon={faArrowRight} /></h2>
                             </div>
                             <div className="each_image_ads">
                                 <img className="image_logo" src={community_image} alt="Community"></img>
-                                <p className="text_color">We are building a compassionate community united to fight hunger by connecting donors, volunteers, and those in need.</p>
+                                <p className="text_color">We are building a compassionate community united to by connecting donors, volunteers, and those in need.</p>
                                 <h2 className="b_donor">Join    <FontAwesomeIcon icon={faArrowRight} /></h2>
                             </div>
                         </div>

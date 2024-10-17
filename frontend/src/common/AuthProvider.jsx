@@ -7,6 +7,7 @@ import instance from "../../env";
 
 const AuthContext = createContext();
 
+
 export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const user = useSelector((state) => state.auth.user);
@@ -29,8 +30,8 @@ export function AuthProvider({ children }) {
         initializeAuth();
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
+    if (loading) { 
+        return <div className="pre-loader"></div>;
     }
 
     return (
