@@ -16,6 +16,7 @@ const Registration = React.lazy(() => import('./pages/RegistrationForm/Registrat
 const Profile = withAuth(React.lazy(() => import('./pages/Profile/Profile')))
 const Fooddetails = React.lazy(() => import('./pages/fooddetails/fooddetails'))
 const AvailableFoodDetails=React.lazy(()=>import('./pages/AvailableFood/AvailableFoodDetails'))
+const ContactUs = React.lazy(() => import ("./pages/ContactUs/ContactUs"));
 const clientId = '285807180215-an40t7r1rau490tt3f82knnnascdal3l.apps.googleusercontent.com';
 function App() {
 
@@ -26,7 +27,7 @@ function App() {
           <AuthProvider>
             <Router basename='/'>
               <div>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<div className="pre-loader"></div>}>
                   <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/DonorLandingPage" element={<DonorLandingPage />} />
@@ -40,6 +41,7 @@ function App() {
                     <Route path="/Profile" element={<Profile />} />
                     <Route path="/Fooddetails" element={<Fooddetails />} />
                     <Route path="/AvailableFoodDetails" element={<AvailableFoodDetails />} />
+                    <Route path="/Contact" element={<ContactUs />} />
                   </Routes>
                 </Suspense>
               </div>
