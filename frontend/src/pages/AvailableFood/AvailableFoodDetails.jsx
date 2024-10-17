@@ -24,8 +24,10 @@ const AvailableFoodDetails = () => {
         name: '',
         mobileNo: '',
         userType: '',
-        emailId: ''
-    })
+        emailId: '',
+        donorEmail: ''
+    });
+    const navigate = useNavigate();
 
     //get data --------------
     async function GetitemDataById(foodListingId) {
@@ -37,6 +39,7 @@ const AvailableFoodDetails = () => {
             console.log("here Response of GetitemDataById", res.data.fetchFoodListingDetails[0]);
             const categoryId = data.categoryId;
             GetDataByList(categoryId)
+            setcontactUs({...contactUs, ["donorEmail"]: data.email});
           console.log("Extracted categoryId:", categoryId);
         } catch (err) {
             console.log("Error : Response of GetItemDataById", err);
@@ -82,12 +85,12 @@ const AvailableFoodDetails = () => {
                 name: contactUs.name,
                 emailId: contactUs.emailId,
                 mobileNo: contactUs.mobileNo,
-                userType:contactUs.userType
-
+                userType:contactUs.userType,
+                donorEmail:contactUs.donorEmail
             });
             toast.success("Thank you for reaching out! Our team will get back to you shortly.");
             console.log("Response of Post Conact us Data", res);
-
+            navigate(0);
         } catch (err) {
             toast.error("Oops! Something went wrong. Please try again.");
             console.log("here Error handler", err);
@@ -97,7 +100,7 @@ const AvailableFoodDetails = () => {
     async function GetInitailData() {
         try {
             let res = await axiosInstance.get(api.USER_INITIALDATA.url)
-            setinitailData(res.data.roles)
+            setinitailData(res.data.roles.filter((role) => {return role.roleName != "Donor"}))
             console.log("Resoponse of get intailData", res);
 
         } catch (err) {
@@ -192,7 +195,8 @@ const AvailableFoodDetails = () => {
                                 name="userType"
                                 value={contactUs.userType}
                                  onChange={handleDropDownChange} >
-                                    {initailData.map((item)=>(
+                                    <option value={""}>Select</option>
+                                    {initailData?.map((item)=>(
                                         <option key={item.roleId} value={item.roleId}>{item.roleName}</option>  
                                     ))}
                                 </select>

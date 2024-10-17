@@ -666,15 +666,17 @@ let donationHistory = async (req, res) => {
 let contactDonor = async (req,res)=>{
     let transaction;
     try {
+        console.log(1)
         transaction = await sequelize.transaction();
-        let {name, mobileNo, userType, emailId} = req.body;
-     
+        let {name, mobileNo, userType, emailId, donorEmail} = req.body;
+        console.log(2)
         let statusId = 1;
         if(!name || !mobileNo || !userType || !emailId){
             return res.status(statusCode.BAD_REQUEST.code).json({
                 message:`Invalid Request`
             })
         }
+        console.log(3)
         let findTheDataIfExist = await contactDonorTable.findOne({
             where:{
                 mobileNo:mobileNo,
@@ -682,7 +684,10 @@ let contactDonor = async (req,res)=>{
             },
             transaction
         })
+        console.log(4)
+        
         if(!findTheDataIfExist){
+            console.log(5)
             let insertToContactTable = await contactDonorTable.create({
               name:name,
               userType:userType,
@@ -693,6 +698,7 @@ let contactDonor = async (req,res)=>{
             },
         transaction)
             if(!insertToContactTable){
+                console.log(6)
                 await transaction.rollback();
                 return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
                     message:'Something went wrong'
@@ -701,23 +707,22 @@ let contactDonor = async (req,res)=>{
 
         }
   
-  
+        console.log(7)
        let message = `
                     <p>I hope this message finds you well!</p>
                     <p>Below are the details of the consumer who has recently engaged with your business:</p>
                     <h3>Contact Details:</h3>
                     <p>Name: ${name}</p>
-                    <p>Mobile No: ${mobileNo}</p>
+                    <p>Email: ${emailId || 'NA'}</p>
+                    <p>Mobile No: ${mobileNo || 'NA'}</p>
                     `;
-  
-  
         try {
+            console.log(8)
           await sendEmail({
-            email: `${emailId}`,
-            subject: "Consumer Details",
+            email: donorEmail,
+            subject: "Contact Request",
             html: message
-          }
-          )
+          });
           await transaction.commit();
           return res
             .status(statusCode.SUCCESS.code)
