@@ -358,7 +358,7 @@ let viewFoodDonationById = async (req, res) => {
         let statusId = 1;
         let foodDonationListQuery = `
             select
-                fl."foodListingId", fli."foodListingItemId", fli."foodName", c."categoryId", fli."foodCategory", fc."foodCategoryName", fli.quantity, fli.unit, u2."unitName",
+                fl."foodListingId", fli."foodListingItemId", fli."foodName", fl."categoryId", fli."foodCategory", fc."foodCategoryName", fli.quantity, fli.unit, u2."unitName",
                 CASE
                     when fli."expirationDate" is null then null
                     else TO_CHAR(fli."expirationDate"AT TIME ZONE 'Asia/Kolkata' AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS')
