@@ -2,7 +2,7 @@ import "./AvailableFoodDetails.css"
 import Header from "../../common/Header";
 import { useState, useEffect } from "react";
 import axiosInstance from "../../services/axios";
-import { decryptData } from "../../utils/encryption";
+import { decryptData, encryptData } from "../../utils/encryption";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../utils/apiList";
 import instance from "../../../env";
@@ -38,7 +38,7 @@ const AvailableFoodDetails = () => {
             setgetDataById(data)
             console.log("here Response of GetitemDataById", res.data.fetchFoodListingDetails[0]);
             const categoryId = data.categoryId;
-            GetDataByList(categoryId)
+            GetDataByList(categoryId, data.foodListingId)
             setcontactUs({...contactUs, ["donorEmail"]: data.email});
           console.log("Extracted categoryId:", categoryId);
         } catch (err) {
@@ -46,13 +46,13 @@ const AvailableFoodDetails = () => {
         }
     }
     // ByList Api ------------
-    async function GetDataByList(categoryId) {
+    async function GetDataByList(categoryId, foodListingId) {
         console.log("categoryId", categoryId);
         try {
        
             let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url)
 
-            const filterData = res.data.foodDonationData.filter((item) => item.categoryId === categoryId);
+            const filterData = res.data.foodDonationData.filter((item) => { return item.categoryId === categoryId && item.foodListingId != foodListingId });
             setFilteredDonationData(filterData);
             console.log("here Response of get data By List ", res);
 
@@ -107,11 +107,23 @@ const AvailableFoodDetails = () => {
             console.log("Error Response of Get Intail Data", err)
         }
     }
+
+    function showDonationDetails(e, data) {
+        e.preventDefault();
+        e.stopPropagation();
+        if(data) {
+            navigate(`/AvailableFoodDetails?foodListingId=${encryptData(data.foodListingId)}`);
+            navigate(0);
+        }
+        else {
+            return;
+        }
+    }
     //   useEffect for Update the data
     useEffect(() => {
         GetInitailData()
         GetitemDataById(foodListingId);
-        GetDataByList()
+        // GetDataByList()
     }, [])
 
     // handle Popup(Open)
@@ -123,46 +135,36 @@ const AvailableFoodDetails = () => {
         setisPopupOpen(false)
     }
 
-    // encrypt the id
-    //List [1, 2, 3, [1, 2, 3, [3, 4, 5 ,6 [6, 7], [1, 2, 3]], [1, 3, 4]]]
-    
-  
-
-
-
-
-
     return (
         <div className="main_container_item_details">
             <Header />
             <ToastContainer/>
-            <div class="product-container">
-                <div class="image-section">
+            <div className="product-container">
+                <div className="image-section">
                     <img src={`${instance().baseURL}/static${getDataById.url}`} ></img>
                 </div>
-                <div class="details-section">
+                <div className="details-section">
                     <h2>{getDataById.foodName}</h2>
-                    <ul class="product-details">
-                        <li> <strong>{getDataById.foodCategoryName}</strong>  </li>
-                        <li><strong>Quantity:</strong>{getDataById.quantity}  {getDataById.unitName}</li>
-                        <li><strong>Expirationdate: </strong> {formatDateAsDDMMYYYYHHMMSS(getDataById.expirationdate)}</li>
+                    <ul className="product-details">
+                        <li> <strong>{getDataById.foodCategoryName}</strong></li>
+                        <li><strong>Quantity:</strong>&nbsp; {getDataById.quantity} {getDataById.unitName}</li>
+                        <li><strong>Expiration Date: </strong>&nbsp; {formatDateAsDDMMYYYYHHMMSS(getDataById.expirationdate)}</li>
 
                     </ul>
-                    <p class="description">Skin Cutting software with CAMEO 4 Cutting Plotter model, you can cut up to 12-inch width, and in roll format skins...</p>
-                    <button class="button-9" onClick={handleOpenPopup}>Contact</button>
+                    {/* <p className="description">Skin Cutting software with CAMEO 4 Cutting Plotter model, you can cut up to 12-inch width, and in roll format skins...</p> */}
+                    <button className="button-9" onClick={handleOpenPopup}>Contact</button>
                 </div>
 
             </div>
             <div className="product-container1">
                 <p className="p_tag_similar">Find Similar More Donation:</p>
-
                 <div className="product_card_item" >
                     {FilteredDonationData.map((item, index) => (
-                        <div className="item_card" key={index}>
+                        <div className="item_card" key={index} onClick={(e) => showDonationDetails(e, item)}>
                             <img src={`${instance().baseURL}/static${item.url}`} alt="Product Image" className="product-image" />
                             <p className="product-name">{item.foodName}</p>
-                            <p1>{item.address.townCity}</p1>
-                            <p1>Expiration Date:{formatDateAsDDMMYYYYHHMMSS(item.expirationdate)}</p1>
+                            <p>Address: {item.address.townCity}</p><br />
+                            <p>Expiration Date:&nbsp;{formatDateAsDDMMYYYYHHMMSS(item.expirationdate)}</p>
                         </div>
                     ))}
                 </div>
@@ -204,7 +206,7 @@ const AvailableFoodDetails = () => {
 
                             <div className="button_close_submit">
                                 <button className="button-9" role="button">Submit</button>
-                                <button class="button-42" role="button" onClick={handleClosePopup}>Close</button>
+                                <button className="button-42" role="button" onClick={handleClosePopup}>Close</button>
                             </div>
                         </div>
                     </div>

@@ -271,6 +271,7 @@ label{
     width: 280px; 
     height: 30vh;
     padding: 8px;
+    cursor: pointer;
 }
 .item_card p{
     font-size: 18px;
