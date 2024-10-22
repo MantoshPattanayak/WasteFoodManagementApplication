@@ -1025,6 +1025,17 @@ let initialData = async (req, res) => {
   }
 }
 
+let volunteerRegistration = async (req, res) => {
+  try {
+    console.log("volunteerRegistration");
+  }
+  catch (error) {
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: error.message
+    })
+  }
+}
+
 module.exports = {
   createOtp,
   verifyOtp,
@@ -1033,6 +1044,7 @@ module.exports = {
   viewUserProfile,
   logout,
   signUp,
+  volunteerRegistration,
   initialData,
   updateUserProfile
 }
