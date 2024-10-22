@@ -1,5 +1,6 @@
 import "./AvailableFoodDetails.css"
 import Header from "../../common/Header";
+import Footer from "../../common/footer";
 import { useState, useEffect } from "react";
 import axiosInstance from "../../services/axios";
 import { decryptData, encryptData } from "../../utils/encryption";
@@ -159,14 +160,18 @@ const AvailableFoodDetails = () => {
             <div className="product-container1">
                 <p className="p_tag_similar">Find Similar More Donation:</p>
                 <div className="product_card_item" >
-                    {FilteredDonationData.map((item, index) => (
+                    {FilteredDonationData?.length > 0 && FilteredDonationData?.map((item, index) => (
                         <div className="item_card" key={index} onClick={(e) => showDonationDetails(e, item)}>
                             <img src={`${instance().baseURL}/static${item.url}`} alt="Product Image" className="product-image" />
                             <p className="product-name">{item.foodName}</p>
-                            <p>Address: {item.address.townCity}</p><br />
-                            <p>Expiration Date:&nbsp;{formatDateAsDDMMYYYYHHMMSS(item.expirationdate)}</p>
+                            <h8>Address: {item.address.townCity}</h8><br />
+                            <h8>Expiration Date:&nbsp;{formatDateAsDDMMYYYYHHMMSS(item.expirationdate)}</h8>
                         </div>
                     ))}
+                    {
+                        FilteredDonationData.length == 0 &&
+                        <div>There's no data to display.</div>
+                    }
                 </div>
             </div>
             {/* Popup component */}
@@ -213,6 +218,7 @@ const AvailableFoodDetails = () => {
                 </form>
 
             )}
+            <Footer />
         </div>
     )
 }
