@@ -158,8 +158,8 @@ export default function ContactUs() {
                         <div className='contact-email'><FontAwesomeIcon icon={faEnvelope} />&nbsp;&nbsp;soul@soulunileaders.com</div>
                         <div className='contact-address'><FontAwesomeIcon icon={faLocationDot} />&nbsp;&nbsp;E/42/D, Infocity Avenue, Chandaka Industrial Estate, Bhubaneswar, Odisha, India - 751024</div>
                     </div>
-                    <div className='contact-socials'>
-                    </div>
+                    {/* <div className='contact-socials'>
+                    </div> */}
                 </div>
                 <div className='contact-right'>
                     <div>
