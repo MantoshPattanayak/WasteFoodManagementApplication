@@ -50,7 +50,7 @@ axiosInstance.interceptors.response.use((res) => res, async (err) => {
         _retry_count++;
         return wait(timeDelay(_retry_count)).then(() => axiosInstance.request(origReqConfig))
     }
-    console.log("headers",origReqConfig.headers);
+    // console.log("headers",origReqConfig.headers);
 
     if (err.response.status === 401 && origReqConfig.headers.hasOwnProperty('Authorization')) {
         const rtoken = tokenService.getLocalRefreshToken();

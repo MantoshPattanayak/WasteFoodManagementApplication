@@ -37,7 +37,7 @@ const Footer = () => {
                         <li><Link to={'/DonorDetails'}>Donate now</Link></li>
                         <li><Link to={'/AvailableFood'}>Explore Donations</Link></li>
                         <li><Link to={'/About'}>About</Link></li>
-                        <li><Link to={'#'}>Contact us</Link></li>
+                        <li><Link to={'/Contact'}>Contact us</Link></li>
                     </ul>
                 </div>
                 {/* 2nd */}

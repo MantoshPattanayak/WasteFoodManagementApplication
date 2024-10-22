@@ -3,9 +3,12 @@ import Header from "../../common/Header";
 import Footer from "../../common/footer";
 import "./ContactUs.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faLocationDot, faPhone, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import axiosInstance from '../../services/axios';
 import api from '../../utils/apiList';
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from 'react-router-dom';
 
 export default function ContactUs() {
     const [contactForm, setContactForm] = useState({
@@ -15,29 +18,51 @@ export default function ContactUs() {
         phoneNumber: "",
         message: ""
     });
+    const navigate = useNavigate();
+    const [captcha, setCaptcha] = useState(generateCaptcha(6));
+    const [confirmCaptcha, setConfirmCaptcha] = useState('')
 
     async function submitForm(e) {
         e.preventDefault();
-        try {
+        console.log(contactForm);
+        if (confirmCaptcha && captcha != confirmCaptcha) {
+            toast.error('Please enter the valid captcha.');
+        }
+        if (contactForm.firstName && (contactForm.email || contactForm.phoneNumber) && contactForm.message && !confirmCaptcha) {
+            toast.error("Please enter the captcha.");
+        }
+        let errors = validateUserInput();
+        if (errors.length > 0) {
+            toast.warn("Please fill the form properly.");
+            return;
+        }
 
+        try {
+            let res = await axiosInstance.post(api.CONTACT_US.url, contactForm);
+            console.log("response at submitForm func", res.data.message);
+            toast.success(res.data.message, {
+                autoClose: 1000,
+                onClose: () => {
+                    setTimeout(navigate(0), 1000);
+                }
+            });
         }
         catch (error) {
+            toast.error(error.response.data.message);
             console.error("Error at submit form func", error);
         }
     }
 
-    function validateUserInput(e, contactForm) {
+    function validateUserInput() {
         let errors = {};
+        console.log(contactForm);
         let nameRegex = "^[A-Z][a-zA-Z'-]+(?:\s[A-Z][a-zA-Z'-]+)*$";
         let emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
         let phoneRegex = "^[7-9]\d{9}$";
         let messageRegex = "^(?!.*[\p{Emoji}]).+?(\n|$)+";
 
-        if(contactForm.firstName && !nameRegex.test(contactForm.firstName)) {
+        if(contactForm.firstName && !nameRegex.match(contactForm.firstName)) {
             errors.firstName = "Please provide a valid name."
-        }
-        else {
-            errors.firstName = "Please provide first name.";
         }
 
         if(!contactForm.email && !contactForm.phoneNumber) {
@@ -45,17 +70,63 @@ export default function ContactUs() {
             errors.phoneNumber = "Please provide either email or phone number.";
         }
 
-        if(contactForm.email && !emailRegex.test(contactForm.email)) {
+        if(contactForm.email && !emailRegex.match(contactForm.email)) {
             errors.email = "Please provide a valid email.";
         }
 
-        if(contactForm.phoneNumber && !phoneRegex.test(contactForm.phoneNumber)) {
+        if(contactForm.phoneNumber && !phoneRegex.match(contactForm.phoneNumber)) {
             errors.phoneNumber = "Please provide a valid phone number.";
         }
 
-        if(contactForm.message && !messageRegex.test(contactForm.message)) {
+        if(contactForm.message && !messageRegex.match(contactForm.message)) {
             errors.message = "Please type a valid message and there should be no emoji."
         }
+
+        return errors;
+    }
+
+    function generateCaptcha(length) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let captcha = '';
+    
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            captcha += characters[randomIndex];
+        }
+    
+        return captcha;
+    }
+
+    function drawRandomLines(ctx, width, height) {
+        for (let i = 0; i < 8; i++) { // Draw 10 random lines
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * width, Math.random() * height);
+            ctx.lineTo(Math.random() * width, Math.random() * height);
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)'; // Light gray color
+            ctx.lineWidth = 2; // Line width
+            ctx.stroke();
+        }
+    }
+
+    function generateAndDisplayCaptcha() {
+        const captchaText = captcha;
+        const canvas = document.getElementById('captcha-canvas');
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#aab7ca';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw random lines in the background
+        drawRandomLines(ctx, canvas.width, canvas.height);
+
+        // Set font properties
+        ctx.font = 'italic 20px "Times New Roman"';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Draw the CAPTCHA text in the center of the canvas
+        ctx.fillText(captchaText, canvas.width / 2, canvas.height / 2);
     }
 
     function handleChange(e) {
@@ -66,9 +137,16 @@ export default function ContactUs() {
 
     useEffect(() => { }, [contactForm]);
 
+    useEffect(() => { generateAndDisplayCaptcha(); }, [captcha]);
+
+    useEffect(() => {
+        generateAndDisplayCaptcha();
+    }, [])
+
     return (
         <>
             <Header />
+            <ToastContainer />
             <div className='contact-container'>
                 <div className='contact-left'>
                     <div className='contact-header'>
@@ -104,6 +182,12 @@ export default function ContactUs() {
                         <label htmlFor="message">Message</label>
                         <textarea name='message' className='textarea' maxLength={200} value={contactForm.message} onChange={handleChange} />
                     </div>
+                    <span className='captcha-text'>
+                        {/* <input type='text' value={captcha} disabled/> */}
+                        <canvas id='captcha-canvas' width={100} height={30}>abcd</canvas>
+                        <input name='captcha' className='input-data' type='text' maxLength={6} value={confirmCaptcha} onChange={(e) => setConfirmCaptcha(e.target.value)} />
+                        <FontAwesomeIcon style={{cursor: 'pointer'}} icon={faRotateRight} onClick={(e) => { setCaptcha(generateCaptcha(6)); }}/>
+                    </span>
                     <div>
                         <button className='contact-submit' onClick={submitForm}>Send Message</button>
                     </div>

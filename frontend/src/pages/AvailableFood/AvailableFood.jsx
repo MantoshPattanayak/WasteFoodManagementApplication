@@ -53,11 +53,6 @@ const AvailableFood = () => {
     const recentRef = useRef();
     const itemTypeRef = useRef();
     const navigate = useNavigate();
-    const [contactFormData, setContactFormData] = useState({
-        name: "",
-        mobile: "",
-        userType: "",
-    })
     // API to fetch list of available food donations
     async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq, categoryId) {
         try {
