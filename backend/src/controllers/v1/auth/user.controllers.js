@@ -19,6 +19,9 @@ const logger = require('../../../logger/index.logger')
 const axios = require('axios')
 const file = db.files;
 const fileAttachement = db.fileAttachments;
+const weekdayMaster = db.WeekdayMasters;
+const timeMaster = db.timeMasters;
+const roles = db.roles;
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
   console.log('incoming');
@@ -1010,6 +1013,21 @@ let initialData = async (req, res) => {
         statusId: 1
       }
     });
+    console.log("fetchRoles", fetchRoles);
+
+    let timeSlotMaster = await timeMaster.findAll({
+      where: {
+        statusId: 1
+      }
+    });
+    console.log("timeSlots", timeSlotMaster);
+
+    let weekDaysMaster = await weekdayMaster.findAll({
+      where: {
+        statusId: 1
+      }
+    });
+    console.log("weekDaysMaster", weekDaysMaster);
 
     return res.status(statusCode.SUCCESS.code).json({
       message: "roles category data",
@@ -1025,6 +1043,86 @@ let initialData = async (req, res) => {
   }
 }
 
+let volunteerRegistration = async (req, res) => {
+  try {
+    console.log("volunteerRegistration");
+    let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay } = req.body;
+    console.log({ name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay });
+    let inputFields = [ 'name', 'phoneNumber', 'email', 'city', 'pincode', 'timeOfDay', 'weekDay' ]; //'verificationDocId', 'docFile', 
+    let emptyFields = [];
+
+    // fetch user type
+    let volunteerType = await roles.findAll({
+      where: {
+        statusId: 1,
+        roleName: 'Volunteer'
+      }
+    });
+    console.log("volunteerType", volunteerType);
+
+    // check for input data
+    console.log("check for input data fields");
+    inputFields.forEach((field) => {
+      if(!req.body[field]) {
+        if(emptyFields.includes('phoneNumber') && field == 'email'){
+          // skip
+        }
+        else if(!emptyFields.includes('phoneNumber') && field == 'email') {
+          emptyFields.push(field);
+        }
+        else {
+          emptyFields.push(field);
+        }
+      }
+    });
+    console.log("emptyFields", emptyFields.toString());
+    // if there are empty fields, then return with error
+    if (emptyFields.length > 0) {
+      return res.status(statusCode.BAD_REQUEST.code).json({
+        message: `Kindly fill the following fields: ${emptyFields.toString()}`,
+      });
+    }
+    let checkForDuplicateData = await users.findOne({
+      where: {
+        [Op.or]: [
+          { phoneNumber: phoneNumber }, { email: email }, { statusId: 1 }
+        ]
+      },
+      type: QueryTypes.SELECT
+    });
+
+    console.log("checkForDuplicateData:- ", checkForDuplicateData.dataValues);
+
+    if(checkForDuplicateData.dataValues) {
+      return res.status(statusCode.CONFLICT.code).json({
+        message: "User details already exist.",
+      });
+    }
+
+    let insertVolunteerData = await users.create({
+      name, email, phoneNumber, 
+      userType: volunteerType[0].roleId,
+      address: { city, pincode },
+      createdBy: 1,
+      statusId: 1,
+      timeOfDay: timeOfDay.toString(),
+      weekDay: weekDay.toString()
+    });
+
+    return res.status(statusCode.CREATED.code).json({
+      message: 'Details are successfully submitted. Kindly login!',
+      insertVolunteerData
+    });
+  }
+  catch (error) {
+    logger.error(`An error occurred: ${error.message}`); // Log the error
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: error.message
+    });
+  }
+}
+
+
 module.exports = {
   createOtp,
   verifyOtp,
@@ -1033,6 +1131,7 @@ module.exports = {
   viewUserProfile,
   logout,
   signUp,
+  volunteerRegistration,
   initialData,
   updateUserProfile
 }
