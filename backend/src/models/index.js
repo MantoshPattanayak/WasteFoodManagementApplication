@@ -57,11 +57,13 @@ db1.advertisements = require('./advertisements.model')(sequelize, DataTypes)
 db1.categories = require('./categories.models')(sequelize, DataTypes)
 db1.contactDonor = require('./contactdonor.models')(sequelize, DataTypes)
 db1.contactRequest = require('./contactRequest.models')(sequelize, DataTypes)
+db1.timeMasters = require('./timeMaster.model')(sequelize, DataTypes)
+db1.WeekdayMasters = require('./weekdayMaster.model')(sequelize, DataTypes)
 
 console.log('all details 2')
 
-db1.contactRequest.sync({
-  alter: false,
+db1.users.sync({
+  alter: true,
 });
 
 module.exports = db1;

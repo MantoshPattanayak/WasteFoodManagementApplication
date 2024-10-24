@@ -121,6 +121,13 @@ const api = {
     /**
      * firstName, lastName, email, phoneNumber, message
      */
+  },
+  REGISTER_VOLUNTEER: {
+    url: baseURL + "/auth/registerVolunteer",
+    method: "post",
+    /**
+     * name, phoneNumber, email, city, pincode, verificationDocId, docFile (file as base64 encoded), timeOfDay (in array of IDs), weekDay (in array of IDs)
+     */
   }
 };
 

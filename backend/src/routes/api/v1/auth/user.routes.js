@@ -25,5 +25,7 @@ router.post('/refresh-token', refreshTokenController.refresh);
 
 router.put('/updateProfile', authenticateToken, authController.updateUserProfile);
 
+router.post('/registerVolunteer', authController.volunteerRegistration);
+
 
 module.exports = router

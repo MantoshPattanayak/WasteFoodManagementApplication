@@ -69,6 +69,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         statusId: {
             type: DataTypes.INTEGER,
+        },
+        timeOfDay: {
+            type: DataTypes.STRING(50),
+        },
+        weekDay: {
+            type: DataTypes.STRING(50),
         }
     }, {
         schema: "soulshare",
