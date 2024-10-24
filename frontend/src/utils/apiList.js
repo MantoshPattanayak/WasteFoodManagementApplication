@@ -128,6 +128,10 @@ const api = {
     /**
      * name, phoneNumber, email, city, pincode, verificationDocId, docFile (file as base64 encoded), timeOfDay (in array of IDs), weekDay (in array of IDs)
      */
+  },
+  VIEW_VOLUNTEER_PROFILE_DATA: {
+    url: baseURL + "/auth/viewVolunteerProfile",
+    method: "get",
   }
 };
 
