@@ -1122,6 +1122,26 @@ let volunteerRegistration = async (req, res) => {
   }
 }
 
+let viewVolunteerProfileData = async (req, res) => {
+  try {
+    let userId = req.user?.userId || 1;
+    let viewProfileData = await users.findOne({
+      where: {
+        userId: userId
+      }
+    });
+    console.log("viewProfileData", viewProfileData);
+    return res.status(statusCode.SUCCESS.code).json({
+      message: "Profile data",
+      data: viewProfileData
+    });
+  } catch (error) {
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: error.message
+    })
+  }
+}
+
 
 module.exports = {
   createOtp,
@@ -1132,6 +1152,7 @@ module.exports = {
   logout,
   signUp,
   volunteerRegistration,
+  viewVolunteerProfileData,
   initialData,
   updateUserProfile
 }
