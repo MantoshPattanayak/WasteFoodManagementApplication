@@ -29,4 +29,6 @@ router.post('/registerVolunteer', authenticateToken, authController.volunteerReg
 
 router.get('/viewVolunteerProfile', authenticateToken, authController.viewVolunteerProfileData);
 
+router.put('/updateVolunteerProfile', authenticateToken, authController.updateVolunteerProfileData);
+
 module.exports = router
