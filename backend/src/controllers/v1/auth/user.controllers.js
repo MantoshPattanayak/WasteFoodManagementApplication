@@ -11,7 +11,7 @@ const { sequelize, Sequelize } = require('../../../models')
 let jwt = require('jsonwebtoken');
 const { encrypt } = require('../../../middlewares/encryption.middlewares')
 const { decrypt } = require('../../../middlewares/decryption.middlewares')
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 let generateToken = require('../../../utils/generateToken');
 const imageUpload = require('../../../utils/imageUpload');
 const imageUpdate = require('../../../utils/imageUpdate')
@@ -1048,7 +1048,7 @@ let volunteerRegistration = async (req, res) => {
     console.log("volunteerRegistration");
     let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay } = req.body;
     console.log({ name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay });
-    let inputFields = [ 'name', 'phoneNumber', 'email', 'city', 'pincode', 'timeOfDay', 'weekDay' ]; //'verificationDocId', 'docFile', 
+    let inputFields = ['name', 'phoneNumber', 'email', 'city', 'pincode', 'timeOfDay', 'weekDay']; //'verificationDocId', 'docFile', 
     let emptyFields = [];
 
     // fetch user type
@@ -1063,11 +1063,11 @@ let volunteerRegistration = async (req, res) => {
     // check for input data
     console.log("check for input data fields");
     inputFields.forEach((field) => {
-      if(!req.body[field]) {
-        if(emptyFields.includes('phoneNumber') && field == 'email'){
+      if (!req.body[field]) {
+        if (emptyFields.includes('phoneNumber') && field == 'email') {
           // skip
         }
-        else if(!emptyFields.includes('phoneNumber') && field == 'email') {
+        else if (!emptyFields.includes('phoneNumber') && field == 'email') {
           emptyFields.push(field);
         }
         else {
@@ -1093,14 +1093,14 @@ let volunteerRegistration = async (req, res) => {
 
     console.log("checkForDuplicateData:- ", checkForDuplicateData.dataValues);
 
-    if(checkForDuplicateData.dataValues) {
+    if (checkForDuplicateData.dataValues) {
       return res.status(statusCode.CONFLICT.code).json({
         message: "User details already exist.",
       });
     }
 
     let insertVolunteerData = await users.create({
-      name, email, phoneNumber, 
+      name, email, phoneNumber,
       userType: volunteerType[0].roleId,
       address: { city, pincode },
       createdBy: 1,
@@ -1133,12 +1133,192 @@ let viewVolunteerProfileData = async (req, res) => {
     console.log("viewProfileData", viewProfileData);
     return res.status(statusCode.SUCCESS.code).json({
       message: "Profile data",
-      data: viewProfileData
+      data: {
+        ...viewProfileData,
+        "timeOfDay": viewProfileData.timeOfDay.split(','),
+        "weekDay": viewProfileData.weekDay.split(',')
+      }
     });
   } catch (error) {
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: error.message
     })
+  }
+}
+
+let updateVolunteerProfileData = async (req, res) => {
+  let transaction;
+  try {
+    console.log("updateVolunteerProfileData");
+    transaction = await sequelize.transaction();
+    let inActiveStatus = 2;
+    let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay } = req.body;
+    console.log("updated field data", { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay });
+    let userId = req.user?.userId || 1;
+    let params = {};
+    let updatepublicUserCount;
+    let docFileUpdateVariable = 0;
+    // fetch saved data
+    let fetchSavedDetails = await users.findOne({
+      where: {
+        userId: userId
+      }
+    });
+    console.log("fetchSavedDetails", fetchSavedDetails.dataValues);
+    // check for any change in data
+    if (name && fetchSavedDetails.dataValues.name != name) {
+      params.name = name;
+    }
+    if (phoneNumber && fetchSavedDetails.dataValues.phoneNumber != phoneNumber) {
+      params.phoneNumber = phoneNumber;
+    }
+    if (email && fetchSavedDetails.dataValues.email != email) {
+      params.email = email;
+    }
+    if (city && fetchSavedDetails.dataValues.address.city != city) {
+      params.address = { city: city };
+    }
+    if (pincode && fetchSavedDetails.dataValues.address.pincode != pincode) {
+      params.address = { ...params.address, pincode: pincode };
+    }
+    if (verificationDocId && fetchSavedDetails.dataValues.verificationDocId != verificationDocId) {
+      params.verificationDocId = verificationDocId;
+    }
+    console.log("Params to be updated", params);
+    if (Object.keys(docFile).length > 0) {
+      if (docFile?.fileId != 0 && docFile?.data) { //if fileId and doc data sent, then update the file data
+        console.log("inside image update - fileId && data");
+        let previousFilePath = await fileAttachement.findOne({
+          where: {
+            statusId: statusId,
+            fileId: docFile.fileId
+          },
+          transaction
+        });
+        let oldFilePath = previousFilePath?.url
+        let errors = [];
+        let insertionData = {
+          id: userId,
+          name: name,
+          fileId: docFile.fileId
+        }
+        let subDir = "verificationDoc";
+
+        console.log("update verification doc file -- start");
+        let updateSingleDocument = await imageUpdate(docFile.data, subDir, insertionData, userId, errors, 1, transaction, oldFilePath);
+        if (errors.length > 0) {
+
+          await transaction.rollback();
+
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors });
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors });
+        }
+        docFileUpdateVariable = 1;
+        console.log("update verification doc file -- end")
+      }
+      else if (docFile?.fileId == 0 && docFile?.data) {  // if new file received
+        console.log('inside new verify doc part start');
+        let insertionData = {
+          id: userId,
+          name: name
+        }
+
+        // create the verification doc file
+        let entityType = "Volunteer Verification Doc";
+        let errors = [];
+        let subDir = "verificationDoc";
+
+        let uploadSingleDocument = await imageUpload(docFile.data, entityType, subDir, insertionData, userId, errors, 1, transaction);
+
+        console.log('inside new verify doc part end');
+        if (errors.length > 0) {
+          await transaction.rollback();
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+        }
+        docFileUpdateVariable = 1;
+      }
+      else if (docFile?.fileId != 0) { // if fileId is sent, then to remove existing doc file
+        console.log('remove doc file');
+        // update status of file to inactive
+        let inactiveTheFileId = await file.update({ statusId: inActiveStatus },
+          {
+            where: {
+              fileId: docFile.fileId
+            },
+            transaction
+          }
+        );
+        console.log('status of file changed to inactive', inactiveTheFileId);
+        let inActiveTheFileInFileAttachmentTable = await fileAttachement.update({
+          statusId: inActiveStatus
+        },
+          {
+            where: {
+              fileId: docFile.fileId
+            },
+            transaction
+          }
+        );
+        console.log("status of file attachment changed to inactive", inActiveTheFileInFileAttachmentTable);
+        if (inactiveTheFileId.length == 0 || inActiveTheFileInFileAttachmentTable == 0) {
+          await transaction.rollback();
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: `Something went wrong`
+          })
+        }
+        else {
+          // successful updation of status of verification doc file to inactive
+          docFileUpdateVariable = 1;
+        }
+      }
+      else {
+        // default condition
+        await transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: "Something went wrong."
+        })
+      }
+    }
+    console.log('outside of verification doc file update');
+    //if params to update
+    if (Object.keys(params).length > 0) {
+      console.log("params update");
+      params.updatedBy = userId;
+      params.updatedDt = new Date();
+
+      updatepublicUserCount = await users.update(params, {
+        where: {
+          [Op.and]: [{ userId: userId }, { statusId: 1 }]
+        },
+        transaction
+      });
+    }
+    if (updatepublicUserCount >= 1 || docFileUpdateVariable == 1) {
+      await transaction.commit();
+      console.log('data updated');
+      return res.status(statusCode.SUCCESS.code).json({
+        message: "Profile updated successfully!",
+      });
+    } else {
+      await transaction.rollback();
+      return res.status(statusCode.BAD_REQUEST.code).json({
+        message: "Profile updation failed!",
+      });
+    }
+  }
+  catch (error) {
+    if (transaction) await transaction.rollback();
+    logger.error(`An error occurred: ${error.message}`); // Log the error
+
+    res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 }
 
@@ -1154,6 +1334,7 @@ module.exports = {
   volunteerRegistration,
   viewVolunteerProfileData,
   initialData,
-  updateUserProfile
+  updateUserProfile,
+  updateVolunteerProfileData
 }
 
