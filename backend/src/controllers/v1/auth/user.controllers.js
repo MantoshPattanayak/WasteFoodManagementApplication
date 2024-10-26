@@ -22,6 +22,7 @@ const fileAttachement = db.fileAttachments;
 const weekdayMaster = db.WeekdayMasters;
 const timeMaster = db.timeMasters;
 const roles = db.roles;
+const verificationDocumentMaster = db.verificationDocumentMasters;
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
   console.log('incoming');
@@ -1015,23 +1016,31 @@ let initialData = async (req, res) => {
     });
     console.log("fetchRoles", fetchRoles);
 
-    let timeSlotMaster = await timeMaster.findAll({
+    let timeSlotMasterData = await timeMaster.findAll({
       where: {
         statusId: 1
       }
     });
-    console.log("timeSlots", timeSlotMaster);
+    console.log("timeSlots", timeSlotMasterData);
 
-    let weekDaysMaster = await weekdayMaster.findAll({
+    let weekDaysMasterData = await weekdayMaster.findAll({
       where: {
         statusId: 1
       }
     });
-    console.log("weekDaysMaster", weekDaysMaster);
+    console.log("weekDaysMaster", weekDaysMasterData);
+
+    let verificationDocumentMasterData = await verificationDocumentMaster.findAll({
+      where: {
+        statusId: 1
+      }
+    });
+    console.log("verificationDocumentMaster", verificationDocumentMasterData);
 
     return res.status(statusCode.SUCCESS.code).json({
-      message: "roles category data",
-      roles: fetchRoles
+      message: "roles category, timeSlot, dayOfWeek, verificationDocType data",
+      roles: fetchRoles,
+      timeSlotMasterData, weekDaysMasterData, verificationDocumentMasterData
     });
   }
   catch (error) {
@@ -1044,12 +1053,14 @@ let initialData = async (req, res) => {
 }
 
 let volunteerRegistration = async (req, res) => {
+  let transaction = await sequelize.transaction();
   try {
     console.log("volunteerRegistration");
-    let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay } = req.body;
+    let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay, userImage } = req.body;
     console.log({ name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay });
     let inputFields = ['name', 'phoneNumber', 'email', 'city', 'pincode', 'timeOfDay', 'weekDay']; //'verificationDocId', 'docFile', 
     let emptyFields = [];
+    let statusId = 1;
 
     // fetch user type
     let volunteerType = await roles.findAll({
@@ -1098,7 +1109,7 @@ let volunteerRegistration = async (req, res) => {
         message: "User details already exist.",
       });
     }
-
+    //insert into users table
     let insertVolunteerData = await users.create({
       name, email, phoneNumber,
       userType: volunteerType[0].roleId,
@@ -1107,14 +1118,46 @@ let volunteerRegistration = async (req, res) => {
       statusId: 1,
       timeOfDay: timeOfDay.toString(),
       weekDay: weekDay.toString()
-    });
+    }, transaction);
 
-    return res.status(statusCode.CREATED.code).json({
-      message: 'Details are successfully submitted. Kindly login!',
-      insertVolunteerData
-    });
+    if(insertVolunteerData) { // if insertion of data successful
+      console.log("insertion of volunteer data success...");
+      console.log("insert verification doc file");
+
+      let insertionData = {
+        id: insertVolunteerData.userId,
+        name: name,
+      };
+      let entityType = 'users';
+      let errors = [];
+      let subDir = "userDir";
+      // let filePurpose = "User Image";
+      let uploadSingleImage = await imageUpload(userImage, entityType, subDir, insertionData, newUser.userId, errors, 1, transaction)
+      
+      if (errors.length > 0) {
+        console.log("first")
+        await transaction.rollback();
+        if (errors.some(error => error.includes("something went wrong"))) {
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+        }
+        return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+      }
+      await transaction.commit();
+      return res.status(statusCode.CREATED.code).json({
+        message: 'Details are successfully submitted. Kindly login!',
+        insertVolunteerData
+      });
+    }
+    else {  //if insertion of user details failed, then rollback transaction
+      await transaction.rollback();
+      logger.error(`An error occurred: ${error.message}`); // Log the error
+      return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+        message: error.message
+      });
+    }
   }
   catch (error) {
+    if(transaction) await transaction.rollback();
     logger.error(`An error occurred: ${error.message}`); // Log the error
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: error.message
@@ -1151,12 +1194,15 @@ let updateVolunteerProfileData = async (req, res) => {
   try {
     console.log("updateVolunteerProfileData");
     transaction = await sequelize.transaction();
+    let statusId = 1;
     let inActiveStatus = 2;
-    let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay } = req.body;
+    let updatedDt = new Date();
+    let { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay, userImage } = req.body;
     console.log("updated field data", { name, phoneNumber, email, city, pincode, verificationDocId, docFile, timeOfDay, weekDay });
     let userId = req.user?.userId || 1;
     let params = {};
     let updatepublicUserCount;
+    let imageUpdateVariable = 0;
     let docFileUpdateVariable = 0;
     // fetch saved data
     let fetchSavedDetails = await users.findOne({
@@ -1185,6 +1231,7 @@ let updateVolunteerProfileData = async (req, res) => {
       params.verificationDocId = verificationDocId;
     }
     console.log("Params to be updated", params);
+    console.log("doc file update -- start")
     if (Object.keys(docFile).length > 0) {
       if (docFile?.fileId != 0 && docFile?.data) { //if fileId and doc data sent, then update the file data
         console.log("inside image update - fileId && data");
@@ -1285,6 +1332,110 @@ let updateVolunteerProfileData = async (req, res) => {
       }
     }
     console.log('outside of verification doc file update');
+    console.log('user profile photo update -- start');
+    if (Object.keys(userImage).length > 0) {
+      // console.log('profilePicture?.data',profilePicture?.data)
+      if (userImage?.fileId != 0 && userImage?.data) {
+        console.log('inside image part', userImage?.fileId)
+        let findThePreviousFilePath = await fileAttachement.findOne({
+          where: {
+            statusId: statusId,
+            fileId: userImage.fileId
+          },
+          transaction
+        })
+        let oldFilePath = findThePreviousFilePath?.url
+        console.log('old file path ', findThePreviousFilePath)
+        let errors = [];
+        let insertionData = {
+          id: userId,
+          name: name,
+          fileId: userImage.fileId
+        }
+        let subDir = "userDir"
+        //update the data
+        let updateSingleImage = await imageUpdate(userImage.data, subDir, insertionData, userId, errors, 1, transaction, oldFilePath)
+        if (errors.length > 0) {
+
+          await transaction.rollback();
+
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+        }
+        imageUpdateVariable = 1;
+        console.log('inside image update')
+
+      }
+      else if (userImage?.fileId == 0 && userImage?.data) {
+        console.log('inside new image part')
+        let insertionData = {
+          id: userId,
+          name: name
+        }
+        // create the data
+        let entityType = 'users'
+        let errors = [];
+        let subDir = "userDir"
+
+        let uploadSingleImage = await imageUpload(userImage.data, entityType, subDir, insertionData, userId, errors, 1, transaction)
+        console.log(uploadSingleImage, '165 line facility image')
+        if (errors.length > 0) {
+          await transaction.rollback();
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+        }
+        imageUpdateVariable = 1;
+
+        console.log('inside image upload')
+      }
+      else if (userImage.fileId != 0) {
+        console.log('inside file')
+        let inactiveTheFileId = await file.update({ statusId: inActiveStatus },
+          {
+            where: {
+              fileId: userImage.fileId
+            },
+            transaction
+          }
+        )
+
+        console.log('fileid', inactiveTheFileId)
+        let inActiveTheFileInFileAttachmentTable = await fileAttachement.update({
+          statusId: inActiveStatus
+        },
+          {
+            where: {
+              fileId: userImage.fileId
+            },
+            transaction
+          }
+        )
+        console.log('file update check', inactiveTheFileId, 'file attachemnt ', inActiveTheFileInFileAttachmentTable)
+
+        if (inactiveTheFileId.length == 0 || inActiveTheFileInFileAttachmentTable == 0) {
+          await transaction.rollback();
+          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+            message: `Something went wrong`
+          })
+        }
+        else {
+          imageUpdateVariable = 1;
+        }
+
+      }
+      else {
+        await transaction.rollback();
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: `Something went wrong`
+        })
+      }
+
+    }
+    console.log('user profile photo update -- end');
     //if params to update
     if (Object.keys(params).length > 0) {
       console.log("params update");
@@ -1298,7 +1449,7 @@ let updateVolunteerProfileData = async (req, res) => {
         transaction
       });
     }
-    if (updatepublicUserCount >= 1 || docFileUpdateVariable == 1) {
+    if (updatepublicUserCount >= 1 || docFileUpdateVariable == 1 || imageUpdateVariable == 1) {
       await transaction.commit();
       console.log('data updated');
       return res.status(statusCode.SUCCESS.code).json({

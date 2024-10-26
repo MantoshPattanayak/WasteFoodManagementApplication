@@ -59,10 +59,11 @@ db1.contactDonor = require('./contactdonor.models')(sequelize, DataTypes)
 db1.contactRequest = require('./contactRequest.models')(sequelize, DataTypes)
 db1.timeMasters = require('./timeMaster.model')(sequelize, DataTypes)
 db1.WeekdayMasters = require('./weekdayMaster.model')(sequelize, DataTypes)
+db1.verificationDocumentMasters = require('./verificationDocumentMaster')(sequelize, DataTypes)
 
 console.log('all details 2')
 
-db1.users.sync({
+db1.verificationDocumentMasters.sync({
   alter: true,
 });
 

@@ -126,12 +126,21 @@ const api = {
     url: baseURL + "/auth/registerVolunteer",
     method: "post",
     /**
-     * name, phoneNumber, email, city, pincode, verificationDocId, docFile (file as base64 encoded), timeOfDay (in array of IDs), weekDay (in array of IDs)
+     * name, phoneNumber, email, city, pincode, verificationDocId, docFile (file as base64 encoded), 
+     * timeOfDay (in array of IDs), weekDay (in array of IDs), userImage
      */
   },
   VIEW_VOLUNTEER_PROFILE_DATA: {
     url: baseURL + "/auth/viewVolunteerProfile",
     method: "get",
+  },
+  UPDATE_VOLUNTEER_PROFILE_DATA: {
+    url: baseURL + "/auth/updateVolunteerProfile",
+    method: 'put',
+    /**
+     * name, phoneNumber, email, city, pincode, verificationDocId, docFile {fileId: '', data: ''} (file as base64 encoded), 
+     * timeOfDay (in array of IDs), weekDay (in array of IDs), userImage: {fileId: '', data: ''}
+     */
   }
 };
 
