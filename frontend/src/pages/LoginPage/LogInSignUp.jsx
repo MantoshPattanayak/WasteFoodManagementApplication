@@ -146,7 +146,7 @@ function LogInSignUp() {
         // const { email, name, picture } = googleUser.data;
 
         // Call your own API to verify if the user exists
-        const response = await axios.post(api.LOGIN_WITH_GOOGLE.url, { googleTokenId: access_token });
+        const response = await axios.post(api.LOGIN_WITH_GOOGLE.url, { googleTokenId: access_token, userType: userType });
         console.log("LOGIN_WITH_GOOGLE response", response.data);
 
         if (response.data.decideSignUpOrLogin) {
