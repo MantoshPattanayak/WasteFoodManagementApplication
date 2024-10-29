@@ -9,10 +9,10 @@ import { logout } from "../store/reducers/authReducer";
 import axiosInstance from "../services/axios";
 import api from "../utils/apiList";
 import { toast } from "react-toastify";
-import profile_image from "../assets/profile.png";
-import axios from "axios";
 import googlePlayStore from "../assets/google-play.svg";
 import appleStore from "../assets/apple.svg";
+import { addData, fetchData } from "../utils/indexedDBUtils";
+
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -25,7 +25,7 @@ const Header = () => {
   const [displayAppLink, setDisplayAppLink] = useState(false);
   let location = useLocation();
   const appDisplayContainer = useRef()
-
+ 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
@@ -56,8 +56,12 @@ const Header = () => {
       let response = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
       console.log("fetchCategoryList", response.data);
       setCategoryList(response.data.findAllCategories);
+      await addData({ id: api.INITIAL_FOOD_DROPDOWN_DATA.url, data: response.data.findAllCategories });
     }
     catch (error) {
+      let indexedDBData = await fetchData(api.INITIAL_FOOD_DROPDOWN_DATA.url);
+      console.log("indexedDBData", indexedDBData);
+      setCategoryList(indexedDBData.data);
       console.log("Error at fetchCategoryList", error);
     }
   }
@@ -106,12 +110,6 @@ const Header = () => {
         }
       });
     }
-    // Fetch notifications on mount and set interval for updates
-    // fetchNotifications();
-    // const intervalId = setInterval(() => {
-    //   console.log("Fetching notifications again...");
-    //   fetchNotifications();
-    // }, 10000);  // Fetch every 10 seconds
 
     // Cleanup interval on unmount
     return () => {
