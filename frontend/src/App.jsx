@@ -4,6 +4,7 @@ import { AuthProvider, withAuth } from './common/AuthProvider';
 import persistor from './store/store';
 import { Provider } from 'react-redux';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { openDatabase } from './utils/indexedDBUtils';
 const LandingPage = React.lazy(() => import('./pages/LandingPage/landingPage'))
 const DonorLandingPage = withAuth(React.lazy(() => import('./pages/DonorPage/DonorLandingPage')))
 const DonateHistory = withAuth(React.lazy(() => import('./pages/DonateHis/DonateHistory')))
@@ -19,7 +20,9 @@ const AvailableFoodDetails=React.lazy(()=>import('./pages/AvailableFood/Availabl
 const ContactUs = React.lazy(() => import ("./pages/ContactUs/ContactUs"));
 const clientId = '285807180215-an40t7r1rau490tt3f82knnnascdal3l.apps.googleusercontent.com';
 function App() {
-
+  (async () => {
+    await openDatabase();
+  })();
   return (
     <>
       <Provider store={persistor}>

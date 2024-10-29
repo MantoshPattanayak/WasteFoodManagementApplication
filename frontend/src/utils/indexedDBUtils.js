@@ -6,6 +6,7 @@ let db;
 // open the database and create object store if needed
 const openDatabase = async () => {
     try {
+        console.log('opening indexed DB');
         const request = indexedDB.open(dbName, dbVersion);
 
         request.onerror = (event) => {
@@ -34,6 +35,7 @@ const openDatabase = async () => {
 // Add data to the database
 const addData = async (data) => {
     try {
+        console.log("data", data);
         const transaction = db.transaction([dbStore], 'readwrite');
         const objectStore = transaction.objectStore(dbStore);
         const request = objectStore.add(data);
@@ -51,29 +53,31 @@ const addData = async (data) => {
             request.onerror = reject;
         });
     } catch (error) {
-        console.error(error);
+        console.error(error.target.error);
     }
 };
 
 // Fetch data by ID
 const fetchData = async (id) => {
     try {
+        // console.log(1, id);
         const transaction = db.transaction([dbStore], 'readonly');
         const objectStore = transaction.objectStore(dbStore);
         const request = objectStore.get(id);
+        // console.log(2)
+        // Use a Promise to wait for the request to complete
+        const data = await new Promise((resolve, reject) => {
+            request.onsuccess = (event) => {
+                const result = event.target.result;
+                resolve(result ? result : null); // Resolve with the result or null if not found
+            };
 
-        request.onsuccess = (event) => {
-            console.log(event.target.result ? event.target.result : 'No data found for ID: ' + id);
-        };
-
-        request.onerror = (event) => {
-            throw new Error('Error fetching data: ' + event.target.error);
-        };
-
-        await new Promise((resolve, reject) => {
-            request.onsuccess = resolve;
-            request.onerror = reject;
+            request.onerror = (event) => {
+                reject(new Error('Error fetching data: ' + event.target.error));
+            };
         });
+        // console.log("data", data);
+        return data; // Return the fetched data
     } catch (error) {
         console.error(error);
     }
@@ -112,7 +116,6 @@ const deleteData = (id) => {
         };
     });
 };
-
 
 // Export the functions
 export { openDatabase, addData, fetchData, updateData, deleteData };

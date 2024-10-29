@@ -16,6 +16,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { encryptData } from "../../utils/encryption";
 import { setFoodList } from "../../store/reducers/foodReducer";
 import { useDispatch, useSelector } from "react-redux";
+import { addData } from "../../utils/indexedDBUtils";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -104,6 +105,7 @@ const AvailableFood = () => {
                     setFoodDonationList(donationList);
                 }
                 dispatch(setFoodList(donationList));
+                await addData({ id: api.VIEW_FOOD_DONATION_LIST.url, data: donationList });
             }
             else {
                 setFoodDonationList([]);
