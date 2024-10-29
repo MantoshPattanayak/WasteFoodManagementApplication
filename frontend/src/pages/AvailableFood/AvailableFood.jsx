@@ -1,32 +1,21 @@
 import "./AvailableFood.css";
 import Header from "../../common/Header";
-import image_his_list from "../../assets/food_donation_home.jpeg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faBagShopping,
-    faCalendar,
-    faCheck,
-    faMapLocationDot,
-    faPhone,
-    faTrash,
-} from "@fortawesome/free-solid-svg-icons";
-import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import axiosInstance from "../../services/axios";
 import api from "../../utils/apiList";
-import { useSelector } from "react-redux";
 import { formatDateAsDDMMYYYYHHMMSS } from "../../utils/utilityFunction";
 import instance from "../../../env";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../common/footer";
-import axios from "axios";
 // import slider
 import ShimmerUi from "../../common/ShimmerUi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { encryptData } from "../../utils/encryption";
-import { Link } from "react-router-dom";
+import { setFoodList } from "../../store/reducers/foodReducer";
+import { useDispatch, useSelector } from "react-redux";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
@@ -53,6 +42,10 @@ const AvailableFood = () => {
     const recentRef = useRef();
     const itemTypeRef = useRef();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const foodDonationStoreData = useSelector((state) => state.food.foodDonationList);
+
+
     // API to fetch list of available food donations
     async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq, categoryId) {
         try {
@@ -80,47 +73,53 @@ const AvailableFood = () => {
             // else {
             //     setFoodDonationList(res.data.foodDonationData);
             // }
+            let donationList = [];
             if (res.data?.foodDonationData.length > 0) {
                 if (categoryId && givenReq) {
-                    setFoodDonationList(
-                        res.data.foodDonationData.filter((item) => {
-                            // console.log(item.foodName, item.address);
-                            return item.categoryId == categoryId &&
-                                (item?.foodName?.toLowerCase().includes(givenReq.toLowerCase()) ||
-                                    JSON.stringify(item.address)?.includes(givenReq));
-                        })
-                    );
+                    donationList = res.data.foodDonationData.filter((item) => {
+                        // console.log(item.foodName, item.address);
+                        return item.categoryId == categoryId &&
+                            (item?.foodName?.toLowerCase().includes(givenReq.toLowerCase()) ||
+                                JSON.stringify(item.address)?.includes(givenReq));
+                    });
+                    setFoodDonationList(donationList);
                 }
                 else if (categoryId) {
-                    setFoodDonationList(
-                        res.data.foodDonationData.filter((item) => {
-                            // console.log(item.foodName, item.address);
-                            return item.categoryId == categoryId;
-                        })
-                    );
+                    donationList = res.data.foodDonationData.filter((item) => {
+                        // console.log(item.foodName, item.address);
+                        return item.categoryId == categoryId;
+                    });
+                    setFoodDonationList(donationList);
                 }
                 else if (givenReq) {
-                    setFoodDonationList(
-                        res.data.foodDonationData.filter((item) => {
-                            // console.log(item.foodName, item.address);
-                            return item?.foodName?.includes(givenReq) ||
-                                JSON.stringify(item.address)?.includes(givenReq);
-                        })
-                    );
+                    donationList = res.data.foodDonationData.filter((item) => {
+                        // console.log(item.foodName, item.address);
+                        return item?.foodName?.includes(givenReq) ||
+                            JSON.stringify(item.address)?.includes(givenReq);
+                    });
+                    setFoodDonationList(donationList);
                 }
                 else {
-                    setFoodDonationList(res.data.foodDonationData);
+                    donationList = res.data.foodDonationData;
+                    setFoodDonationList(donationList);
                 }
+                dispatch(setFoodList(donationList));
             }
             else {
                 setFoodDonationList([]);
+                dispatch(setFoodList([]));
             }
 
             setisLoding(false);
         }
 
         catch (error) {
-            setFoodDonationList([]);
+            if(foodDonationStoreData.length > 0) {
+                setFoodDonationList(foodDonationStoreData);
+            }
+            else {
+                setFoodDonationList([]);
+            }
             console.error('Error while fetching available food', error);
             setisLoding(false)
         }

@@ -9,7 +9,8 @@ const foodReducer = createSlice({
     initialState,
     reducers: {
         setFoodList(state = initialState, action) {
-            const { foodDonationList } = action.payload;
+            // console.log('action payload', action.payload);
+            const foodDonationList = action.payload;
             state.foodDonationList = foodDonationList;
             console.log("initial state", foodDonationList);
         },
@@ -17,5 +18,5 @@ const foodReducer = createSlice({
     },
 });
 
-export const { fetchFoodList } = foodReducer.actions;
+export const { setFoodList } = foodReducer.actions;
 export default foodReducer.reducer;
