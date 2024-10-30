@@ -197,7 +197,7 @@ const DonorDetails = () => {
         }
     }
 
-    // Validation of donor food--------------------
+    // Validation of donor item--------------------
     const DonorValidation = (value) => {
         console.log("donor validation");
         const err = {};
@@ -206,13 +206,17 @@ const DonorDetails = () => {
         // here is the regex code ..
         const RegexPincode = /^\d{6}$/;
         const Addresspattern = /^(?!\s*$)[\w\s,.\-\/]+$/;
+        const foodRegex = /^[A-Za-z&',.-][A-Za-z\s&',.-]*$/;
 
 
         if (!value.foodName) {
-            err.foodName = "Please enter food name";
-        } 
+            err.foodName = "Please enter item name";
+        }
+        else if(!foodRegex.test(value.foodName)) {
+            err.foodName = "Please enetr valid item name."
+        }
         if (!value.foodCategory) {
-            err.foodCategory = "Please select a food category"
+            err.foodCategory = "Please select a item category"
         }
         if (!value.quantity) {
             err.quantity = "Please enter quantity"
@@ -233,11 +237,11 @@ const DonorDetails = () => {
         if (!value.address.area) {
             err.area = "Please enter area"
         } else if (!Addresspattern.test(value.address.area)) {
-            err.area = "Please enter vaild Area"
+            err.area = "Please enter vaild area"
         }
         if (value.address.landmark) {
             if (!Addresspattern.test(value.address.landmark)) {
-                err.landmark = "Please enter  vaild landmark"
+                err.landmark = "Please enter vaild landmark"
             }
         }
 
@@ -404,6 +408,7 @@ const DonorDetails = () => {
                                         value={DonorData.address.townCity}
                                         onChange={handleAddressChange}
                                         placeholder="Town/City"
+                                        disabled
                                     />
                                 </div>
                             </div>
@@ -416,6 +421,7 @@ const DonorDetails = () => {
                                         value={DonorData.address.state}
                                         onChange={handleAddressChange}
                                         placeholder="State"
+                                        disabled
                                     />
                                 </div>
                                 <div className="input_group">
@@ -426,6 +432,7 @@ const DonorDetails = () => {
                                         value={DonorData.address.country}
                                         onChange={handleAddressChange}
                                         placeholder="Country"
+                                        disabled
                                     />
                                 </div>
                             </div>
