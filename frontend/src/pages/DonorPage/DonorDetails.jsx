@@ -262,7 +262,7 @@ const DonorDetails = () => {
                             <input
                                 type="text"
                                 name="foodName"
-                                placeholder="Enter Food Name"
+                                placeholder="Enter Item Name"
                                 value={DonorData.foodName}
                                 onChange={handleChange}
                             />
@@ -293,7 +293,7 @@ const DonorDetails = () => {
                                 value={DonorData.foodCategory}
                                 onChange={handleChange}
                             >
-                                <option value="">Select Food Category</option>
+                                <option value="">Select Sub Category</option>
                                 {DonorType?.length > 0 && DonorType.map((item, index) => {
                                     if(parseInt(DonorData.categoryId) == parseInt(item.categoryId)) {
                                         return (
@@ -347,7 +347,7 @@ const DonorDetails = () => {
                             {showError.expirationDate && <span className="error_msg"> {showError.expirationDate}</span>}
                         </span>
                         <span className="input_text_conatiner">
-                            <label>Item Photo</label>
+                            <label>Item Photo*</label>
                             <input type="file"
                                 onChange={handleImageChange}
                                 accept="image/*"

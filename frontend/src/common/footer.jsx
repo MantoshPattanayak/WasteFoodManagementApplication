@@ -27,7 +27,7 @@ const Footer = () => {
                 <h1>Transforming Generosity into Action</h1>
             </span>
             <div className="footer_button_vol_do">
-                <button className="volunteer_button">VOLUNTEER</button>
+                <button className="volunteer_button" onClick={(e) => { toast.info("Development inprogres..."); }}>VOLUNTEER</button>
                 <button className="donate_button" onClick={handleNavigation}>DONATE</button>
             </div>
             <div className="content_footer">
@@ -46,13 +46,16 @@ const Footer = () => {
                     <ul>
                         <li>
                             {/* <FontAwesomeIcon icon={faEnvelope} /> */}
-                            <b>Email:</b><a href=" soul@soulunileaders.com"> soul@soulunileaders.com</a></li>
+                            <b>Email:</b> <a href="mailto:soul@soulunileaders.com">soul@soulunileaders.com</a>
+                        </li>
                         <li>
                             {/* <FontAwesomeIcon icon={faPhone} /> */}
-                            <b>Phone:</b><a href=" +91 7077769335"> +91 7077769335</a></li>
+                            <b>Phone:</b> <a href="tel:+917077769335">+91 7077769335</a>
+                        </li>
                         <li>
                             {/* <FontAwesomeIcon icon={faLocationDot} /> */}
-                            <p><b>Address:</b> E/42/D, Infocity Avenue, Chandaka Industrial Estate, Bhubaneswar, Odisha, India - 751024</p></li>
+                            <p><b>Address:</b> E/42/D, Infocity Avenue, Chandaka Industrial Estate, Bhubaneswar, Odisha, India - 751024</p>
+                        </li>
                     </ul>
                 </div>
                 {/* <div className="footer-section">

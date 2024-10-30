@@ -62,7 +62,7 @@ let addFoodDonationRequest = async (req, res) => {
         for (let key of Object.keys(foodItemsArray[0].address)) {
             if (!addressDetails.includes(key) || (key != 'landmark' && !foodItemsArray[0].address[key])) {
                 return res.status(statusCode.BAD_REQUEST.code).json({
-                    message: `please provide all required data to set up the profile`
+                    message: `Please provide all required address data.`
                 });
             }
         }
@@ -120,7 +120,7 @@ let addFoodDonationRequest = async (req, res) => {
         serialNumber = 0;
         await transaction.commit();
         return res.status(statusCode.CREATED.code).json({
-            message: "New food donation has been posted."
+            message: "New donation has been posted."
         })
     }
     catch (error) {

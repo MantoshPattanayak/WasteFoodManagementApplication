@@ -99,6 +99,10 @@ function LogInSignUp() {
       console.log("response of verify otp api", res.data);
       let checkOTP = (sessionStorage.getItem('check')) == encryptData(otp);
       console.log("checkOTP", checkOTP);
+      if(!checkOTP) {
+        toast.error("Incorrect OTP!");
+        return;
+      }
       if (res.data.decideSignUpOrLogin) {
         dispatch(login(res.data.user));
         tokenService.setUser(res.data.user);
