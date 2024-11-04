@@ -5,16 +5,16 @@ self.addEventListener('install', (event) => {
     // self.skipWaiting(); // Activates the service worker as soon as it's installed
     event.waitUntil(
         caches.open(cachedData)
-        .then((cache) => {
-            cache.addAll([
-                '/index.html',
-                '/',
-                '/assets/react-dom-BsKPv0mT.js',
-                '/assets/index-_-maVoVq.js',
-                '/@react-oauth-edsVJGFr.js',
-                '/assets/@fortawesome-Com2JvGT.js ',
-            ])
-        })
+            .then((cache) => {
+                cache.addAll([
+                    '/index.html',
+                    '/',
+                    '/assets/react-dom-BsKPv0mT.js',
+                    '/assets/index-_-maVoVq.js',
+                    '/@react-oauth-edsVJGFr.js',
+                    '/assets/@fortawesome-Com2JvGT.js ',
+                ])
+            })
     )
 });
 
@@ -25,25 +25,43 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event listener in the service worker
 self.addEventListener('fetch', (event) => {
-    if(!navigator.onLine) {
-        if(event.request.url.includes('/assets/index-_-maVoVq.js') || event.request.url.includes('/assets/react-dom-BsKPv0mT.js')) {
-            event.waitUntil(
-                self.registration.showNotification('Internet', {
-                    body: "internet not working",
-                })
-            )
-        }
+    if (!navigator.onLine) {    // while and trying to access the page, serve from the cache storage
+        // if (event.request.url.includes('/assets/index-_-maVoVq.js') || event.request.url.includes('/assets/react-dom-BsKPv0mT.js')) {
+        event.waitUntil(
+            self.registration.showNotification('Internet', {
+                body: "internet not working",
+            })
+        )
+        // }
 
         event.respondWith(
             caches.match(event.request)
-            .then((res) => {
-                if(res) {
-                    return res;
-                }
-                let requestUrl = event.request.clone();
-                fetch(requestUrl);
-            })
+                .then((res) => {
+                    if (res) {
+                        return res;
+                    }
+                    let requestUrl = event.request.clone();
+                    fetch(requestUrl);
+                })
         )
+    }
+    else {  // while online cache static images to reduce the load time
+        if (event.request.url.includes('.png') || event.request.url.includes('.svg') || event.request.url.includes('.jpg') || event.request.url.includes('.jpeg')) {
+            event.respondWith(
+                caches.match(event.request)
+                .then((response) => {
+                    if (response) {
+                        return response; // Return cached image
+                    }
+                    return fetch(event.request).then((networkResponse) => {
+                        return caches.open(cachedData).then((cache) => {
+                            cache.put(event.request, networkResponse.clone()); // Cache new image
+                            return networkResponse;
+                        });
+                    });
+                })
+            );
+        }
     }
 });
 
