@@ -1155,7 +1155,7 @@ let volunteerRegistration = async (req, res) => {
         }
       }
 
-      if(docFile) { // if verification document provided, then insert
+      if (docFile) { // if verification document provided, then insert
         // create the verification doc file
         entityType = "Volunteer Verification Doc";
         errors = [];
@@ -1515,13 +1515,72 @@ let updateAvailability = async (req, res) => {
     let userAvailability = await availabilityUser.findAll({
       where: {
         userId: userId
+      },
+      type: QueryTypes.SELECT
+    }, transaction);
+    console.log("user availability info", userAvailability, userAvailability.length);
+    // return res.status(statusCode.SUCCESS.code).json({
+    //   message: availabilityStatus == 1 ? 'Marked available for volunteering' : 'Marked unavailable for volunteering',
+    //   userAvailability
+    // });
+
+    if (userAvailability.length > 0) {  // if records present, then update
+      console.log(1)
+      let [updateCount] = await availabilityUser.update({
+        statusId: availabilityStatus,
+        updatedBy: userId,
+        updatedOn: new Date()
+      }, {
+        where: {
+          userId: userId
+        },
+        transaction
+      });
+      console.log(2, updateCount);
+      if(updateCount > 0) {
+        console.log(3)
+        await transaction.commit();
+        return res.status(statusCode.SUCCESS.code).json({
+          message: availabilityStatus == 1 ? 'Marked available for volunteering' : 'Marked unavailable for volunteering'
+        });
       }
-    });
-    console.log("user availability info", userAvailability);
-    return res.status(statusCode.SUCCESS.code).json({
-      message: availabilityStatus == 1 ? 'Marked available for volunteering' : 'Marked unavailable',
-      userAvailability
-    });
+      else {
+        console.log(4);
+        await transaction.rollback();
+        logger.error(`An error occurred: updating availability of volunteer failed.`); // Log the error
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: 'something went wrong'
+        })
+      }
+    }
+    else {  // if records not present, then insert
+      console.log(5)
+      let insertAvailabilityData = await availabilityUser.create({
+        userId: userId,
+        statusId: availabilityStatus,
+        createdBy: userId,
+        createdOn: new Date()
+      }, {
+        transaction
+      });
+      console.log(6)
+      if(insertAvailabilityData) {
+        console.log(7)
+        await transaction.commit();
+        return res.status(statusCode.SUCCESS.code).json({
+          message: availabilityStatus == 1 ? 'Marked available for volunteering' : 'Marked unavailable for volunteering',
+          userAvailability, insertAvailabilityData
+        });
+      }
+      else {
+        console.log(8)
+        await transaction.rollback();
+        logger.error(`An error occurred: Inserting availability data failed`); // Log the error
+        return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+          message: 'something went wrong'
+        })
+      }
+    }
   } catch (error) {
     if (transaction) transaction.rollback();
     logger.error(`An error occurred: ${error.message}`); // Log the error
