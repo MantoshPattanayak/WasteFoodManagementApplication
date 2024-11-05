@@ -65,7 +65,7 @@ db1.availabilityUsers = require('./availabilityUsers.models')(sequelize, DataTyp
 console.log('all details 2')
 
 db1.users.sync({
-  alter: true,
+  alter: false,
 });
 
 module.exports = db1;
