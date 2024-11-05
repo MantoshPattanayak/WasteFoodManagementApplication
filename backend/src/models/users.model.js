@@ -75,6 +75,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         weekDay: {
             type: DataTypes.STRING(50),
+        },
+        verificationDocumentId: {
+            type: DataTypes.INTEGER,
         }
     }, {
         schema: "soulshare",

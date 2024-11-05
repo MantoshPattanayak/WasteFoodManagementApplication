@@ -23,6 +23,7 @@ const weekdayMaster = db.WeekdayMasters;
 const timeMaster = db.timeMasters;
 const roles = db.roles;
 const verificationDocumentMaster = db.verificationDocumentMasters;
+const availabilityUser = db.availabilityUsers;
 
 function generateRandomOTP(numberValue = "1234567890", otpLength = 6) {
   console.log('incoming');
@@ -1095,8 +1096,14 @@ let volunteerRegistration = async (req, res) => {
     }
     let checkForDuplicateData = await users.findOne({
       where: {
-        [Op.or]: [
-          { phoneNumber: phoneNumber }, { email: email }, { statusId: 1 }
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { phoneNumber: phoneNumber },
+              { email: email }
+            ]
+          },
+          { statusId: 1 }
         ]
       },
       type: QueryTypes.SELECT
@@ -1117,10 +1124,11 @@ let volunteerRegistration = async (req, res) => {
       createdBy: 1,
       statusId: 1,
       timeOfDay: timeOfDay.toString(),
-      weekDay: weekDay.toString()
+      weekDay: weekDay.toString(),
+      verificationDocumentId: verificationDocId,
     }, transaction);
 
-    if(insertVolunteerData) { // if insertion of data successful
+    if (insertVolunteerData) { // if insertion of data successful
       console.log("insertion of volunteer data success...");
       console.log("insert verification doc file");
 
@@ -1128,20 +1136,43 @@ let volunteerRegistration = async (req, res) => {
         id: insertVolunteerData.userId,
         name: name,
       };
-      let entityType = 'users';
+      let entityType = '';
       let errors = [];
-      let subDir = "userDir";
-      // let filePurpose = "User Image";
-      let uploadSingleImage = await imageUpload(userImage, entityType, subDir, insertionData, newUser.userId, errors, 1, transaction)
-      
-      if (errors.length > 0) {
-        console.log("first")
-        await transaction.rollback();
-        if (errors.some(error => error.includes("something went wrong"))) {
-          return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+      let subDir = "";
+
+      if (userImage) {  // if profile picture provided, then insert
+        entityType = 'users';
+        subDir = "userDir";
+        uploadSingleImage = await imageUpload(userImage, entityType, subDir, insertionData, insertVolunteerData.userId, errors, 1, transaction)
+
+        if (errors.length > 0) {
+          console.log("first")
+          await transaction.rollback();
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
         }
-        return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
       }
+
+      if(docFile) { // if verification document provided, then insert
+        // create the verification doc file
+        entityType = "Volunteer Verification Doc";
+        errors = [];
+        subDir = "verificationDoc";
+
+        let uploadSingleDocument = await imageUpload(docFile.data, entityType, subDir, insertionData, insertVolunteerData.userId, errors, 1, transaction);
+
+        console.log('inside new verify doc part end');
+        if (errors.length > 0) {
+          await transaction.rollback();
+          if (errors.some(error => error.includes("something went wrong"))) {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({ message: errors })
+          }
+          return res.status(statusCode.BAD_REQUEST.code).json({ message: errors })
+        }
+      }
+
       await transaction.commit();
       return res.status(statusCode.CREATED.code).json({
         message: 'Details are successfully submitted. Kindly login!',
@@ -1157,7 +1188,7 @@ let volunteerRegistration = async (req, res) => {
     }
   }
   catch (error) {
-    if(transaction) await transaction.rollback();
+    if (transaction) await transaction.rollback();
     logger.error(`An error occurred: ${error.message}`); // Log the error
     return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
       message: error.message
@@ -1473,6 +1504,34 @@ let updateVolunteerProfileData = async (req, res) => {
   }
 }
 
+let updateAvailability = async (req, res) => {
+  let transaction = await sequelize.transaction();
+  try {
+    console.log("update availability");
+    let { availabilityStatus } = req.body;
+    let userId = req.user?.userId;
+
+    // check if user availability record exists
+    let userAvailability = await availabilityUser.findAll({
+      where: {
+        userId: userId
+      }
+    });
+    console.log("user availability info", userAvailability);
+    return res.status(statusCode.SUCCESS.code).json({
+      message: availabilityStatus == 1 ? 'Marked available for volunteering' : 'Marked unavailable',
+      userAvailability
+    });
+  } catch (error) {
+    if (transaction) transaction.rollback();
+    logger.error(`An error occurred: ${error.message}`); // Log the error
+
+    return res.status(statusCode.INTERNAL_SERVER_ERROR.code).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+}
 
 module.exports = {
   createOtp,
@@ -1486,6 +1545,7 @@ module.exports = {
   viewVolunteerProfileData,
   initialData,
   updateUserProfile,
-  updateVolunteerProfileData
+  updateVolunteerProfileData,
+  updateAvailability
 }
 

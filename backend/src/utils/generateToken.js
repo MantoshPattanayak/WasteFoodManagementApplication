@@ -11,7 +11,7 @@ async function jwtTokens(userId, userName) {
     let accessToken;
     let refreshToken;
 
-    accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1day' });
+    accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30day' });
     refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30day' });
     return ({ accessToken, refreshToken });
   }

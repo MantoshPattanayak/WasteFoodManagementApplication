@@ -31,4 +31,6 @@ router.get('/viewVolunteerProfile', authenticateToken, authController.viewVolunt
 
 router.put('/updateVolunteerProfile', authenticateToken, authController.updateVolunteerProfileData);
 
+router.put('/updateUserAvailability', authenticateToken, authController.updateAvailability);
+
 module.exports = router
