@@ -1109,9 +1109,9 @@ let volunteerRegistration = async (req, res) => {
       type: QueryTypes.SELECT
     });
 
-    console.log("checkForDuplicateData:- ", checkForDuplicateData.dataValues);
+    console.log("checkForDuplicateData:- ", checkForDuplicateData);
 
-    if (checkForDuplicateData.dataValues) {
+    if (checkForDuplicateData) {
       return res.status(statusCode.CONFLICT.code).json({
         message: "User details already exist.",
       });
