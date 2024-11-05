@@ -26,24 +26,28 @@ app.use(
     credentials: true,
   })
 );
+// limit the json data size
 app.use(express.json({ limit: "20mb" }));
+
 app.use(
   express.urlencoded({
     extended: true,
     limit: "20mb"
   })
 );
-app.use('/sshare/static', express.static(uploadDir));
-
-app.use(cookieParser());
-// app.use(requestLogger);
 
 app.use((req,res,next)=>{
   console.log('inside logger info')
   logger.info(`Received ${req.method} request for ${req.url}`);
+  // Set Cache-Control header for 30 days (30 days * 24 hours * 60 minutes * 60 seconds)
+  res.set('Cache-Control', 'public, max-age=' + (30 * 24 * 60 * 60));
   next();
 })
 
+app.use('/sshare/static', express.static(uploadDir));
+
+app.use(cookieParser());
+// app.use(requestLogger);
 
 //-------------------------------------------------------------------------------------------------------------//
 

@@ -319,7 +319,7 @@ const AvailableFood = () => {
                 <div className="grid_content_area">
                     {isLoding ? (
                         <ShimmerUi />
-                    ) : (
+                    ) : foodDonationList?.length > 0 ? (
                         
                         foodDonationList?.map((food, index) => (
                          
@@ -356,6 +356,10 @@ const AvailableFood = () => {
                           
                           
                         ))
+                    ) : (
+                        <div>
+                            <p>No donation available at the moment.</p>
+                        </div>
                     )}
                     {/* Multiple Grid Items */}
                 </div>
