@@ -35,7 +35,7 @@ const openDatabase = async () => {
 // Add data to the database
 const addData = async (data) => {
     try {
-        console.log("data", data);
+        // console.log("data", data);
         const transaction = db.transaction([dbStore], 'readwrite');
         const objectStore = transaction.objectStore(dbStore);
         const request = objectStore.add(data);

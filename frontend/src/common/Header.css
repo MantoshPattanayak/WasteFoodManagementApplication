@@ -11,7 +11,20 @@
   background-color: #d9e7fc;
   color: #000000;
   z-index: 1000;
+  flex-direction: column;
   /* Ensure it's above other content */
+}
+
+.offline-header {
+  /* background-color: rgb(224, 92, 92); */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.offline-text {
+  color: red;
 }
 
 /* Container for logo and navigation */
