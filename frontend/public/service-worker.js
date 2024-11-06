@@ -18,20 +18,39 @@ self.addEventListener('install', (event) => {
     )
 });
 
+// self.addEventListener('activate', (event) => {
+//     console.log('Service Worker activated!!');
+//     return self.clients.claim();
+// });
+
+// Activate event: clean up old caches
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker activated!!');
-    return self.clients.claim();
+    console.log('Service Worker activated');
+
+    const cacheWhitelist = [cachedData]; // Only keep the current cache
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (!cacheWhitelist.includes(cacheName)) {
+                        // Delete old caches that are not in the whitelist
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
 });
 
 // Fetch event listener in the service worker
 self.addEventListener('fetch', (event) => {
     if (!navigator.onLine) {    // while and trying to access the page, serve from the cache storage
         // if (event.request.url.includes('/assets/index-_-maVoVq.js') || event.request.url.includes('/assets/react-dom-BsKPv0mT.js')) {
-        event.waitUntil(
-            self.registration.showNotification('Internet', {
-                body: "internet not working",
-            })
-        )
+        // event.waitUntil(
+        //     self.registration.showNotification('Internet', {
+        //         body: "internet not working",
+        //     })
+        // )
         // }
 
         event.respondWith(
@@ -85,17 +104,17 @@ self.addEventListener('fetch', (event) => {
 //     }
 // });
 
-self.addEventListener('message', (event) => {
-    if (event.data.type === 'NOTIFICATIONS') {
-        const notificationData = event.data.data;
-        // Display notification
-        self.registration.showNotification('New Notification', {
-            body: notificationData,
-            tag: `notification-${event.data.id}`,
-            data: { url: event.data.url },  // Extra data can be passed here
-            actions: [
-                { action: 'open', title: 'Open App' }
-            ]
-        });
-    }
-});
+// self.addEventListener('message', (event) => {
+//     if (event.data.type === 'NOTIFICATIONS') {
+//         const notificationData = event.data.data;
+//         // Display notification
+//         self.registration.showNotification('New Notification', {
+//             body: notificationData,
+//             tag: `notification-${event.data.id}`,
+//             data: { url: event.data.url },  // Extra data can be passed here
+//             actions: [
+//                 { action: 'open', title: 'Open App' }
+//             ]
+//         });
+//     }
+// });

@@ -16,27 +16,28 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { encryptData } from "../../utils/encryption";
 import { setFoodList } from "../../store/reducers/foodReducer";
 import { useDispatch, useSelector } from "react-redux";
-import { addData } from "../../utils/indexedDBUtils";
+import { addData, fetchData } from "../../utils/indexedDBUtils";
 
 const AvailableFood = () => {
     const [recordsCount, setRecordsCount] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
     const [timeLimit, setTimeLimit] = useState("");
     const [distanceRange, setDistanceRange] = useState("");
-    const [foodTypeChoice, setFoodTypeChoice] = useState('');
+    const [foodTypeChoice, setFoodTypeChoice] = useState("");
     const [foodDonationList, setFoodDonationList] = useState([]);
     const [filterOptions, setFilterOptions] = useState({});
     const user = useSelector((state) => state.auth.user);
     const [showRecentOptions, setShowRecentOptions] = useState(false);
     const [showItemTypeOptions, setShowItemTypeOptions] = useState(false);
-    const [isLoding, setisLoding] = useState(false)
+    const [isLoding, setisLoding] = useState(false);
     const [userPosition, setUserPosition] = useState({
-        latitude: '', longitude: ''
-    })
-    const [pincode, setPincode] = useState('');
+        latitude: "",
+        longitude: "",
+    });
+    const [pincode, setPincode] = useState("");
     const location = useLocation();
-    let searchTerm = new URLSearchParams(location.search).get('s') || '';
-    let categoryId = new URLSearchParams(location.search).get('category') || '';
+    let searchTerm = new URLSearchParams(location.search).get("s") || "";
+    let categoryId = new URLSearchParams(location.search).get("category") || "";
     const [category, setCategory] = useState(categoryId);
     const [givenReq, setGivenReq] = useState(searchTerm);
     // const [townCity, setTownCity] = useState('');
@@ -44,102 +45,141 @@ const AvailableFood = () => {
     const itemTypeRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const foodDonationStoreData = useSelector((state) => state.food.foodDonationList);
-
+    const foodDonationStoreData = useSelector(
+        (state) => state.food.foodDonationList
+    );
 
     // API to fetch list of available food donations
     async function fetchAvailableFood(timeLimit = null, foodTypeChoice = null, user, givenReq, categoryId) {
+        const data = (await fetchData(api.VIEW_FOOD_DONATION_LIST.url))?.data;
+        console.log("data", data);
+        let res;
         try {
             setisLoding(true);
-            let res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url, {
-                page_size: recordsCount,
-                page_number: pageNumber,
-                timeLimit,
-                userLatitude: user?.latitude || 20.3010259,
-                userLongitude: user?.longitude || 85.7380521,
-                distanceRange,
-                foodType: foodTypeChoice,
-                categoryId: categoryId,
-                // givenReq: givenReq
-            });
-            console.log("Response of fetchAvailableFood API", res.data.foodDonationData, new Date().toISOString());
+            // fetch api data via api call or from local storage
+            if (data) {
+                console.log(1);
+                res = {
+                    data: {
+                        foodDonationData: data,
+                    },
+                };
+            } else {
+                console.log(2);
+                res = await axiosInstance.post(api.VIEW_FOOD_DONATION_LIST.url, {
+                    page_size: recordsCount,
+                    page_number: pageNumber,
+                    timeLimit,
+                    userLatitude: user?.latitude || 20.3010259,
+                    userLongitude: user?.longitude || 85.7380521,
+                    distanceRange,
+                    foodType: foodTypeChoice,
+                    categoryId: categoryId,
+                    // givenReq: givenReq
+                });
+                console.log(
+                    "Response of fetchAvailableFood API",
+                    res.data.foodDonationData,
+                    new Date().toISOString()
+                );
+                await addData({
+                    id: api.VIEW_FOOD_DONATION_LIST.url,
+                    data: res.data.foodDonationData,
+                });
+            }
+
             // if (pincode && pincode.length == 6) {
             //     let donationList = res.data.foodDonationData;
             //     donationList = donationList.filter((data) => {
             //         return JSON.stringify(data.address).toLowerCase().includes(Array.from(townCityList)[0].toLowerCase())
             //     });
             //     // console.log("donation list filtered by pincode", donationList);
-            //     setFoodDonationList(donationList); 
+            //     setFoodDonationList(donationList);
             // }
             // else {
             //     setFoodDonationList(res.data.foodDonationData);
             // }
+
             let donationList = [];
             if (res.data?.foodDonationData.length > 0) {
                 if (categoryId && givenReq) {
                     donationList = res.data.foodDonationData.filter((item) => {
                         // console.log(item.foodName, item.address);
-                        return item.categoryId == categoryId &&
+                        return (
+                            item.categoryId == categoryId &&
                             (item?.foodName?.toLowerCase().includes(givenReq.toLowerCase()) ||
-                                JSON.stringify(item.address)?.includes(givenReq));
+                                JSON.stringify(item.address)?.includes(givenReq))
+                        );
                     });
                     setFoodDonationList(donationList);
-                }
-                else if (categoryId) {
+                } else if (categoryId) {
                     donationList = res.data.foodDonationData.filter((item) => {
                         // console.log(item.foodName, item.address);
                         return item.categoryId == categoryId;
                     });
                     setFoodDonationList(donationList);
-                }
-                else if (givenReq) {
+                } else if (givenReq) {
                     donationList = res.data.foodDonationData.filter((item) => {
                         // console.log(item.foodName, item.address);
-                        return item?.foodName?.includes(givenReq) ||
-                            JSON.stringify(item.address)?.includes(givenReq);
+                        return (
+                            item?.foodName?.includes(givenReq) ||
+                            JSON.stringify(item.address)?.includes(givenReq)
+                        );
                     });
                     setFoodDonationList(donationList);
-                }
-                else {
+                } else {
                     donationList = res.data.foodDonationData;
                     setFoodDonationList(donationList);
                 }
                 dispatch(setFoodList(donationList));
-                await addData({ id: api.VIEW_FOOD_DONATION_LIST.url, data: donationList });
-            }
-            else {
+                await addData({
+                    id: api.VIEW_FOOD_DONATION_LIST.url,
+                    data: donationList,
+                });
+            } else {
                 setFoodDonationList([]);
                 dispatch(setFoodList([]));
             }
-
             setisLoding(false);
-        }
-
-        catch (error) {
-            if(foodDonationStoreData.length > 0) {
+        } catch (error) {
+            if (foodDonationStoreData.length > 0) {
                 setFoodDonationList(foodDonationStoreData);
-            }
-            else {
+            } else {
                 setFoodDonationList([]);
             }
-            console.error('Error while fetching available food', error);
-            setisLoding(false)
+            console.error("Error while fetching available food", error);
+            setisLoding(false);
         }
     }
     // API to fetch filter dropdown data
     async function fetchFilterDropdown() {
+        const data = (await fetchData(api.INITIAL_FOOD_DROPDOWN_DATA.url))?.data;
+        console.log("fetchFilterDropdown indexed DB", data);
+        let res;
         try {
-            let res = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
-            // console.log("Response of fetchFilterDropdown API", res.data);
+            if (data) {
+                res = {
+                    data: data,
+                };
+            } else {
+                res = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
+                console.log("Response of fetchFilterDropdown API", res.data);
+            }
             setFilterOptions({
                 timeRange: res.data.timeRange,
                 distanceRange: res.data.distanceRange,
                 foodType: res.data.foodType,
-                category: res.data.findAllCategories
+                category: res.data.findAllCategories,
             });
-        }
-        catch (error) {
-            console.error('Error while fetching available food', error);
+            await addData({ id: api.INITIAL_FOOD_DROPDOWN_DATA.url, data: res.data });
+        } catch (error) {
+            setFilterOptions({
+                timeRange: res.data.timeRange,
+                distanceRange: res.data.distanceRange,
+                foodType: res.data.foodType,
+                category: res.data.findAllCategories,
+            });
+            console.error("Error while fetching available food", error);
         }
     }
 
@@ -211,7 +251,7 @@ const AvailableFood = () => {
         let timeoutId;
         return function (...args) {
             timeoutId = setTimeout(() => fn(...args), 700);
-        }
+        };
     }
 
     // async function fetchPincodeDetails(pincode) {
@@ -239,8 +279,10 @@ const AvailableFood = () => {
     //     }
     // }
 
-
-    let debouncedFetchAvailableFood = useCallback(debounce(fetchAvailableFood), []);
+    let debouncedFetchAvailableFood = useCallback(
+        debounce(fetchAvailableFood),
+        []
+    );
 
     useEffect(() => {
         fetchAvailableFood();
@@ -249,23 +291,19 @@ const AvailableFood = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (
-                recentRef.current && !recentRef.current.contains(event.target)
-            ) {
+            if (recentRef.current && !recentRef.current.contains(event.target)) {
                 setShowRecentOptions(false);
                 setShowItemTypeOptions(false);
             }
-            if (
-                itemTypeRef.current && !itemTypeRef.current.contains(event.target)
-            ) {
+            if (itemTypeRef.current && !itemTypeRef.current.contains(event.target)) {
                 setShowRecentOptions(false);
                 setShowItemTypeOptions(false);
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -274,15 +312,13 @@ const AvailableFood = () => {
         debouncedFetchAvailableFood(timeLimit, foodTypeChoice, userPosition, givenReq, category);
     }, [timeLimit, foodTypeChoice, userPosition, givenReq, category]);
 
+    // here Function to encryptDataid (Pass the Id)----------------------------------------------
+    function encryptDataId(id) {
+        let res = encryptData(id);
+        return res;
+    }
 
-  // here Function to encryptDataid (Pass the Id)----------------------------------------------
-  function encryptDataId(id) {
-    let res = encryptData(id);
-    return res;
-}
-
-
-// useNavigate
+    // useNavigate
 
     return (
         <div className="main_container">
@@ -292,25 +328,44 @@ const AvailableFood = () => {
                 {/* Left Sidebar Filter */}
                 <div className="filter_sidebar">
                     <ul className="filter_menu">
-                        <li style={{display: "flex", justifyContent: "space-between", alignItems: "center"}} onClick={(e) => { setCategory(""); navigate("/AvailableFood"); navigate(0); }}>Clear All &nbsp; &nbsp;<FontAwesomeIcon icon={faTrash} /></li>
-                        {
-                            filterOptions?.category?.length > 0 && filterOptions?.category.map((item, index) => {
+                        <li
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                            onClick={(e) => {
+                                setCategory("");
+                                setFoodTypeChoice('');
+                                navigate(0);
+                            }}
+                        >
+                            Clear All &nbsp; &nbsp;
+                            <FontAwesomeIcon icon={faTrash} />
+                        </li>
+                        {filterOptions?.category?.length > 0 &&
+                            filterOptions?.category.map((item, index) => {
                                 if (category && category == item.categoryId) {
                                     return (
-                                        <li key={index} className="selected" onClick={(e) => setCategory(item.categoryId)}>
+                                        <li
+                                            key={index}
+                                            className="selected"
+                                            onClick={(e) => setCategory(item.categoryId)}
+                                        >
                                             {item.description}
                                         </li>
-                                    )
-                                }
-                                else {
+                                    );
+                                } else {
                                     return (
-                                        <li key={index} onClick={(e) => setCategory(item.categoryId)}>
+                                        <li
+                                            key={index}
+                                            onClick={(e) => setCategory(item.categoryId)}
+                                        >
                                             {item.description}
                                         </li>
-                                    )
+                                    );
                                 }
-                            })
-                        }
+                            })}
                     </ul>
                 </div>
 
@@ -320,20 +375,38 @@ const AvailableFood = () => {
                     {isLoding ? (
                         <ShimmerUi />
                     ) : foodDonationList?.length > 0 ? (
-                        
                         foodDonationList?.map((food, index) => (
-                         
-                              <div className="item_grid"   key={index}
-                              onClick={()=>navigate(`/AvailableFoodDetails?foodListingId=${encryptDataId(food.foodListingId)}`
-                             
-                              )}
-                              >
+                            <div
+                                className="item_grid"
+                                key={index}
+                                onClick={() =>
+                                    navigate(
+                                        `/AvailableFoodDetails?foodListingId=${encryptDataId(
+                                            food.foodListingId
+                                        )}`
+                                    )
+                                }
+                            >
                                 {/* Image placeholder */}
-                                <img className="item_image" src={`${instance().baseURL}/static${food.url}`} ></img>
+                                <img
+                                    className="item_image"
+                                    src={`${instance().baseURL}/static${food.url}`}
+                                ></img>
                                 <div className="item_content">
                                     <h2 className="item_title">{food.foodName}</h2>
-                                    <p className="text">{food.address ? food.address.townCity + ', ' + food.address.state : "NA"}</p>
-                                    <p className="text">Expiration date - {formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(" ")[0]}</p>
+                                    <p className="text">
+                                        {food.address
+                                            ? food.address.townCity + ", " + food.address.state
+                                            : "NA"}
+                                    </p>
+                                    <p className="text">
+                                        Expiration date -{" "}
+                                        {
+                                            formatDateAsDDMMYYYYHHMMSS(food.expirationdate).split(
+                                                " "
+                                            )[0]
+                                        }
+                                    </p>
                                     {/* <p className="exp_date">
                                         <FontAwesomeIcon icon={faPhone} /> &nbsp;
                                         <a href={`tel: ${food.phoneNumber}`}>{food.phoneNumber}</a>
@@ -349,12 +422,8 @@ const AvailableFood = () => {
                                     >
                                         <FontAwesomeIcon icon={faMapLocationDot} /> Direction in map
                                     </p> */}
-                                 
-                                
                                 </div>
-                              </div>
-                          
-                          
+                            </div>
                         ))
                     ) : (
                         <div>
@@ -366,7 +435,6 @@ const AvailableFood = () => {
             </div>
             <Footer />
         </div>
-
     );
 };
 export default AvailableFood;

@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import googlePlayStore from "../assets/google-play.svg";
 import appleStore from "../assets/apple.svg";
 import { addData, fetchData } from "../utils/indexedDBUtils";
+import useOnlineStatus from "../services/useOnlineStatus";
 
 
 const Header = () => {
@@ -24,8 +25,9 @@ const Header = () => {
   const [itemCategory, setItemCategory] = useState('');
   const [displayAppLink, setDisplayAppLink] = useState(false);
   let location = useLocation();
-  const appDisplayContainer = useRef()
- 
+  const appDisplayContainer = useRef();
+  const isOnline = useOnlineStatus();
+
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
@@ -53,15 +55,20 @@ const Header = () => {
 
   async function fetchCategoryList() {
     try {
-      let response = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
-      console.log("fetchCategoryList", response.data);
-      setCategoryList(response.data.findAllCategories);
-      await addData({ id: api.INITIAL_FOOD_DROPDOWN_DATA.url, data: response.data.findAllCategories });
+      let data = (await fetchData(api.INITIAL_FOOD_DROPDOWN_DATA.url))?.data;
+      if (data) {  // if api data is locally stored, then fetch
+        console.log("fetch from indexed Db: ", data);
+        setCategoryList(data.findAllCategories);
+      }
+      else {  // if api data not present in local storage, then fetch
+        let response = await axiosInstance.get(api.INITIAL_FOOD_DROPDOWN_DATA.url);
+        console.log("fetchCategoryList", response.data);
+        setCategoryList(response.data.findAllCategories);
+        await addData({ id: api.INITIAL_FOOD_DROPDOWN_DATA.url, data: response.data });
+      }
     }
     catch (error) {
-      let indexedDBData = await fetchData(api.INITIAL_FOOD_DROPDOWN_DATA.url);
-      console.log("indexedDBData", indexedDBData);
-      setCategoryList(indexedDBData.data);
+      setCategoryList(data.findAllCategories);
       console.log("Error at fetchCategoryList", error);
     }
   }
@@ -101,15 +108,15 @@ const Header = () => {
   useEffect(() => {
     fetchCategoryList();
     // Request notification permission
-    if ('Notification' in window && navigator.serviceWorker) {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          console.log('Notification permission granted.');
-        } else {
-          console.log('Notification permission denied.');
-        }
-      });
-    }
+    // if ('Notification' in window && navigator.serviceWorker) {
+    //   Notification.requestPermission().then((permission) => {
+    //     if (permission === 'granted') {
+    //       console.log('Notification permission granted.');
+    //     } else {
+    //       console.log('Notification permission denied.');
+    //     }
+    //   });
+    // }
 
     // Cleanup interval on unmount
     return () => {
@@ -145,6 +152,11 @@ const Header = () => {
 
   return (
     <header className="header">
+      <div className="offline-header">
+        {
+          !isOnline && <p className="offline-text">You are in offline mode.</p>
+        }
+      </div>
       <div className="header__container">
         <div className="header__logo">
           <img className="app_logo" src={Logo} onClick={(e) => { user ? navigate('/') : navigate('/') }} />
